@@ -1,0 +1,23 @@
+# 系統檔案
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 編譯輸出
+dist/
+build/
+*.o
+*.exe
+*.dll
+
+# 日誌
+*.log
+
+# 臨時檔案
+tmp/
+temp/
