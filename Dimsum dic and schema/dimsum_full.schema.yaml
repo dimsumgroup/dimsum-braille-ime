@@ -1,0 +1,52 @@
+# Rime schema
+# encoding: utf-8
+
+schema:
+  schema_id: dimsum_full
+  name: "點心粵語點字 (一陽指模式)"
+  version: "1.1"
+  author:
+    - Dimsum group
+
+menu:
+  page_size: 9
+
+engine:
+  processors:
+    # 🔥 刪除了 chord_composer (並擊模組)，回歸傳統的一陽指敲擊
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - table_translator
+
+# 拼字器
+speller:
+  # 🔥 將 0-9 放回字母表，讓數字能被當作打字代碼 (這會關閉數字鍵選字功能)
+  alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_"
+  delimiter: " "
+  # 🔥 刪除了所有的暗號轉換 (1->A, g->G 等全數清空)，回歸直上直下的輸入
+  algebra: []
+
+# 快捷鍵綁定
+key_binder:
+  bindings:
+    # 🔥 刪除了 h (下一頁) 和 g (上一頁) 的綁定，把這兩個鍵還給打字使用
+    # (找字請統一使用方向鍵的「上」與「下」)
+    - { when: composing, accept: Return, send: commit_raw_input }
+    - { when: composing, accept: Control+Return, send: commit_raw_input }
+
+translator:
+  dictionary: dimsum_cb
+  prism: dimsum_full       # 讓一陽指版擁有獨立的編譯快取！
+  enable_user_dict: true
+  enable_sentence: true
+  enable_completion: false
