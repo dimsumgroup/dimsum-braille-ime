@@ -8,12 +8,6 @@
 
 ## 📥 快速開始
 
-### 下載安裝
-
-**最新版本**：v1.1.0
-
-**下載連結**：[Dimsum_Setup_v1.1.exe](https://github.com/dimsumgroup/dimsum-braille-ime/releases/download/v1.1.0/Dimsum_Setup_v1.1.exe)
-
 ### 安裝步驟
 
 1. 下載 `Dimsum_Setup_v1.1.exe` 檔案
@@ -97,12 +91,6 @@
 
 - **電子郵件**：dimsumgroup@outlook.com
 - **GitHub**：[@dimsumgroup](https://github.com/dimsumgroup)
-
----
-
-## 📄 授權條款
-
-點心粵語點字輸入法以 MIT 授權條款發布。詳見 [LICENSE](./LICENSE) 檔案。
 
 ---
 
