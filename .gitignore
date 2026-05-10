@@ -21,3 +21,10 @@ build/
 # 臨時檔案
 tmp/
 temp/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
