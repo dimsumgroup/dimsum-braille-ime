@@ -5,6 +5,10 @@ name: dimsum_cb
 version: "6.0"
 sort: by_weight
 ...
+
+#標點符號
+……	'''
+——	--
 #其他
 粵拼	('&0@	1000122
 叱咤樂壇	xrxkg]')^'	1000121
