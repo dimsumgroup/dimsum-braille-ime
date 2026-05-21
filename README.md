@@ -24,6 +24,7 @@ NVDA / JAWS 螢幕閱讀器支援
 ### 安裝步驟
 
 1. 下載安裝檔案
+https://github.com/dimsumgroup/dimsum-braille-ime/releases/latest
 2. 雙擊執行安裝程式
 3. 按照安裝精靈的指示完成安裝
 4. 安裝完成後，按下 **`Windows 鍵 + 空白鍵`** 切換輸入法
