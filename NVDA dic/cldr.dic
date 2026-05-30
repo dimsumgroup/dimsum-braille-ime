@@ -1,0 +1,3770 @@
+﻿symbols:
+🏻	白皮膚	some
+🏼	黃皮膚	some
+🏽	淺啡色皮膚	some
+🏾	啡色皮膚	some
+🏿	黑皮膚	some
+‾	overscore	some
+‐	hyphen	some
+–	en dash	some
+―	horizontal bar	some
+・	片假名間隔號	most
+،	阿拉伯文逗號	some
+、	頓號	some
+؛	阿拉伯文分號	some
+¡	inverted exclamation	some
+¿	inverted question mark	some
+؟	阿拉伯文問號	some
+‽	疑問感歎號	some
+.	dot	some
+…	省略號	some
+。	句號	some
+·	間隔號	some
+'	apostrophe	some
+‘	turned comma	some
+’	typeset apostrophe	some
+“	左雙引號	some
+”	右雙引號	some
+〈	左尖括弧	some
+〉	右尖括弧	some
+《	左雙尖括弧	some
+》	右雙尖括弧	some
+「	左角括弧	some
+」	右角括弧	some
+『	左中空角括弧	some
+』	右中空角括弧	some
+【	左黑色透鏡狀方括號	some
+】	右黑色透鏡狀方括號	some
+〔	左六角括弧	some
+〕	右六角括弧	some
+〖	左中空透鏡狀方括號	some
+〗	右中空透鏡狀方括號	some
+§	章節符號	some
+¶	段落標記	some
+‰	千分號	some
+†	劍號	some
+‡	雙劍號	some
+•	專案符號	some
+‧	連字號點	some
+′	角分符號	some
+″	角秒符號	some
+‴	三撇	some
+※	參考標記	some
+⁂	三星標記	some
+´	重音符號	some
+^	抑揚音符號	some
+¨	分音符號	some
+°	度	some
+℗	錄音版權	some
+←	向左箭嘴	some
+↚	左箭嘴刪除線	some
+→	向右箭嘴	some
+↛	右箭嘴刪除線	some
+↑	向上箭嘴	some
+↓	向下箭嘴	some
+↜	波浪左箭嘴	some
+↝	波浪右箭嘴	some
+↞	向左雙頭箭嘴	some
+↟	向上雙頭箭嘴	some
+↠	向右雙頭箭嘴	some
+↡	向下雙頭箭嘴	some
+↢	有尾巴的向左箭嘴	some
+↣	有尾巴的向右箭嘴	some
+↤	尾部帶槓的向左箭嘴	some
+↥	尾部帶槓的向上箭嘴	some
+↦	尾部帶槓的向右箭嘴	some
+↧	尾部帶槓的向下箭嘴	some
+↨	處於基線的上下箭嘴	some
+↫	尾部帶環的向左箭嘴	some
+↬	尾部帶環的向右箭嘴	some
+↭	左右波浪箭嘴	some
+↯	向下鋸齒形箭嘴	some
+↰	頭朝左的向上箭嘴	some
+↱	頭朝右的向上箭嘴	some
+↲	頭朝左的向下箭嘴	some
+↳	頭朝右的向下箭嘴	some
+↴	角朝下的向右箭嘴	some
+↵	角朝左的向下箭嘴	some
+↶	逆時針上半圓箭嘴	some
+↷	順時針上半圓箭嘴	some
+↸	指向長槓的西北箭嘴	some
+↹	頭帶槓的向左箭嘴在頭帶槓的向右箭嘴上面	some
+↺	逆時針開口循環箭嘴	some
+↻	順時針開口循環箭嘴	some
+↼	倒鉤在上面的向左魚叉	some
+↽	倒鉤在下麵的向左魚叉	some
+↾	倒鉤在右邊的向上魚叉	some
+↿	倒鉤在左邊的向上魚叉	some
+⇀	倒鉤在上面的向右魚叉	some
+⇁	倒鉤在下麵的向右魚叉	some
+⇂	倒鉤在右邊的向下魚叉	some
+⇃	倒鉤在左邊的向下魚叉	some
+⇄	向右箭嘴在向左箭嘴的上面	some
+⇅	上下並列箭嘴	some
+⇆	向左箭嘴在向右箭嘴上邊	some
+⇇	一對向左箭嘴	some
+⇈	一對向上箭嘴	some
+⇉	一對向右箭嘴	some
+⇊	一對向下箭嘴	some
+⇋	向左魚叉在向右魚叉的上面	some
+⇌	向右魚叉在向左魚叉的上面	some
+⇐	向左雙箭嘴	some
+∆	增量	some
+∇	向量微分	some
+∈	是...的元素	some
+±	加減	some
+÷	除號	some
+×	乘號	some
+≠	不等於	some
+¬	否定	some
+−	減法符號	some
+⁻	上標減號	some
+√	平方根	some
+∞	無窮大符號	some
+∩	交集	some
+∪	並集	some
+≈	約等於	some
+≡	等同於	some
+≤	小於等於	some
+≥	大於等於	some
+⊂	是...的子集	some
+▲	實心向上三角	some
+▼	實心向下三角	some
+◊	菱形	some
+○	空心圓	some
+●	實心圓	some
+◯	大空心圓	some
+♪	八分音符	some
+♭	降音符	some
+♯	升號	some
+🥹	強忍淚水的臉	none
+🧌	巨魔	none
+🩻	X光	none
+🩼	拐杖	none
+🪩	鏡面球	none
+🪪	識別證	none
+🪫	電量不足	none
+🪬	法蒂瑪之手	none
+🪷	蓮花	none
+🪸	珊瑚	none
+🪹	空巢	none
+🪺	有蛋的巢	none
+😀	嘿嘿	some
+😃	開眼嘅笑臉	some
+😄	含笑同笑嘻嘻嘅表情	some
+😁	含笑嘅眼睛同笑嘻嘻嘅表情	some
+😆	斜眼笑	some
+😅	冒汗同笑嘻嘻嘅表情	some
+🤣	笑到轆地	some
+😂	喜極而泣嘅表情	some
+🙂	稍為微笑嘅表情	some
+🙃	倒臉	some
+😉	眨眼笑嘅表情	some
+😊	瞇眼微笑嘅表情	some
+😇	頭上有個圈嘅笑面	some
+🥰	三個心心嘅笑臉	some
+😍	心心眼嘅表情	some
+🤩	星星眼	some
+😘	飛吻嘅表情	some
+😗	送吻嘅表情	some
+☺	笑面	some
+😚	合埋眼親吻嘅表情	some
+😙	笑眼送吻嘅表情	some
+🥲	含淚的笑臉	some
+😋	舔舌頭嘅表情	some
+😛	吐舌	some
+😜	單眼吐舌	some
+🤪	鬥雞眼咧嘴笑伸脷嘅鬼臉	some
+😝	眯眼吐舌	some
+🤑	發財	some
+🤗	開心擁抱嘅表情	some
+🙂‍↔	左右搖頭	some
+🙂‍↕	上下點頭	some
+🤭	手遮住嘴	some
+🤫	安靜的臉	some
+🤔	思考中嘅表情	some
+🤐	拉鍊嘴嘅表情	some
+🤨	單邊戚眉嘅表情	some
+😐	無話好說	some
+😑	無語	some
+😶	無言嘅表情	some
+😶‍🌫	迷茫	some
+🫨	挑眉睜眼張嘴大力搖頭	some
+😏	得意	some
+😒	不高興	some
+🙄	反白眼嘅表情	some
+😬	依起棚牙	some
+😮‍💨	呼氣	some
+🤥	說謊	some
+😌	松了口氣	some
+😔	沉思	some
+😪	困	some
+🤤	流口水	some
+😴	睡著了	some
+😷	戴著口罩	some
+🤒	發燒	some
+🤕	受傷	some
+🤢	想嘔	some
+🤮	嘔吐	some
+🤧	打乞嚏	some
+🥵	熱嘅樣	some
+🥶	凍嘅樣	some
+🥴	頭昏眼花	some
+😵	暈頭轉向	some
+😵‍💫	暈	some
+🤯	頭都爆	some
+🤠	牛仔樣	some
+🥳	聚會笑臉	some
+🥸	偽裝的臉	some
+😎	戴太陽眼鏡嘅笑面	some
+🤓	書呆子	some
+🧐	戴單片眼鏡	some
+😕	困擾	some
+😟	擔心	some
+🙁	微微不滿	some
+☹	不滿	some
+😮	擘大口嘅表情	some
+😯	驚訝嘅表情	some
+😲	震驚	some
+😳	臉紅	some
+🥺	懇求嘅樣	some
+😦	皺眉張嘴	some
+😧	苦埋口面	some
+😨	驚恐	some
+😰	冷汗	some
+😥	失望滴汗嘅表情	some
+😢	喊緊	some
+😭	放聲大哭	some
+😱	嚇死了	some
+😖	困惑	some
+😣	疲倦嘅表情	some
+😞	失望	some
+😓	汗	some
+😩	面露疲憊	some
+😫	累	some
+🥱	打喊露嘅樣	some
+😤	傲慢	some
+😡	怒火中燒	some
+😠	憤怒	some
+🤬	嘴巴上有符號嘅表情	some
+😈	惡魔微笑	some
+👿	生氣的惡魔	some
+💀	頭骨	some
+☠	骷髏頭同交叉嘅骨	some
+💩	屎	some
+🤡	小丑臉	some
+👹	食人魔	some
+👺	小妖精	some
+👻	鬼	some
+👽	外星人	some
+👾	外星怪物	some
+🤖	機械人	some
+😺	開心貓樣	some
+😸	露齒而笑嘅貓樣	some
+😹	笑出眼淚的貓	some
+😻	花癡的貓	some
+😼	奸笑的貓	some
+😽	送吻嘅貓樣	some
+🙀	疲倦的貓	some
+😿	喊緊嘅貓樣	some
+😾	生氣的貓	some
+🙈	非禮勿視馬騮	some
+🙉	非禮勿聽馬騮	some
+🙊	非禮勿言馬騮	some
+💋	唇印	some
+💌	情信	some
+💘	一箭穿心	some
+💝	系有緞帶的心	some
+💖	閃亮的心	some
+💗	搏動的心	some
+💓	心跳	some
+💞	循環心心	some
+💕	兩顆心	some
+💟	心形裝飾	some
+❣	心形嘆號	some
+💔	心碎	some
+❤‍🔥	火熱的心	some
+❤‍🩹	修復受傷的心靈	some
+❤	紅心	some
+🧡	橙心	some
+💛	黃心	some
+💚	綠心	some
+💙	藍心	some
+💜	紫心	some
+🤎	啡心	some
+🖤	黑心	some
+🤍	白心	some
+🩷	粉紅心	some
+🩵	粉藍心	some
+🩶	灰色心	some
+💯	100 分	some
+💢	憤怒	some
+💥	爆炸	some
+💫	頭暈星星	some
+💦	汗滴	some
+💨	強風	some
+🕳	洞	some
+💣	炸彈	some
+💬	話語氣泡	some
+👁‍🗨	眼睛對話方塊	some
+🗨	朝左的話語氣泡	some
+🗯	憤怒話語氣泡	some
+💭	內心活動氣泡	some
+💤	Z Z Z	some
+👋	揮手	some
+🤚	立起的手背	some
+🖐	手掌	some
+✋	舉起手	some
+🖖	瓦肯舉手禮	some
+👌	OK	some
+🤌	捏手指	some
+🤏	一啲啲	some
+✌	V字手勢	some
+🤞	交叉的手指	some
+🤟	我愛你手勢	some
+🤘	搖滾手勢	some
+🤙	call 我	some
+👈	反手食指向左指	some
+👉	反手食指向右指	some
+👆	反手食指向上指	some
+🖕	豎中指	some
+👇	反手食指向下指	some
+☝	食指向上指	some
+👍	拇指向上	some
+👎	拇指向下	some
+✊	舉起拳頭	some
+👊	出拳	some
+🤛	拳頭向左	some
+🤜	拳頭向右	some
+👏	拍手	some
+🙌	舉雙手歡呼	some
+👐	張開雙手	some
+🤲	雙手掌心向上	some
+🤝	握手	some
+🙏	雙手合十	some
+✍	寫字	some
+💅	塗指甲油	some
+🤳	自拍	some
+💪	強壯的二頭肌	some
+🦾	機械手臂	some
+🦿	機械腿	some
+🦵	腿	some
+🦶	腳	some
+👂	耳朵	some
+🦻	戴助聽器的耳朵	some
+👃	鼻	some
+🧠	腦袋	some
+🫀	心臟	some
+🫁	肺部	some
+🦷	牙齒	some
+🦴	骨頭	some
+👀	雙眼	some
+👁	眼睛	some
+👅	舌頭	some
+👄	嘴	some
+👶	嬰兒	some
+🧒	兒童	some
+👦	男孩	some
+👧	女孩	some
+🧑	成人	some
+👱	金髮嘅人	some
+👨	男人	some
+🧔	留鬚嘅人	some
+🧔‍♂	有絡腮鬍子的男人	some
+👱‍♂	金髮男人	some
+👩	女人	some
+🧔‍♀	有絡腮鬍子的女人	some
+👱‍♀	金髮女人	some
+🧓	老人家	some
+👴	老伯	some
+👵	老婆婆	some
+🙍	皺眉嘅人	some
+🙍‍♂	男子皺眉	some
+🙍‍♀	女子皺眉	some
+🙎	撅嘴嘅人	some
+🙎‍♂	男子噘嘴	some
+🙎‍♀	女子噘嘴	some
+🙅	用手臂做出交叉手勢嘅人	some
+🙅‍♂	用手臂做出交叉手勢嘅男人	some
+🙅‍♀	用手臂做出交叉手勢嘅女人	some
+🙆	用手勢表示 OK 嘅人	some
+🙆‍♂	用手勢表示 OK 嘅男人	some
+🙆‍♀	用手勢表示 OK 嘅女人	some
+💁	攤開手嘅人	some
+💁‍♂	男子抬手	some
+💁‍♀	攤開手嘅女人	some
+🙋	舉起一隻手	some
+🙋‍♂	開心嘅男人舉起一隻手	some
+🙋‍♀	開心嘅女人舉起一隻手	some
+🧏	聽障人士	some
+🧏‍♂	聽障男人	some
+🧏‍♀	聽障女人	some
+🙇	鞠躬	some
+🙇‍♂	鞠躬嘅男人	some
+🙇‍♀	鞠躬嘅女人	some
+🤦	遮住塊面	some
+🤦‍♂	遮住面嘅男人	some
+🤦‍♀	遮住面嘅女人	some
+🤷	聳肩嘅人	some
+🤷‍♂	聳肩嘅男人	some
+🤷‍♀	聳肩嘅女人	some
+🧑‍⚕	醫護人員	some
+👨‍⚕	男醫護人員	some
+👩‍⚕	女醫護人員	some
+🧑‍🎓	學生	some
+👨‍🎓	男學生	some
+👩‍🎓	女學生	some
+🧑‍🏫	老師	some
+👨‍🏫	男老師	some
+👩‍🏫	女老師	some
+🧑‍⚖	法官	some
+👨‍⚖	男法官	some
+👩‍⚖	女法官	some
+🧑‍🌾	農民	some
+👨‍🌾	男農夫	some
+👩‍🌾	女農夫	some
+🧑‍🍳	廚師	some
+👨‍🍳	男廚師	some
+👩‍🍳	女廚師	some
+🧑‍🔧	技工	some
+👨‍🔧	男技工	some
+👩‍🔧	女技工	some
+🧑‍🏭	工人	some
+👨‍🏭	男工廠工人	some
+👩‍🏭	女工廠工人	some
+🧑‍💼	白領	some
+👨‍💼	男職員	some
+👩‍💼	女職員	some
+🧑‍🔬	科學家	some
+👨‍🔬	男科學家	some
+👩‍🔬	女科學家	some
+🧑‍💻	程式師	some
+👨‍💻	男技術人員	some
+👩‍💻	女技術人員	some
+🧑‍🎤	歌手	some
+👨‍🎤	男歌手	some
+👩‍🎤	女歌手	some
+🧑‍🎨	藝術家	some
+👨‍🎨	男畫家	some
+👩‍🎨	女畫家	some
+🧑‍✈	飛行員	some
+👨‍✈	男機師	some
+👩‍✈	女機師	some
+🧑‍🚀	宇航員	some
+👨‍🚀	男宇航員	some
+👩‍🚀	女宇航員	some
+🧑‍🚒	消防員	some
+👨‍🚒	男消防員	some
+👩‍🚒	女消防員	some
+👮	警察	some
+👮‍♂	男警察	some
+👮‍♀	女警察	some
+🕵	偵探	some
+🕵‍♂	男偵探	some
+🕵‍♀	女偵探	some
+💂	守衛	some
+💂‍♂	男守衛	some
+💂‍♀	女守衛	some
+🥷	忍者	some
+👷	建築工人	some
+👷‍♂	男建築工人	some
+👷‍♀	女建築工人	some
+🤴	王子	some
+👸	公主	some
+👳	戴頭巾嘅人	some
+👳‍♂	戴頭巾嘅男人	some
+👳‍♀	戴頭巾嘅女人	some
+👲	戴中式帽嘅男人	some
+🧕	包頭巾嘅女人	some
+🤵	著禮服嘅男人	some
+🤵‍♂	穿禮服的男人	some
+🤵‍♀	穿燕尾服的女人	some
+👰	戴頭紗的人	some
+👰‍♂	戴頭紗的男人	some
+👰‍♀	披著頭紗的女人	some
+🤰	大肚的女人	some
+🫃	大肚的男人	some
+🫄	大肚子的人	some
+🫅	戴皇冠的人	some
+🫗	倒出液體	some
+🫘	幾粒豆	some
+🫙	空罐	some
+🫠	融化的臉	some
+🫡	敬禮的臉	some
+🫢	睜眼掩嘴的臉	some
+🫣	偷看的臉	some
+🫤	歪嘴的臉	some
+🫥	虛線的臉	some
+🫦	咬脣	some
+🫧	泡泡	some
+🫰	食指和拇指交叉的手	some
+🫱	向右的手	some
+🫲	向左的手	some
+🫳	掌心朝下	some
+🫴	手掌向上	some
+🫵	食指指向觀眾	some
+🫶	雙手做心形手勢	some
+🫶🏻	雙手做心形手勢 白皮膚	some
+🫶🏼	雙手做心形手勢 黃皮膚	some
+🫶🏽	雙手做心形手勢 淺啡色皮膚	some
+🫶🏾	雙手做心形手勢 啡色皮膚	some
+🫶🏿	雙手做心形手勢 黑皮膚	some
+🛝	瀡滑梯	some
+🛞	車呔	some
+🛟	救生圈	some
+🟰	粗體等號	some
+🤱	母乳餵哺	some
+👩‍🍼	餵奶的媽媽	some
+👨‍🍼	哺乳的男人	some
+🧑‍🍼	正在餵奶的人	some
+👼	天使嬰兒	some
+🎅	聖誕老人	some
+🤶	聖誕婆婆	some
+🧑‍🎄	聖誕人	some
+🦸	超人	some
+🦸‍♂	男超人	some
+🦸‍♀	女超級英雄	some
+🦹	超級大壞蛋	some
+🦹‍♂	男超級大壞蛋	some
+🦹‍♀	女超級大壞蛋	some
+🧙	巫師	some
+🧙‍♂	男巫師	some
+🧙‍♀	女法師	some
+🧚	仙子	some
+🧚‍♂	男仙子	some
+🧚‍♀	女仙子	some
+🧛	吸血鬼	some
+🧛‍♂	男吸血鬼	some
+🧛‍♀	女吸血鬼	some
+🧜	人魚	some
+🧜‍♂	男人魚	some
+🧜‍♀	美人魚	some
+🧝	精靈	some
+🧝‍♂	男小精靈	some
+🧝‍♀	女小精靈	some
+🧞	燈神	some
+🧞‍♂	男燈神	some
+🧞‍♀	女燈神	some
+🧟	喪屍	some
+🧟‍♂	男喪屍	some
+🧟‍♀	女喪屍	some
+💆	接受頭部按摩嘅人	some
+💆‍♂	接受頭部按摩嘅男人	some
+💆‍♀	接受頭部按摩嘅女人	some
+💇	剪頭髮	some
+💇‍♂	剪緊頭髮嘅男人	some
+💇‍♀	剪緊頭髮嘅女人	some
+🚶	行人	some
+🚶‍♂	行路嘅男人	some
+🚶‍♀	行路嘅女人	some
+🧍	企係度嘅人	some
+🧍‍♂	企係度嘅男人	some
+🧍‍♀	企係度嘅女人	some
+🧎	跪係度嘅人	some
+🧎‍♂	跪係度嘅男人	some
+🧎‍♀	跪係度嘅女人	some
+🧑‍🦯	拎白杖嘅人	some
+👨‍🦯	拎白杖嘅男人	some
+👩‍🦯	拎白杖嘅女人	some
+🧑‍🦼	坐電動輪椅的人	some
+👨‍🦼	坐電動輪椅嘅男人	some
+👩‍🦼	坐電動輪椅嘅女人	some
+🧑‍🦽	坐手動輪椅的人	some
+👨‍🦽	坐手動輪椅嘅男人	some
+👩‍🦽	坐手動輪椅嘅女人	some
+🏃	跑步嘅人	some
+🏃‍♂	男跑手	some
+🏃‍♀	女跑手	some
+💃	跳舞嘅女人	some
+🕺	跳舞嘅男人	some
+🕴	著住西裝飄浮嘅男人	some
+👯	戴兔耳朵的人	some
+👯‍♂	戴兔耳仔嘅男人	some
+👯‍♀	戴兔耳仔嘅女人	some
+🧖	焗桑拿嘅人	some
+🧖‍♂	焗桑拿嘅男人	some
+🧖‍♀	焗桑拿嘅女人	some
+🧗	攀岩嘅人	some
+🧗‍♂	攀岩嘅男人	some
+🧗‍♀	攀岩嘅女人	some
+🤺	劍擊運動員	some
+🏇	騎馬	some
+⛷	玩雙板滑雪的人	some
+🏂	玩單板滑雪的人	some
+🏌	打高爾夫球	some
+🏌‍♂	打高爾夫球嘅男人	some
+🏌‍♀	打高爾夫球嘅女人	some
+🏄	滑浪	some
+🏄‍♂	滑浪嘅男人	some
+🏄‍♀	滑浪嘅女人	some
+🚣	撐艇	some
+🚣‍♂	撐艇嘅男人	some
+🚣‍♀	撐艇嘅女人	some
+🏊	游水	some
+🏊‍♂	男泳手	some
+🏊‍♀	女泳手	some
+⛹	打緊波嘅人	some
+⛹‍♂	打緊波嘅男人	some
+⛹‍♀	打緊波嘅女人	some
+🏋	舉重	some
+🏋‍♂	男舉重員	some
+🏋‍♀	女舉重員	some
+🚴	踩單車	some
+🚴‍♂	男單車手	some
+🚴‍♀	女單車手	some
+🚵	踩爬山單車	some
+🚵‍♂	踩爬山單車嘅男人	some
+🚵‍♀	踩爬山單車嘅女人	some
+🤸	側手翻	some
+🤸‍♂	打側手翻嘅男人	some
+🤸‍♀	打側手翻嘅女人	some
+🤼	摔角選手	some
+🤼‍♂	男摔角選手	some
+🤼‍♀	女摔角選手	some
+🤽	水球	some
+🤽‍♂	打水球嘅男人	some
+🤽‍♀	打水球嘅女人	some
+🤾	手球	some
+🤾‍♂	打手球嘅男人	some
+🤾‍♀	打手球嘅女人	some
+🤹	耍雜技	some
+🤹‍♂	耍雜技嘅男人	some
+🤹‍♀	耍雜技嘅女人	some
+🧘	盤腿坐嘅人	some
+🧘‍♂	盤腿坐嘅男人	some
+🧘‍♀	盤腿坐嘅女人	some
+🛀	浸浴嘅人	some
+🛀‍♀	浸浴嘅女人	some
+🛀‍♂	浸浴嘅男人	some
+🛌	瞓覺	some
+🧑‍🤝‍🧑	拖手的人	some
+👭	兩個女人拖住手	some
+👫	一男一女拖住手	some
+👬	兩個男人拖住手	some
+💏	錫緊嘅一男一女	some
+💑	情侶之間有個愛心	some
+👪	家庭	some
+🗣	講緊嘢嘅人頭剪影	some
+👤	人形剪影	some
+👥	雙人剪影	some
+🫂	擁抱的人	some
+👣	腳印	some
+🦰	紅色頭髮	some
+🦱	曲髮	some
+🦳	白頭髮	some
+🦲	禿頂	some
+🐵	馬騮面	some
+🐒	馬騮	some
+🦍	大猩猩	some
+🦧	紅毛猩猩	some
+🐶	狗樣	some
+🐕	狗	some
+🦮	導盲犬	some
+🐕‍🦺	服務犬	some
+🐩	貴婦狗	some
+🐺	狼	some
+🦊	狐狸樣	some
+🦝	浣熊	some
+🐱	貓樣	some
+🐈	貓	some
+🐈‍⬛	黑貓	some
+🦁	獅子樣	some
+🐯	老虎樣	some
+🐅	老虎	some
+🐆	豹	some
+🐴	馬頭	some
+🐎	馬	some
+🦄	獨角獸	some
+🦓	斑馬	some
+🦌	鹿	some
+🦬	大野牛	some
+🐮	牛樣	some
+🐂	牛	some
+🐃	水牛	some
+🐄	乳牛	some
+🐷	豬樣	some
+🐖	豬	some
+🐗	野豬	some
+🐽	豬鼻	some
+🐏	雄性綿羊	some
+🐑	雌性綿羊	some
+🐐	山羊	some
+🐪	駱駝	some
+🐫	雙峰駱駝	some
+🦙	草泥馬	some
+🦒	長頸鹿	some
+🐘	大象	some
+🦣	猛獁	some
+🦏	犀牛	some
+🦛	河馬	some
+🐭	老鼠樣	some
+🐁	老鼠	some
+🐀	耗子	some
+🐹	倉鼠樣	some
+🐰	兔仔樣	some
+🐇	兔子	some
+🐿	松鼠	some
+🦫	海狸	some
+🦔	刺蝟	some
+🦇	蝙蝠	some
+🐻	熊仔樣	some
+🐻‍❄	北極熊	some
+🐨	樹熊	some
+🐼	大熊貓樣	some
+🦥	樹懶	some
+🦦	水獺	some
+🦨	臭鼬	some
+🦘	袋鼠	some
+🦡	獾	some
+🐾	爪印	some
+🦃	火雞	some
+🐔	雞	some
+🐓	公雞	some
+🐣	孵化雞仔	some
+🐤	小雞樣	some
+🐥	正面朝向的小雞	some
+🐦	雀仔	some
+🐧	企鵝	some
+🕊	白鴿	some
+🦅	鷹	some
+🦆	鴨子	some
+🦢	天鵝	some
+🦉	貓頭鷹	some
+🦤	渡渡鳥	some
+🪶	羽毛	some
+🦩	火烈鳥	some
+🦚	孔雀	some
+🦜	鸚鵡	some
+🫎	麋鹿	some
+🫏	驢子或騾子	some
+🪽	翅膀	some
+🐦‍⬛	黑鳥	some
+🐦‍🔥	鳳凰	some
+🪿	鵝	some
+🪼	水母	some
+🐸	青蛙樣	some
+🐊	鱷魚	some
+🐢	龜	some
+🦎	蜥蜴	some
+🐍	蛇	some
+🐲	龍樣	some
+🐉	龍	some
+🦕	蜥腳類恐龍	some
+🦖	暴龍	some
+🐳	噴水的鯨	some
+🐋	座頭鯨	some
+🐬	海豚	some
+🦭	海豹	some
+🐟	魚	some
+🐠	熱帶魚	some
+🐡	河豚	some
+🦈	鯊魚	some
+🐙	章魚	some
+🐚	貝殼	some
+🐌	蝸牛	some
+🦋	蝴蝶	some
+🐛	毛蟲	some
+🐜	螞蟻	some
+🐝	蜜蜂	some
+🪲	甲蟲	some
+🐞	瓢蟲	some
+🦗	蟋蟀	some
+🪳	蟑螂	some
+🕷	蜘蛛	some
+🕸	蜘蛛網	some
+🦂	蠍子	some
+🦟	蚊子	some
+🪰	蒼蠅	some
+🪱	蠕蟲	some
+🦠	細菌	some
+💐	花束	some
+🌸	櫻花	some
+💮	白花	some
+🏵	玫瑰花飾	some
+🌹	玫瑰	some
+🥀	枯萎嘅玫瑰	some
+🌺	扶桑花	some
+🌻	向日葵	some
+🌼	花朵	some
+🌷	鬱金香	some
+🪻	風信子	some
+🌱	幼苗	some
+🪴	盆栽植物	some
+🌲	常綠樹	some
+🌳	落葉樹	some
+🌴	棕櫚樹	some
+🌵	仙人掌	some
+🌾	稻穗	some
+🌿	草本植物	some
+☘	三葉草	some
+🍀	四葉草	some
+🍁	楓葉	some
+🍂	落葉	some
+🍃	隨風飄落嘅樹葉	some
+🍇	葡萄	some
+🍈	蜜瓜	some
+🍉	西瓜	some
+🍊	橙	some
+🍋	檸檬	some
+🍌	香蕉	some
+🍍	菠蘿	some
+🥭	芒果	some
+🍎	紅蘋果	some
+🍏	青蘋果	some
+🍐	啤梨	some
+🍑	桃	some
+🍒	車厘子	some
+🍓	士多啤梨	some
+🫐	藍莓	some
+🥝	獼猴桃	some
+🍅	番茄	some
+🫒	橄欖	some
+🥥	椰子	some
+🥑	牛油果	some
+🍆	茄子	some
+🥔	薯仔	some
+🥕	紅蘿蔔	some
+🌽	粟米	some
+🌶	紅辣椒	some
+🫑	燈籠椒	some
+🥒	青瓜	some
+🥬	綠色蔬菜	some
+🥦	西蘭花	some
+🧄	蒜頭	some
+🧅	洋蔥	some
+🍄	蘑菇	some
+🥜	花生	some
+🌰	栗子	some
+🫚	薑	some
+🫛	豌豆莢	some
+🍄‍🟫	棕色蕈菇	some
+🫜	根莖類蔬菜	some
+🍞	麵包	some
+🥐	牛角包	some
+🥖	法棍包	some
+🫓	扁麵包	some
+🥨	蝴蝶圈	some
+🥯	麵包圈	some
+🥞	班戟	some
+🧇	窩夫	some
+🧀	芝士	some
+🍖	肉骨	some
+🍗	雞髀	some
+🥩	肉塊	some
+🥓	煙肉	some
+🍔	漢堡包	some
+🍟	薯條	some
+🍕	薄餅	some
+🌭	熱狗	some
+🥪	三文治	some
+🌮	墨西哥夾餅	some
+🌯	墨西哥捲餅	some
+🫔	墨西哥粽子	some
+🥙	有餡三文治	some
+🧆	炸豆餅	some
+🥚	蛋	some
+🍳	煮飯	some
+🥘	一鍋食物	some
+🍲	打邊爐	some
+🫕	芝士火鍋	some
+🥣	匙羮同碗	some
+🥗	生菜沙律	some
+🍿	爆穀	some
+🧈	牛油	some
+🧂	鹽	some
+🥫	罐頭食品	some
+🍱	飯盒	some
+🍘	米餅	some
+🍙	飯團	some
+🍚	白飯	some
+🍛	咖喱飯	some
+🍜	熱氣騰騰嘅碗	some
+🍝	義大利粉	some
+🍠	煨蕃薯	some
+🍢	關東煮	some
+🍣	壽司	some
+🍤	炸蝦	some
+🍥	鳴門卷	some
+🥮	月餅	some
+🍡	和菓子	some
+🥟	餃子	some
+🥠	幸運曲奇	some
+🥡	外賣盒	some
+🦀	蟹	some
+🦞	龍蝦	some
+🦐	蝦	some
+🦑	烏賊	some
+🦪	蠔	some
+🍦	軟雪糕	some
+🍧	刨冰	some
+🍨	雪糕	some
+🍩	冬甩	some
+🍪	曲奇	some
+🎂	生日蛋糕	some
+🍰	水果蛋糕	some
+🧁	紙杯蛋糕	some
+🥧	批	some
+🍫	朱古力	some
+🍬	糖	some
+🍭	波板糖	some
+🍮	奶黃	some
+🍯	蜂蜜壺	some
+🍼	奶樽	some
+🥛	一杯奶	some
+☕	熱咖啡	some
+🫖	茶壺	some
+🍵	冇耳嘅茶杯	some
+🍶	清酒	some
+🍾	開緊蓋嘅樽	some
+🍷	紅酒	some
+🍸	雞尾酒杯	some
+🍹	熱帶飲品	some
+🍺	啤酒	some
+🍻	乾杯	some
+🥂	舉杯慶祝	some
+🥃	玻璃杯	some
+🥤	有飲管嘅杯	some
+🧋	珍珠奶茶	some
+🧃	紙包裝	some
+🧉	馬黛茶	some
+🧊	冰粒	some
+🥢	筷子	some
+🍽	刀叉同碟	some
+🍴	刀叉	some
+🥄	匙羹	some
+🔪	刀	some
+🏺	雙耳瓶	some
+🌍	顯示歐洲同非洲嘅地球	some
+🌎	顯示美洲嘅地球	some
+🌏	顯示亞洲和澳洲的地球	some
+🌐	帶有經緯嘅地球	some
+🗺	世界地圖	some
+🗾	日本地圖	some
+🧭	指南針	some
+🏔	雪山	some
+⛰	山	some
+🌋	火山	some
+🗻	富士山	some
+🏕	露營	some
+🏖	沙灘傘	some
+🏜	沙漠	some
+🏝	荒島	some
+🏞	國家公園	some
+🏟	體育館	some
+🏛	古典建築	some
+🏗	建築地盤	some
+🧱	磚頭	some
+🪨	岩石	some
+🪵	木頭	some
+🛖	小屋	some
+🏘	屋	some
+🏚	荒廢嘅屋	some
+🏠	房子	some
+🏡	有花園嘅屋	some
+🏢	辦公樓	some
+🏣	日本郵局	some
+🏤	郵局	some
+🏥	醫院	some
+🏦	銀行	some
+🏨	酒店	some
+🏩	愛情賓館	some
+🏪	便利店	some
+🏫	學校	some
+🏬	商場	some
+🏭	工廠	some
+🏯	日本城堡	some
+🏰	歐洲城堡	some
+💒	婚禮	some
+🗼	東京鐵塔	some
+🗽	自由女神像	some
+⛪	教堂	some
+🕌	清真寺	some
+🛕	印度寺廟	some
+🕍	猶太教會	some
+⛩	神社	some
+🕋	麥加卡巴天房	some
+⛲	噴泉	some
+⛺	帳篷	some
+🌁	有霧	some
+🌃	夜晚	some
+🏙	城市景觀	some
+🌄	山頭嘅日出	some
+🌅	日出	some
+🌆	城市黃昏	some
+🌇	日落	some
+🌉	夜晚嘅橋	some
+♨	溫泉	some
+🎠	旋轉木馬	some
+🎡	摩天輪	some
+🎢	過山車	some
+💈	髮型屋招牌	some
+🎪	馬戲團帳篷	some
+🚂	蒸汽火車	some
+🚃	鐵路車輛	some
+🚄	高速列車	some
+🚅	子彈火車	some
+🚆	火車	some
+🚇	地鐵	some
+🚈	輕軌列車	some
+🚉	車站	some
+🚊	電車	some
+🚝	單軌電車	some
+🚞	上山鐵路	some
+🚋	有軌電車	some
+🚌	巴士	some
+🚍	接近中嘅巴士	some
+🚎	電動車	some
+🚐	小巴	some
+🚑	救護車	some
+🚒	消防車	some
+🚓	警車	some
+🚔	迎面駛來的警車	some
+🚕	的士	some
+🚖	接近中的計程車	some
+🚗	車	some
+🚘	汽車	some
+🚙	吉普車	some
+🛻	敞蓬小型載貨卡車	some
+🚚	貨車	some
+🚛	貨櫃車	some
+🚜	拖拉機	some
+🏎	賽車	some
+🏍	電單車	some
+🛵	綿羊仔	some
+🦽	手動輪椅	some
+🦼	電動輪椅	some
+🛺	篤篤車	some
+🚲	單車	some
+🛴	滑板車	some
+🛹	滑板	some
+🛼	四輪滑冰鞋	some
+🚏	巴士站	some
+🛣	高速公路	some
+🛤	鐵軌	some
+🛢	石油桶	some
+⛽	油站	some
+🚨	警車燈	some
+🚥	橫向的紅綠燈	some
+🚦	縱向的紅綠燈	some
+🛑	停止標誌	some
+🚧	路障	some
+⚓	錨	some
+⛵	帆船	some
+🛶	獨木舟	some
+🚤	快艇	some
+🛳	客輪	some
+⛴	渡輪	some
+🛥	摩托艇	some
+🚢	船	some
+✈	飛機	some
+🛩	小型飛機	some
+🛫	起飛緊嘅飛機	some
+🛬	降落緊嘅飛機	some
+🪂	降落傘	some
+💺	座位	some
+🚁	直升機	some
+🚟	懸浮列車	some
+🚠	纜車	some
+🚡	吊車	some
+🛰	衛星	some
+🚀	火箭	some
+🛸	飛碟	some
+🛎	叮叮鐘	some
+🧳	行李箱	some
+⌛	沙漏	some
+⏳	流緊沙嘅沙漏	some
+⌚	手錶	some
+⏰	鬧鐘	some
+⏱	秒錶	some
+⏲	計時器	some
+🕰	壁爐鐘	some
+🕛	十二點	some
+🕧	十二點半	some
+🕐	一點	some
+🕜	一點半	some
+🕑	兩點	some
+🕝	兩點半	some
+🕒	三點	some
+🕞	三點半	some
+🕓	四點	some
+🕟	四點半	some
+🕔	五點	some
+🕠	五點半	some
+🕕	六點	some
+🕡	六點半	some
+🕖	七點	some
+🕢	七點半	some
+🕗	八點	some
+🕣	八點半	some
+🕘	九點	some
+🕤	九點半	some
+🕙	十點	some
+🕥	十點半	some
+🕚	十一點	some
+🕦	十一點半	some
+🌑	朔月	some
+🌒	娥眉月	some
+🌓	上弦月	some
+🌔	盈凸月	some
+🌕	滿月	some
+🌖	虧凸月	some
+🌗	下弦月	some
+🌘	殘月	some
+🌙	彎月	some
+🌚	新月嘅面孔	some
+🌛	上弦月嘅面孔	some
+🌜	下弦月嘅面孔	some
+🌡	溫度計	some
+☀	太陽	some
+🌝	滿月嘅面孔	some
+🌞	太陽笑面	some
+🪐	有行星環的行星	some
+⭐	星星	some
+🌟	閃亮嘅星星	some
+🌠	流星	some
+🌌	銀河	some
+☁	雲	some
+⛅	陰	some
+⛈	有雷雨嘅雲	some
+🌤	太陽喺一嚿細雲後面	some
+🌥	太陽喺一大片雲後面	some
+🌦	太陽喺雨雲後面	some
+🌧	雨雲	some
+🌨	落雪嘅雲	some
+🌩	打雷	some
+🌪	龍捲風	some
+🌫	霧	some
+🌬	風吹臉	some
+🌀	颱風	some
+🌈	彩虹	some
+🌂	收起嘅遮	some
+☂	遮	some
+☔	落雨	some
+⛱	沙灘遮	some
+⚡	高壓	some
+❄	雪花	some
+☃	雪中的雪人	some
+⛄	雪人	some
+☄	彗星	some
+🔥	火焰	some
+💧	水滴	some
+🌊	海浪	some
+🎃	南瓜燈	some
+🎄	聖誕樹	some
+🎆	煙花	some
+🎇	煙花棒	some
+🧨	炮仗	some
+✨	閃光	some
+🎈	氣球	some
+🎉	拉炮彩帶	some
+🎊	五彩紙屑球	some
+🎋	七夕樹	some
+🎍	門松	some
+🎎	日本人形	some
+🎏	鯉魚旗	some
+🎐	風鈴	some
+🎑	賞月	some
+🧧	利是	some
+🎀	蝴蝶結	some
+🎁	禮物	some
+🎗	提示絲帶	some
+🎟	入場券	some
+🎫	票	some
+🎖	勳章	some
+🏆	獎盃	some
+🏅	體育獎章	some
+🥇	金牌	some
+🥈	銀牌	some
+🥉	銅牌	some
+⚽	足球	some
+⚾	棒球	some
+🥎	壘球	some
+🏀	籃球	some
+🏐	排球	some
+🏈	美式足球	some
+🏉	英式欖球	some
+🎾	網球	some
+🥏	飛碟運動	some
+🎳	保齡球	some
+🏏	木球	some
+🏑	曲棍球	some
+🏒	冰球	some
+🥍	棍網球	some
+🏓	乒乓球	some
+🏸	羽毛球	some
+🥊	拳擊手套	some
+🥋	武術道服	some
+🥅	龍門	some
+⛳	哥爾夫球	some
+⛸	滑冰	some
+🎣	釣魚竿	some
+🤿	潛水面罩	some
+🎽	運動背心	some
+🎿	雙板滑雪裝備	some
+🛷	雪橇	some
+🥌	冰壺	some
+🎯	正中靶心的飛鏢	some
+🪀	搖搖	some
+🪁	風箏	some
+🎱	桌球	some
+🔮	水晶球	some
+🪄	神仙棒	some
+🧿	納紮爾護身符	some
+🎮	電子遊戲機	some
+🕹	控制杆	some
+🎰	老虎機	some
+🎲	骰仔	some
+🧩	拼圖	some
+🧸	泰迪熊	some
+🪅	皮納塔彩罐	some
+🪆	套娃	some
+♠	葵扇	some
+♥	紅桃	some
+♦	階磚	some
+♣	梅花	some
+🃏	小丑牌	some
+♟	黑棋士兵	some
+♜	黑棋城堡	some
+♞	黑棋騎士	some
+♝	黑棋主教	some
+♛	黑棋皇后	some
+♚	黑棋國王	some
+♙	白棋士兵	some
+♖	白棋城堡	some
+♘	白棋騎士	some
+♗	白棋主教	some
+♕	白棋皇后	some
+♔	白棋國王	some
+🀄	麻將紅中	some
+🎴	花劄紙牌	some
+🎭	表演藝術	some
+🖼	相片連相框	some
+🎨	調色盤	some
+🧵	線	some
+🪡	縫合針	some
+🧶	毛冷	some
+🪢	結	some
+👓	眼鏡	some
+🕶	墨鏡	some
+🥽	護目鏡	some
+🥼	白大褂	some
+🦺	救生衣	some
+👔	領呔	some
+👕	T恤	some
+👖	牛仔褲	some
+🧣	頸巾	some
+🧤	手套	some
+🧥	外套	some
+🧦	襪子	some
+👗	連身裙	some
+👘	和服	some
+🥻	莎麗	some
+🩱	一件式泳衣	some
+🩲	三角褲	some
+🩳	短褲	some
+👙	比堅尼	some
+👚	女裝	some
+🪭	摺扇	some
+👛	銀包	some
+👜	手袋	some
+👝	手袋	some
+🛍	購物袋	some
+🎒	書包	some
+🩴	人字拖	some
+👞	男鞋	some
+👟	運動鞋	some
+🥾	登山鞋	some
+🥿	平底鞋	some
+👠	高踭鞋	some
+👡	女式涼鞋	some
+🩰	芭蕾舞鞋	some
+👢	女靴	some
+🪮	梳子	some
+👑	皇冠	some
+👒	女帽	some
+🎩	禮帽	some
+🎓	畢業帽	some
+🧢	棒球帽	some
+🪖	軍用頭盔	some
+⛑	安全帽	some
+📿	頸鏈	some
+💄	唇膏	some
+💍	戒指	some
+💎	寶石	some
+🔇	已靜音的喇叭	some
+🔈	細聲喇叭	some
+🔉	聲量中等嘅喇叭	some
+🔊	聲量大嘅喇叭	some
+📢	喇叭	some
+📣	大聲公	some
+📯	郵政號角	some
+🔔	時鐘	some
+🔕	冇聲嘅鐘	some
+🎼	樂譜	some
+🎵	音符	some
+🎶	三個音符	some
+🎙	錄音室咪高風	some
+🎚	滑桿	some
+🎛	控制旋鈕	some
+🎤	咪高風	some
+🎧	耳筒	some
+📻	收音機	some
+🎷	色士風	some
+🪗	手風琴	some
+🎸	結他	some
+🎹	音樂鍵盤	some
+🎺	小號	some
+🎻	小提琴	some
+🪕	班卓琴	some
+🥁	鼓	some
+🪘	長鼓	some
+🪇	沙槌	some
+🪈	長笛	some
+🪉	豎琴	some
+📱	手提電話	some
+📲	有箭嘴嘅電話	some
+☎	電話	some
+📞	電話筒	some
+📟	傳呼機	some
+📠	傳真機	some
+🔋	電池	some
+🔌	插蘇	some
+💻	手提電腦	some
+🖥	桌上電腦	some
+🖨	印表機	some
+⌨	鍵盤	some
+🖱	電腦滑鼠	some
+🖲	軌跡球	some
+💽	電腦光碟	some
+💾	磁碟	some
+💿	光碟	some
+📀	DVD	some
+🧮	算盤	some
+🎥	電影攝影機	some
+🎞	菲林	some
+📽	電影放映機	some
+🎬	場記板	some
+📺	電視機	some
+📷	相機	some
+📸	開咗閃光燈嘅相機	some
+📹	錄影機	some
+📼	錄影帶	some
+🔍	向左嘅放大鏡	some
+🔎	向右嘅放大鏡	some
+🕯	蠟燭	some
+💡	燈膽	some
+🔦	電筒	some
+🏮	紅燈籠	some
+🪔	印度油燈	some
+📔	彩色封面筆記簿	some
+📕	閂埋嘅書	some
+📖	打開嘅書	some
+📗	綠色簿	some
+📘	藍色簿	some
+📙	橙色簿	some
+📚	一疊書	some
+📓	筆記簿	some
+📒	帳簿	some
+📃	彎曲嘅文件	some
+📜	卷軸	some
+📄	文件正面	some
+📰	報紙	some
+🗞	捲起嘅報紙	some
+📑	書籤頁	some
+🔖	書簽	some
+🏷	標籤	some
+💰	一袋錢	some
+🪙	硬幣	some
+💴	日円紙幣	some
+💵	美金紙幣	some
+💶	歐羅紙幣	some
+💷	英鎊紙幣	some
+💸	錢飛走	some
+💳	信用卡	some
+🧾	收據	some
+💹	有日元標誌嘅向上折線圖	some
+✉	信封	some
+📧	電郵	some
+📨	來信	some
+📩	有箭嘴嘅信封	some
+📤	寄件箱	some
+📥	收件箱	some
+📦	包裹	some
+📫	關上嘅郵箱（旗標直立）	some
+📪	關上嘅郵箱（旗標平放）	some
+📬	開住嘅郵箱（旗標直立）	some
+📭	開住嘅郵箱（旗標平放）	some
+📮	郵筒	some
+🗳	投票箱	some
+✏	鉛筆	some
+✒	鋼筆尖	some
+🖋	鋼筆	some
+🖊	原子筆	some
+🖌	畫筆	some
+🖍	蠟筆	some
+📝	便條	some
+💼	公事包	some
+📁	文件夾	some
+📂	打開嘅文件夾	some
+🗂	索引分隔卡	some
+📅	日曆	some
+📆	撕開嘅日曆	some
+🗒	線圈筆記簿	some
+🗓	線圈日曆	some
+📇	卡片索引	some
+📈	向上折線圖	some
+📉	向下折線圖	some
+📊	棒形圖	some
+📋	剪貼簿	some
+📌	大頭釘	some
+📍	圓頭大頭釘	some
+📎	萬字夾	some
+🖇	連住嘅萬字夾	some
+📏	間尺	some
+📐	三角尺	some
+✂	骹剪	some
+🗃	卡片檔案盒	some
+🗄	文件櫃	some
+🗑	垃圾桶	some
+🔒	鎖	some
+🔓	打開的鎖	some
+🔏	墨水筆和鎖	some
+🔐	鑰匙和鎖	some
+🔑	鎖匙	some
+🗝	舊鎖匙	some
+🔨	鎚仔	some
+🪓	斧頭	some
+⛏	十字鋤	some
+⚒	鎚仔同十字鋤	some
+🛠	鎚仔同士巴拿	some
+🗡	匕首	some
+⚔	交叉放置的劍	some
+🔫	水槍	some
+🪃	迴旋鏢	some
+🏹	弓和箭	some
+🛡	盾牌	some
+🪚	木工鋸	some
+🔧	士巴拿	some
+🪛	螺絲刀	some
+🔩	螺母與螺栓	some
+⚙	齒輪	some
+🗜	車輪夾鎖	some
+⚖	天秤	some
+🦯	白手杖	some
+🔗	超連結	some
+⛓	鐵鍊	some
+🪝	掛鉤	some
+🧰	工具箱	some
+🧲	磁鐵	some
+🪜	梯子	some
+⚗	蒸餾器	some
+🧪	試管	some
+🧫	培養皿	some
+🧬	DNA	some
+🔬	顯微鏡	some
+🔭	望遠鏡	some
+📡	衛星天線	some
+💉	針筒	some
+🩸	一滴血	some
+💊	藥丸	some
+🩹	膠布	some
+🩺	聽診器	some
+🚪	門	some
+🛗	電梯	some
+🪞	鏡子	some
+🪟	窗戶	some
+🛏	床	some
+🛋	梳化和座地燈	some
+🪑	椅子	some
+🚽	廁所	some
+🪠	活塞	some
+🚿	淋浴	some
+🛁	浴缸	some
+🪤	捕鼠器	some
+🪒	剃鬚刀	some
+🧴	潤膚乳樽	some
+🧷	扣針	some
+🧹	掃帚	some
+🧺	籃	some
+🧻	一捲廁紙	some
+🪣	桶	some
+🧼	番梘	some
+🪥	牙刷	some
+🧽	海綿	some
+🧯	滅火筒	some
+🛒	購物車	some
+🚬	香煙	some
+⚰	棺材	some
+🪦	墓碑	some
+⚱	骨灰盅	some
+🗿	復活島石像	some
+🪧	告示牌	some
+🏧	櫃員機	some
+🚮	垃圾桶標誌	some
+🚰	飲用水	some
+♿	輪椅符號	some
+🚹	男廁	some
+🚺	女廁	some
+🚻	洗手間	some
+🚼	嬰兒符號	some
+🚾	WC	some
+🛂	通關檢查	some
+🛃	海關	some
+🛄	提取行李	some
+🛅	寄存行李	some
+⚠	警告	some
+🚸	兒童過街	some
+⛔	禁止通行	some
+🚫	禁止標誌	some
+🚳	禁止單車	some
+🚭	禁止吸煙	some
+🚯	請勿亂丟垃圾	some
+🚱	非飲用水	some
+🚷	行人禁止	some
+📵	禁用手提電話	some
+🔞	十八禁	some
+☢	輻射	some
+☣	生物危害	some
+⬆	上箭嘴	some
+↗	上右箭嘴	some
+➡	右箭嘴	some
+↘	下右箭嘴	some
+⬇	下箭嘴	some
+↙	下左箭嘴	some
+⬅	左箭嘴	some
+↖	上左箭嘴	some
+↕	上下箭嘴	some
+↔	左右箭嘴	some
+↮	左右箭嘴刪除線	some
+↩	向左彎嘅右箭嘴	some
+↪	向右彎嘅左箭嘴	some
+⤴	向上彎嘅右箭嘴	some
+⤵	向下彎嘅右箭嘴	some
+🔃	順時針方向垂直嘅箭嘴	some
+🔄	逆時針箭嘴按鈕	some
+🔙	後退箭嘴	some
+🔚	結束箭嘴	some
+🔛	「On!」箭嘴	some
+🔜	soon 標誌的箭嘴	some
+🔝	top 標誌的箭嘴	some
+🛐	祈禱室符號	some
+⚛	原子符號	some
+🕉	歐姆	some
+✡	六角星	some
+☸	佛教法輪	some
+☯	陰陽	some
+✝	十字架	some
+☦	正教會十字	some
+☪	伊斯蘭教星月	some
+☮	和平符號	some
+🕎	光明節燈台	some
+🔯	中間帶點的六角星	some
+🪯	錫克教Khanda符號	some
+♈	白羊座	some
+♉	金牛座	some
+♊	雙子座	some
+♋	巨蟹座	some
+♌	獅子座	some
+♍	處女座	some
+♎	天秤座	some
+♏	天蠍座	some
+♐	射手座	some
+♑	山羊座	some
+♒	水瓶座	some
+♓	雙魚座	some
+⛎	蛇夫座	some
+🔀	隨機播放按鈕	some
+🔁	重播按鈕	some
+🔂	重播單曲按鈕	some
+▶	播放按鈕	some
+⏩	快速快轉按鈕	some
+⏭	下一首按鈕	some
+⏯	播放或暫停按鈕	some
+◀	回帶按鈕	some
+⏪	快速倒轉按鈕	some
+⏮	上一首按鈕	some
+🔼	向上按鈕	some
+⏫	向上快捲按鈕	some
+🔽	向下按鈕	some
+⏬	向下快捲按鈕	some
+⏸	暫停按鈕	some
+⏹	停止按鈕	some
+⏺	錄製按鈕	some
+⏏	退出按鈕	some
+🎦	戲院	some
+🔅	低亮度按鈕	some
+🔆	高亮度按鈕	some
+📶	手機訊號格	some
+📳	震機模式	some
+📴	手提電話關機	some
+🛜	無線網絡	some
+♀	女性符號	some
+♂	男性符號	some
+⚧	跨性別符號	some
+✖	打交叉	some
+➕	加號標誌	some
+➖	減號	some
+➗	除	some
+♾	無限	some
+‼	雙感嘆號	some
+⁉	感嘆號加問號	some
+❓	紅色問號	some
+❔	白色問號	some
+❕	白色感嘆號	some
+❗	感嘆號	some
+〰	波浪破折號	some
+💱	貨幣兌換	some
+💲	錢符號	some
+⚕	蛇杖	some
+♻	回收標誌	some
+⚜	百合花飾	some
+🔱	三叉戟徽章	some
+📛	姓名牌	some
+🔰	日本嘅初學者符號	some
+⭕	紅色空心圓圈	some
+☑	方框內有剔號	some
+✅	白色粗剔號	some
+✓	剔號	some
+✔	粗剔號	some
+❌	交叉符號	some
+❎	方框內有交叉	some
+➰	彎曲線	some
+➿	雙彎曲線	some
+〽	歌謠開始記號	some
+✳	八輪輻星號	some
+✴	八角星	some
+❇	火花	some
+©	版權	some
+®	註冊	some
+™	商標	some
+🔠	大階英文輸入	some
+🔡	細階英文輸入	some
+🔢	數字輸入	some
+🔣	符號輸入	some
+🔤	輸入拉丁字母	some
+🅰	A 型血	some
+🆎	AB 型血	some
+🅱	B型血	some
+🆑	CL 按鈕	some
+🆒	Cool 按鈕	some
+🆓	免費按鈕	some
+ℹ	資料	some
+🆔	身份	some
+Ⓜ	圓圈中嘅 M	some
+🆕	NEW 按鈕	some
+🆖	NG 按鈕	some
+🅾	O型血	some
+🆗	OK 方塊	some
+🅿	P 按鈕	some
+🆘	求救按鈕	some
+🆙	UP 按鈕	some
+🆚	VS 按鈕	some
+🈁	日文嘅「呢度」按鈕	some
+🈂	日文嘅「免費提供」按鈕	some
+🈷	日文嘅「每月總額」按鈕	some
+🈶	日文嘅「收費」按鈕	some
+🈯	日文嘅「已預留」按鈕	some
+🉐	日文嘅「優惠」按鈕	some
+🈹	日文嘅「折扣」按鈕	some
+🈚	日文嘅「免費」按鈕	some
+🈲	日文嘅「禁止」按鈕	some
+🉑	日文嘅「許可」按鈕	some
+🈸	日文嘅「申請」按鈕	some
+🈴	日文嘅「合格」按鈕	some
+🈳	日文嘅「空缺」按鈕	some
+㊗	日文嘅「恭喜」按鈕	some
+㊙	日文嘅「秘密」按鈕	some
+🈺	日文嘅「營業中」按鈕	some
+🈵	日文嘅「冇空位」按鈕	some
+🔴	紅色大圓圈	some
+🟠	橙色圓形	some
+🟡	黃色圓	some
+🟢	綠色圓	some
+🔵	藍色大圓圈	some
+🟣	紫色圓	some
+🟤	啡色圓形	some
+⚫	黑色大圓圈	some
+⚪	白色大圓圈	some
+🟥	紅色正方形	some
+🟧	橙色正方形	some
+🟨	黃色正方形	some
+🟩	綠色正方形	some
+🟦	藍色正方形	some
+🟪	紫色正方形	some
+🟫	啡色正方形	some
+⬛	黑色大正方形	some
+⬜	白色大正方形	some
+◼	黑色中正方形	some
+◻	白色中正方形	some
+◾	黑色中小正方形	some
+◽	白色中細正方形	some
+▪	黑色小正方形	some
+▫	白色細正方形	some
+🔶	橙色大菱形	some
+🔷	藍色大菱形	some
+🔸	橙色小菱形	some
+🔹	藍色小菱形	some
+🔺	指向上嘅紅三角	some
+🔻	指向下嘅紅三角	some
+💠	中間有一點嘅菱形	some
+🔘	圓形按鈕	some
+🔳	白色正方形按鈕	some
+🔲	黑色正方形按鈕	some
+🏁	終點旗	some
+🚩	三角旗	some
+🎌	交叉嘅旗	some
+🏴	舉黑旗	some
+🏳	舉白旗	some
+🏳‍🌈	彩虹旗	some
+🏳‍⚧	跨性別旗	some
+🏴‍☠	海盜旗	some
+
+
+
+¹	上標1	some
+²	上標2	some
+³	上標3	some
+µ	微的符號	some
+⇍	有刪除線的向左雙箭嘴	some
+⇑	向上雙箭嘴	some
+⇒	向右雙箭嘴	some
+⇏	有刪除線的向右雙箭嘴	some
+⇓	向下雙箭嘴	some
+⇔	左右雙箭嘴	some
+⇎	有刪除線的左右雙箭嘴	some
+⇚	向左三箭嘴	some
+⇛	向右三箭嘴	some
+👋🏻	揮手 白皮膚	some
+👋🏼	揮手 黃皮膚	some
+👋🏽	揮手 淺啡色皮膚	some
+👋🏾	揮手 啡色皮膚	some
+👋🏿	揮手 黑皮膚	some
+🤚🏻	立起的手背 白皮膚	some
+🤚🏼	立起的手背 黃皮膚	some
+🤚🏽	豎起手掌 淺啡色皮膚	some
+🤚🏾	豎起手掌 啡色皮膚	some
+🤚🏿	立起的手背 黑皮膚	some
+🖐🏻	手掌 白皮膚	some
+🖐🏼	手掌 黃皮膚	some
+🖐🏽	手掌 淺啡色皮膚	some
+🖐🏾	手掌 啡色皮膚	some
+🖐🏿	手掌 黑皮膚	some
+✋🏻	舉起手 白皮膚	some
+✋🏼	舉起手 黃皮膚	some
+✋🏽	舉起手 淺啡色皮膚	some
+✋🏾	舉起手 啡色皮膚	some
+✋🏿	舉起手 黑皮膚	some
+🖖🏻	瓦肯舉手禮 白皮膚	some
+🖖🏼	瓦肯舉手禮 黃皮膚	some
+🖖🏽	瓦肯舉手禮 淺啡色皮膚	some
+🖖🏾	瓦肯舉手禮 啡色皮膚	some
+🖖🏿	瓦肯舉手禮 黑皮膚	some
+👌🏻	OK 白皮膚	some
+👌🏼	OK 黃皮膚	some
+👌🏽	OK 手勢 淺啡色皮膚	some
+👌🏾	OK 手勢 啡色皮膚	some
+👌🏿	OK 黑皮膚	some
+🤌🏻	捏手指 白皮膚	some
+🤌🏼	捏手指 黃皮膚	some
+🤌🏽	捏手指 淺啡色皮膚	some
+🤌🏾	捏手指 啡色皮膚	some
+🤌🏿	捏手指 黑皮膚	some
+🤏🏻	一啲啲 白皮膚	some
+🤏🏼	一啲啲 黃皮膚	some
+🤏🏽	一啲啲 淺啡色皮膚	some
+🤏🏾	一啲啲 啡色皮膚	some
+🤏🏿	一啲啲 黑皮膚	some
+✌🏻	V字手勢 白皮膚	some
+✌🏼	V字手勢 黃皮膚	some
+✌🏽	V字手勢 淺啡色皮膚	some
+✌🏾	V字手勢 啡色皮膚	some
+✌🏿	V字手勢 黑皮膚	some
+🤞🏻	交叉的手指 白皮膚	some
+🤞🏼	交叉的手指 黃皮膚	some
+🤞🏽	交叉的手指 淺啡色皮膚	some
+🤞🏾	交叉的手指 啡色皮膚	some
+🤞🏿	交叉的手指 黑皮膚	some
+🤟🏻	我愛你手勢 白皮膚	some
+🤟🏼	我愛你手勢 黃皮膚	some
+🤟🏽	我愛你手勢 淺啡色皮膚	some
+🤟🏾	我愛你手勢 啡色皮膚	some
+🤟🏿	我愛你手勢 黑皮膚	some
+🤘🏻	搖滾手勢 白皮膚	some
+🤘🏼	搖滾手勢 黃皮膚	some
+🤘🏽	搖滾手勢 淺啡色皮膚	some
+🤘🏾	搖滾手勢 啡色皮膚	some
+🤘🏿	搖滾手勢 黑皮膚	some
+🤙🏻	call 我 白皮膚	some
+🤙🏼	call 我 黃皮膚	some
+🤙🏽	call 我 淺啡色皮膚	some
+🤙🏾	call 我 啡色皮膚	some
+🤙🏿	call 我 黑皮膚	some
+👈🏻	反手食指向左指 白皮膚	some
+👈🏼	反手食指向左指 黃皮膚	some
+👈🏽	反手食指向左指 淺啡色皮膚	some
+👈🏾	反手食指向左指 啡色皮膚	some
+👈🏿	反手食指向左指 黑皮膚	some
+👉🏻	反手食指向右指 白皮膚	some
+👉🏼	反手食指向右指 黃皮膚	some
+👉🏽	反手食指向右指 淺啡色皮膚	some
+👉🏾	反手食指向右指 啡色皮膚	some
+👉🏿	反手食指向右指 黑皮膚	some
+👆🏻	反手食指向上指 白皮膚	some
+👆🏼	反手食指向上指 黃皮膚	some
+👆🏽	反手食指向上指 淺啡色皮膚	some
+👆🏾	反手食指向上指 啡色皮膚	some
+👆🏿	反手食指向上指 黑皮膚	some
+🖕🏻	豎中指 白皮膚	some
+🖕🏼	豎中指 黃皮膚	some
+🖕🏽	豎中指 淺啡色皮膚	some
+🖕🏾	豎中指 啡色皮膚	some
+🖕🏿	豎中指 黑皮膚	some
+👇🏻	反手食指向下指 白皮膚	some
+👇🏼	反手食指向下指 黃皮膚	some
+👇🏽	反手食指向下指 淺啡色皮膚	some
+👇🏾	反手食指向下指 啡色皮膚	some
+👇🏿	反手食指向下指 黑皮膚	some
+☝🏻	食指向上指 白皮膚	some
+☝🏼	食指向上指 黃皮膚	some
+☝🏽	食指向上指 淺啡色皮膚	some
+☝🏾	食指向上指 啡色皮膚	some
+☝🏿	食指向上指 黑皮膚	some
+👍🏻	拇指向上 白皮膚	some
+👍🏼	拇指向上 黃皮膚	some
+👍🏽	拇指向上 淺啡色皮膚	some
+👍🏾	拇指向上 啡色皮膚	some
+👍🏿	拇指向上 黑皮膚	some
+👎🏻	拇指向下 白皮膚	some
+👎🏼	拇指向下 黃皮膚	some
+👎🏽	拇指向下 淺啡色皮膚	some
+👎🏾	拇指向下 啡色皮膚	some
+👎🏿	拇指向下 黑皮膚	some
+✊🏻	舉起拳頭 白皮膚	some
+✊🏼	舉起拳頭 黃皮膚	some
+✊🏽	舉起拳頭 淺啡色皮膚	some
+✊🏾	舉起拳頭 啡色皮膚	some
+✊🏿	舉起拳頭 黑皮膚	some
+👊🏻	出拳 白皮膚	some
+👊🏼	出拳 黃皮膚	some
+👊🏽	出拳 淺啡色皮膚	some
+👊🏾	出拳 啡色皮膚	some
+👊🏿	出拳 黑皮膚	some
+🤛🏻	拳頭向左 白皮膚	some
+🤛🏼	拳頭向左 黃皮膚	some
+🤛🏽	拳頭向左 淺啡色皮膚	some
+🤛🏾	拳頭向左 啡色皮膚	some
+🤛🏿	拳頭向左 黑皮膚	some
+🤜🏻	拳頭向右 白皮膚	some
+🤜🏼	拳頭向右 黃皮膚	some
+🤜🏽	拳頭向右 淺啡色皮膚	some
+🤜🏾	拳頭向右 啡色皮膚	some
+🤜🏿	拳頭向右 黑皮膚	some
+👏🏻	拍手 白皮膚	some
+👏🏼	拍手 黃皮膚	some
+👏🏽	拍手 淺啡色皮膚	some
+👏🏾	拍手 啡色皮膚	some
+👏🏿	拍手 黑皮膚	some
+🙌🏻	舉雙手歡呼 白皮膚	some
+🙌🏼	舉雙手歡呼 黃皮膚	some
+🙌🏽	舉雙手歡呼 淺啡色皮膚	some
+🙌🏾	舉雙手歡呼 啡色皮膚	some
+🙌🏿	舉雙手歡呼 黑皮膚	some
+👐🏻	張開雙手 白皮膚	some
+👐🏼	張開雙手 黃皮膚	some
+👐🏽	張開雙手 淺啡色皮膚	some
+👐🏾	張開雙手 啡色皮膚	some
+👐🏿	張開雙手 黑皮膚	some
+🤲🏻	雙手掌心向上 白皮膚	some
+🤲🏼	雙手掌心向上 黃皮膚	some
+🤲🏽	雙手掌心向上 淺啡色皮膚	some
+🤲🏾	雙手掌心向上 啡色皮膚	some
+🤲🏿	雙手掌心向上 黑皮膚	some
+🙏🏻	雙手合十 白皮膚	some
+🙏🏼	雙手合十 黃皮膚	some
+🙏🏽	雙手合十 淺啡色皮膚	some
+🙏🏾	雙手合十 啡色皮膚	some
+🙏🏿	雙手合十 黑皮膚	some
+🫸	掌心向右	some
+🫸🏻	掌心向右 白皮膚	some
+🫸🏼	掌心向右 黃皮膚	some
+🫸🏽	掌心向右 淺啡色皮膚	some
+🫸🏾	掌心向右 啡色皮膚	some
+🫸🏿	掌心向右 黑皮膚	some
+🫷	掌心向左	some
+🫷🏻	掌心向左 白皮膚	some
+🫷🏼	掌心向左 黃皮膚	some
+🫷🏽	掌心向左 淺啡色皮膚	some
+🫷🏾	掌心向左 啡色皮膚	some
+🫷🏿	掌心向左 黑皮膚	some
+✍🏻	寫字 白皮膚	some
+✍🏼	寫字 黃皮膚	some
+✍🏽	寫字 淺啡色皮膚	some
+✍🏾	寫字 啡色皮膚	some
+✍🏿	寫字 黑皮膚	some
+💅🏻	塗指甲油 白皮膚	some
+💅🏼	塗指甲油 黃皮膚	some
+💅🏽	塗指甲油 淺啡色皮膚	some
+💅🏾	塗指甲油 啡色皮膚	some
+💅🏿	塗指甲油 黑皮膚	some
+🤳🏻	自拍 白皮膚	some
+🤳🏼	自拍 黃皮膚	some
+🤳🏽	自拍 淺啡色皮膚	some
+🤳🏾	自拍 啡色皮膚	some
+🤳🏿	自拍 黑皮膚	some
+💪🏻	肌肉 白皮膚	some
+💪🏼	肌肉 黃皮膚	some
+💪🏽	肌肉 淺啡色皮膚	some
+💪🏾	肌肉 啡色皮膚	some
+💪🏿	肌肉 黑皮膚	some
+🦵🏻	腿 白皮膚	some
+🦵🏼	腿 黃皮膚	some
+🦵🏽	腿 淺啡色皮膚	some
+🦵🏾	腿 啡色皮膚	some
+🦵🏿	腿 黑皮膚	some
+🦶🏻	腳 白皮膚	some
+🦶🏼	腳 黃皮膚	some
+🦶🏽	腳 淺啡色皮膚	some
+🦶🏾	腳 啡色皮膚	some
+🦶🏿	腳 黑皮膚	some
+👂🏻	耳朵 白皮膚	some
+👂🏼	耳朵 黃皮膚	some
+👂🏽	耳朵 淺啡色皮膚	some
+👂🏾	耳朵 啡色皮膚	some
+👂🏿	耳朵 黑皮膚	some
+🦻🏻	戴助聽器的耳朵 白皮膚	some
+🦻🏼	戴助聽器的耳朵 黃皮膚	some
+🦻🏽	戴助聽器的耳朵 淺啡色皮膚	some
+🦻🏾	戴助聽器的耳朵 啡色皮膚	some
+🦻🏿	戴助聽器的耳朵 黑皮膚	some
+👃🏻	鼻 白皮膚	some
+👃🏼	鼻 黃皮膚	some
+👃🏽	鼻 淺啡色皮膚	some
+👃🏾	鼻 啡色皮膚	some
+👃🏿	鼻 黑皮膚	some
+👶🏻	嬰兒 白皮膚	some
+👶🏼	嬰兒 黃皮膚	some
+👶🏽	嬰兒 淺啡色皮膚	some
+👶🏾	嬰兒 啡色皮膚	some
+👶🏿	嬰兒 黑皮膚	some
+🧒🏻	兒童 白皮膚	some
+🧒🏼	兒童 黃皮膚	some
+🧒🏽	小孩 淺啡色皮膚	some
+🧒🏾	小孩 啡色皮膚	some
+🧒🏿	兒童 黑皮膚	some
+👦🏻	男孩 白皮膚	some
+👦🏼	男孩 黃皮膚	some
+👦🏽	男孩 淺啡色皮膚	some
+👦🏾	男孩 啡色皮膚	some
+👦🏿	男孩 黑皮膚	some
+👧🏻	女孩 白皮膚	some
+👧🏼	女孩 黃皮膚	some
+👧🏽	女孩 淺啡色皮膚	some
+👧🏾	女孩 啡色皮膚	some
+👧🏿	女孩 黑皮膚	some
+🧑🏻	成人 白皮膚	some
+🧑🏼	成人 黃皮膚	some
+🧑🏽	大人 淺啡色皮膚	some
+🧑🏾	大人 啡色皮膚	some
+🧑🏿	成人 黑皮膚	some
+👱🏻	金髮嘅人 白皮膚	some
+👱🏼	金髮嘅人 黃皮膚	some
+👱🏽	金髮嘅人 淺啡色皮膚	some
+👱🏾	金髮嘅人 啡色皮膚	some
+👱🏿	金髮嘅人 黑皮膚	some
+🧑🏻‍❤‍💋‍🧑🏼	錫緊嘅一男一女 大人 大人 白皮膚 黃皮膚	some
+🧑🏻‍❤‍💋‍🧑🏽	錫緊嘅一男一女 大人 大人 白皮膚 淺啡色皮膚	some
+🧑🏻‍❤‍💋‍🧑🏾	錫緊嘅一男一女 大人 大人 白皮膚 啡色皮膚	some
+🧑🏻‍❤‍💋‍🧑🏿	錫緊嘅一男一女 大人 大人 白皮膚 黑皮膚	some
+🧑🏼‍❤‍💋‍🧑🏻	錫緊嘅一男一女 大人 大人 黃皮膚 白皮膚	some
+🧑🏼‍❤‍💋‍🧑🏽	錫緊嘅一男一女 大人 大人 黃皮膚 淺啡色皮膚	some
+🧑🏼‍❤‍💋‍🧑🏾	錫緊嘅一男一女 大人 大人 黃皮膚 啡色皮膚	some
+🧑🏼‍❤‍💋‍🧑🏿	錫緊嘅一男一女 大人 大人 黃皮膚 黑皮膚	some
+🧑🏽‍❤‍💋‍🧑🏻	錫緊嘅一男一女 大人 大人 淺啡色皮膚 白皮膚	some
+🧑🏽‍❤‍💋‍🧑🏼	錫緊嘅一男一女 大人 大人 淺啡色皮膚 黃皮膚	some
+🧑🏽‍❤‍💋‍🧑🏾	錫緊嘅一男一女 大人 大人 淺啡色皮膚 啡色皮膚	some
+🧑🏽‍❤‍💋‍🧑🏿	錫緊嘅一男一女 大人 大人 淺啡色皮膚 黑皮膚	some
+🧑🏾‍❤‍💋‍🧑🏻	錫緊嘅一男一女 大人 大人 啡色皮膚 白皮膚	some
+🧑🏾‍❤‍💋‍🧑🏼	錫緊嘅一男一女 大人 大人 啡色皮膚 黃皮膚	some
+🧑🏾‍❤‍💋‍🧑🏽	錫緊嘅一男一女 大人 大人 啡色皮膚 淺啡色皮膚	some
+🧑🏾‍❤‍💋‍🧑🏿	錫緊嘅一男一女 大人 大人 啡色皮膚 黑皮膚	some
+🧑🏿‍❤‍💋‍🧑🏻	錫緊嘅一男一女 大人 大人 黑皮膚 白皮膚	some
+🧑🏿‍❤‍💋‍🧑🏼	錫緊嘅一男一女 大人 大人 黑皮膚 黃皮膚	some
+🧑🏿‍❤‍💋‍🧑🏽	錫緊嘅一男一女 大人 大人 黑皮膚 淺啡色皮膚	some
+🧑🏿‍❤‍💋‍🧑🏾	錫緊嘅一男一女 大人 大人 黑皮膚 啡色皮膚	some
+🧑🏻‍❤‍🧑🏼	戀愛中 大人 大人 白皮膚 黃皮膚	some
+🧑🏻‍❤‍🧑🏽	戀愛中 大人 大人 白皮膚 淺啡色皮膚	some
+🧑🏻‍❤‍🧑🏾	戀愛中 大人 大人 白皮膚 啡色皮膚	some
+🧑🏻‍❤‍🧑🏿	戀愛中 大人 大人 白皮膚 黑皮膚	some
+🧑🏼‍❤‍🧑🏻	戀愛中 大人 大人 黃皮膚 白皮膚	some
+🧑🏼‍❤‍🧑🏽	戀愛中 大人 大人 黃皮膚 淺啡色皮膚	some
+🧑🏼‍❤‍🧑🏾	戀愛中 大人 大人 黃皮膚 啡色皮膚	some
+🧑🏼‍❤‍🧑🏿	戀愛中 大人 大人 黃皮膚 黑皮膚	some
+🧑🏽‍❤‍🧑🏻	戀愛中 大人 大人 淺啡色皮膚 白皮膚	some
+🧑🏽‍❤‍🧑🏼	戀愛中 大人 大人 淺啡色皮膚 黃皮膚	some
+🧑🏽‍❤‍🧑🏾	戀愛中 大人 大人 淺啡色皮膚 啡色皮膚	some
+🧑🏽‍❤‍🧑🏿	戀愛中 大人 大人 淺啡色皮膚 黑皮膚	some
+🧑🏾‍❤‍🧑🏻	戀愛中 大人 大人 啡色皮膚 白皮膚	some
+🧑🏾‍❤‍🧑🏼	戀愛中 大人 大人 啡色皮膚 黃皮膚	some
+🧑🏾‍❤‍🧑🏽	戀愛中 大人 大人 啡色皮膚 淺啡色皮膚	some
+🧑🏾‍❤‍🧑🏿	戀愛中 大人 大人 啡色皮膚 黑皮膚	some
+🧑🏿‍❤‍🧑🏻	戀愛中 大人 大人 黑皮膚 白皮膚	some
+🧑🏿‍❤‍🧑🏼	戀愛中 大人 大人 黑皮膚 黃皮膚	some
+🧑🏿‍❤‍🧑🏽	戀愛中 大人 大人 黑皮膚 淺啡色皮膚	some
+🧑🏿‍❤‍🧑🏾	戀愛中 大人 大人 黑皮膚 啡色皮膚	some
+🧑‍🦰	成人 紅發	some
+🧑🏻‍🦰	成人 白皮膚紅發	some
+🧑🏼‍🦰	成人 黃皮膚紅發	some
+🧑🏽‍🦰	大人 淺啡色皮膚 紅髮	some
+🧑🏾‍🦰	大人 啡色皮膚 紅髮	some
+🧑🏿‍🦰	成人 黑皮膚紅發	some
+🧑‍🦱	大人 曲髮	some
+🧑🏻‍🦱	大人 白皮膚 曲髮	some
+🧑🏼‍🦱	大人 黃皮膚 曲髮	some
+🧑🏽‍🦱	大人 淺啡色皮膚 曲髮	some
+🧑🏾‍🦱	大人 啡色皮膚 曲髮	some
+🧑🏿‍🦱	大人 黑皮膚 曲髮	some
+🧑‍🦳	大人 白頭髮	some
+🧑🏻‍🦳	大人 白皮膚 白頭髮	some
+🧑🏼‍🦳	大人 黃皮膚 白頭髮	some
+🧑🏽‍🦳	大人 淺啡色皮膚 白頭髮	some
+🧑🏾‍🦳	大人 啡色皮膚 白頭髮	some
+🧑🏿‍🦳	大人 黑皮膚 白頭髮	some
+🧑‍🦲	成人 禿頂	some
+🧑🏻‍🦲	成人 白皮膚禿頂	some
+🧑🏼‍🦲	成人 黃皮膚禿頂	some
+🧑🏽‍🦲	大人 淺啡色皮膚 禿頭	some
+🧑🏾‍🦲	大人 啡色皮膚 禿頭	some
+🧑🏿‍🦲	成人 黑皮膚禿頂	some
+👨🏻	男人 白皮膚	some
+👨🏼	男人 黃皮膚	some
+👨🏽	男人 淺啡色皮膚	some
+👨🏾	男人 啡色皮膚	some
+👨🏿	男人 黑皮膚	some
+🧔🏻	留鬚嘅人 白皮膚	some
+🧔🏼	留鬚嘅人 黃皮膚	some
+🧔🏽	留鬚嘅人 淺啡色皮膚	some
+🧔🏾	留鬚嘅人 啡色皮膚	some
+🧔🏿	留鬚嘅人 黑皮膚	some
+🧔🏻‍♂	有絡腮鬍子的男人 白皮膚	some
+🧔🏼‍♂	有絡腮鬍子的男人 黃皮膚	some
+🧔🏽‍♂	男人 淺啡色皮膚 蓄鬍的人	some
+🧔🏾‍♂	男人 啡色皮膚 蓄鬍的人	some
+🧔🏿‍♂	有絡腮鬍子的男人 黑皮膚	some
+👱🏻‍♂	金髮男人 白皮膚	some
+👱🏼‍♂	金髮男人 黃皮膚	some
+👱🏽‍♂	金髮男人 淺啡色皮膚	some
+👱🏾‍♂	金髮男人 啡色皮膚	some
+👱🏿‍♂	金髮男人 黑皮膚	some
+👨🏻‍❤‍💋‍👨🏻	錫緊嘅一男一女 男人 男人 白皮膚	some
+👨🏻‍❤‍💋‍👨🏼	錫緊嘅一男一女 男人 男人 白皮膚 黃皮膚	some
+👨🏻‍❤‍💋‍👨🏽	錫緊嘅一男一女 男人 男人 白皮膚 淺啡色皮膚	some
+👨🏻‍❤‍💋‍👨🏾	錫緊嘅一男一女 男人 男人 白皮膚 啡色皮膚	some
+👨🏻‍❤‍💋‍👨🏿	錫緊嘅一男一女 男人 男人 白皮膚 黑皮膚	some
+👨🏼‍❤‍💋‍👨🏻	錫緊嘅一男一女 男人 男人 黃皮膚 白皮膚	some
+👨🏼‍❤‍💋‍👨🏼	錫緊嘅一男一女 男人 男人 黃皮膚	some
+👨🏼‍❤‍💋‍👨🏽	錫緊嘅一男一女 男人 男人 黃皮膚 淺啡色皮膚	some
+👨🏼‍❤‍💋‍👨🏾	錫緊嘅一男一女 男人 男人 黃皮膚 啡色皮膚	some
+👨🏼‍❤‍💋‍👨🏿	錫緊嘅一男一女 男人 男人 黃皮膚 黑皮膚	some
+👨🏽‍❤‍💋‍👨🏻	錫緊嘅一男一女 男人 男人 淺啡色皮膚 白皮膚	some
+👨🏽‍❤‍💋‍👨🏼	錫緊嘅一男一女 男人 男人 淺啡色皮膚 黃皮膚	some
+👨🏽‍❤‍💋‍👨🏽	錫緊嘅一男一女 男人 男人 淺啡色皮膚	some
+👨🏽‍❤‍💋‍👨🏾	錫緊嘅一男一女 男人 男人 淺啡色皮膚 啡色皮膚	some
+👨🏽‍❤‍💋‍👨🏿	錫緊嘅一男一女 男人 男人 淺啡色皮膚 黑皮膚	some
+👨🏾‍❤‍💋‍👨🏻	錫緊嘅一男一女 男人 男人 啡色皮膚 白皮膚	some
+👨🏾‍❤‍💋‍👨🏼	錫緊嘅一男一女 男人 男人 啡色皮膚 黃皮膚	some
+👨🏾‍❤‍💋‍👨🏽	錫緊嘅一男一女 男人 男人 啡色皮膚 淺啡色皮膚	some
+👨🏾‍❤‍💋‍👨🏾	錫緊嘅一男一女 男人 男人 啡色皮膚	some
+👨🏾‍❤‍💋‍👨🏿	錫緊嘅一男一女 男人 男人 啡色皮膚 黑皮膚	some
+👨🏿‍❤‍💋‍👨🏻	錫緊嘅一男一女 男人 男人 黑皮膚 白皮膚	some
+👨🏿‍❤‍💋‍👨🏼	錫緊嘅一男一女 男人 男人 黑皮膚 黃皮膚	some
+👨🏿‍❤‍💋‍👨🏽	錫緊嘅一男一女 男人 男人 黑皮膚 淺啡色皮膚	some
+👨🏿‍❤‍💋‍👨🏾	錫緊嘅一男一女 男人 男人 黑皮膚 啡色皮膚	some
+👨🏿‍❤‍💋‍👨🏿	錫緊嘅一男一女 男人 男人 黑皮膚	some
+👨🏻‍❤‍👨🏻	戀愛中 男人 男人 白皮膚	some
+👨🏻‍❤‍👨🏼	戀愛中 男人 男人 白皮膚 黃皮膚	some
+👨🏻‍❤‍👨🏽	戀愛中 男人 男人 白皮膚 淺啡色皮膚	some
+👨🏻‍❤‍👨🏾	戀愛中 男人 男人 白皮膚 啡色皮膚	some
+👨🏻‍❤‍👨🏿	戀愛中 男人 男人 白皮膚 黑皮膚	some
+👨🏼‍❤‍👨🏻	戀愛中 男人 男人 黃皮膚 白皮膚	some
+👨🏼‍❤‍👨🏼	戀愛中 男人 男人 黃皮膚	some
+👨🏼‍❤‍👨🏽	戀愛中 男人 男人 黃皮膚 淺啡色皮膚	some
+👨🏼‍❤‍👨🏾	戀愛中 男人 男人 黃皮膚 啡色皮膚	some
+👨🏼‍❤‍👨🏿	戀愛中 男人 男人 黃皮膚 黑皮膚	some
+👨🏽‍❤‍👨🏻	戀愛中 男人 男人 淺啡色皮膚 白皮膚	some
+👨🏽‍❤‍👨🏼	戀愛中 男人 男人 淺啡色皮膚 黃皮膚	some
+👨🏽‍❤‍👨🏽	戀愛中 男人 男人 淺啡色皮膚	some
+👨🏽‍❤‍👨🏾	戀愛中 男人 男人 淺啡色皮膚 啡色皮膚	some
+👨🏽‍❤‍👨🏿	戀愛中 男人 男人 淺啡色皮膚 黑皮膚	some
+👨🏾‍❤‍👨🏻	戀愛中 男人 男人 啡色皮膚 白皮膚	some
+👨🏾‍❤‍👨🏼	戀愛中 男人 男人 啡色皮膚 黃皮膚	some
+👨🏾‍❤‍👨🏽	戀愛中 男人 男人 啡色皮膚 淺啡色皮膚	some
+👨🏾‍❤‍👨🏾	戀愛中 男人 男人 啡色皮膚	some
+👨🏾‍❤‍👨🏿	戀愛中 男人 男人 啡色皮膚 黑皮膚	some
+👨🏿‍❤‍👨🏻	戀愛中 男人 男人 黑皮膚 白皮膚	some
+👨🏿‍❤‍👨🏼	戀愛中 男人 男人 黑皮膚 黃皮膚	some
+👨🏿‍❤‍👨🏽	戀愛中 男人 男人 黑皮膚 淺啡色皮膚	some
+👨🏿‍❤‍👨🏾	戀愛中 男人 男人 黑皮膚 啡色皮膚	some
+👨🏿‍❤‍👨🏿	戀愛中 男人 男人 黑皮膚	some
+👨‍🦰	男人 紅發	some
+👨🏻‍🦰	男人 白皮膚紅發	some
+👨🏼‍🦰	男人 黃皮膚紅發	some
+👨🏽‍🦰	男人 淺啡色皮膚 紅髮	some
+👨🏾‍🦰	男人 啡色皮膚 紅髮	some
+👨🏿‍🦰	男人 黑皮膚紅發	some
+👨‍🦱	男人 曲髮	some
+👨🏻‍🦱	男人 白皮膚 曲髮	some
+👨🏼‍🦱	男人 黃皮膚 曲髮	some
+👨🏽‍🦱	男人 淺啡色皮膚 曲髮	some
+👨🏾‍🦱	男人 啡色皮膚 曲髮	some
+👨🏿‍🦱	男人 黑皮膚 曲髮	some
+👨‍🦳	男人 白頭髮	some
+👨🏻‍🦳	男人 白皮膚 白頭髮	some
+👨🏼‍🦳	男人 黃皮膚 白頭髮	some
+👨🏽‍🦳	男人 淺啡色皮膚 白頭髮	some
+👨🏾‍🦳	男人 啡色皮膚 白頭髮	some
+👨🏿‍🦳	男人 黑皮膚 白頭髮	some
+👨‍🦲	男人 禿頂	some
+👨🏻‍🦲	男人 白皮膚禿頂	some
+👨🏼‍🦲	男人 黃皮膚禿頂	some
+👨🏽‍🦲	男人 淺啡色皮膚 禿頭	some
+👨🏾‍🦲	男人 啡色皮膚 禿頭	some
+👨🏿‍🦲	男人 黑皮膚禿頂	some
+👩🏻	女人 白皮膚	some
+👩🏼	女人 黃皮膚	some
+👩🏽	女人 淺啡色皮膚	some
+👩🏾	女人 啡色皮膚	some
+👩🏿	女人 黑皮膚	some
+🧔🏻‍♀	有絡腮鬍子的女人 白皮膚	some
+🧔🏼‍♀	有絡腮鬍子的女人 黃皮膚	some
+🧔🏽‍♀	女人 淺啡色皮膚 蓄鬍的人	some
+🧔🏾‍♀	女人 啡色皮膚 蓄鬍的人	some
+🧔🏿‍♀	有絡腮鬍子的女人 黑皮膚	some
+👱🏻‍♀	金髮女人 白皮膚	some
+👱🏼‍♀	金髮女人 黃皮膚	some
+👱🏽‍♀	金髮女人 淺啡色皮膚	some
+👱🏾‍♀	金髮女人 啡色皮膚	some
+👱🏿‍♀	金髮女人 黑皮膚	some
+👩🏻‍❤‍💋‍👨🏻	錫緊嘅一男一女 女人 男人 白皮膚	some
+👩🏻‍❤‍💋‍👨🏼	錫緊嘅一男一女 女人 男人 白皮膚 黃皮膚	some
+👩🏻‍❤‍💋‍👨🏽	錫緊嘅一男一女 女人 男人 白皮膚 淺啡色皮膚	some
+👩🏻‍❤‍💋‍👨🏾	錫緊嘅一男一女 女人 男人 白皮膚 啡色皮膚	some
+👩🏻‍❤‍💋‍👨🏿	錫緊嘅一男一女 女人 男人 白皮膚 黑皮膚	some
+👩🏼‍❤‍💋‍👨🏻	錫緊嘅一男一女 女人 男人 黃皮膚 白皮膚	some
+👩🏼‍❤‍💋‍👨🏼	錫緊嘅一男一女 女人 男人 黃皮膚	some
+👩🏼‍❤‍💋‍👨🏽	錫緊嘅一男一女 女人 男人 黃皮膚 淺啡色皮膚	some
+👩🏼‍❤‍💋‍👨🏾	錫緊嘅一男一女 女人 男人 黃皮膚 啡色皮膚	some
+👩🏼‍❤‍💋‍👨🏿	錫緊嘅一男一女 女人 男人 黃皮膚 黑皮膚	some
+👩🏽‍❤‍💋‍👨🏻	錫緊嘅一男一女 女人 男人 淺啡色皮膚 白皮膚	some
+👩🏽‍❤‍💋‍👨🏼	錫緊嘅一男一女 女人 男人 淺啡色皮膚 黃皮膚	some
+👩🏽‍❤‍💋‍👨🏽	錫緊嘅一男一女 女人 男人 淺啡色皮膚	some
+👩🏽‍❤‍💋‍👨🏾	錫緊嘅一男一女 女人 男人 淺啡色皮膚 啡色皮膚	some
+👩🏽‍❤‍💋‍👨🏿	錫緊嘅一男一女 女人 男人 淺啡色皮膚 黑皮膚	some
+👩🏾‍❤‍💋‍👨🏻	錫緊嘅一男一女 女人 男人 啡色皮膚 白皮膚	some
+👩🏾‍❤‍💋‍👨🏼	錫緊嘅一男一女 女人 男人 啡色皮膚 黃皮膚	some
+👩🏾‍❤‍💋‍👨🏽	錫緊嘅一男一女 女人 男人 啡色皮膚 淺啡色皮膚	some
+👩🏾‍❤‍💋‍👨🏾	錫緊嘅一男一女 女人 男人 啡色皮膚	some
+👩🏾‍❤‍💋‍👨🏿	錫緊嘅一男一女 女人 男人 啡色皮膚 黑皮膚	some
+👩🏿‍❤‍💋‍👨🏻	錫緊嘅一男一女 女人 男人 黑皮膚 白皮膚	some
+👩🏿‍❤‍💋‍👨🏼	錫緊嘅一男一女 女人 男人 黑皮膚 黃皮膚	some
+👩🏿‍❤‍💋‍👨🏽	錫緊嘅一男一女 女人 男人 黑皮膚 淺啡色皮膚	some
+👩🏿‍❤‍💋‍👨🏾	錫緊嘅一男一女 女人 男人 黑皮膚 啡色皮膚	some
+👩🏿‍❤‍💋‍👨🏿	錫緊嘅一男一女 女人 男人 黑皮膚	some
+👩🏻‍❤‍💋‍👩🏻	錫緊嘅一男一女 女人 女人 白皮膚	some
+👩🏻‍❤‍💋‍👩🏼	錫緊嘅一男一女 女人 女人 白皮膚 黃皮膚	some
+👩🏻‍❤‍💋‍👩🏽	錫緊嘅一男一女 女人 女人 白皮膚 淺啡色皮膚	some
+👩🏻‍❤‍💋‍👩🏾	錫緊嘅一男一女 女人 女人 白皮膚 啡色皮膚	some
+👩🏻‍❤‍💋‍👩🏿	錫緊嘅一男一女 女人 女人 白皮膚 黑皮膚	some
+👩🏼‍❤‍💋‍👩🏻	錫緊嘅一男一女 女人 女人 黃皮膚 白皮膚	some
+👩🏼‍❤‍💋‍👩🏼	錫緊嘅一男一女 女人 女人 黃皮膚	some
+👩🏼‍❤‍💋‍👩🏽	錫緊嘅一男一女 女人 女人 黃皮膚 淺啡色皮膚	some
+👩🏼‍❤‍💋‍👩🏾	錫緊嘅一男一女 女人 女人 黃皮膚 啡色皮膚	some
+👩🏼‍❤‍💋‍👩🏿	錫緊嘅一男一女 女人 女人 黃皮膚 黑皮膚	some
+👩🏽‍❤‍💋‍👩🏻	錫緊嘅一男一女 女人 女人 淺啡色皮膚 白皮膚	some
+👩🏽‍❤‍💋‍👩🏼	錫緊嘅一男一女 女人 女人 淺啡色皮膚 黃皮膚	some
+👩🏽‍❤‍💋‍👩🏽	錫緊嘅一男一女 女人 女人 淺啡色皮膚	some
+👩🏽‍❤‍💋‍👩🏾	錫緊嘅一男一女 女人 女人 淺啡色皮膚 啡色皮膚	some
+👩🏽‍❤‍💋‍👩🏿	錫緊嘅一男一女 女人 女人 淺啡色皮膚 黑皮膚	some
+👩🏾‍❤‍💋‍👩🏻	錫緊嘅一男一女 女人 女人 啡色皮膚 白皮膚	some
+👩🏾‍❤‍💋‍👩🏼	錫緊嘅一男一女 女人 女人 啡色皮膚 黃皮膚	some
+👩🏾‍❤‍💋‍👩🏽	錫緊嘅一男一女 女人 女人 啡色皮膚 淺啡色皮膚	some
+👩🏾‍❤‍💋‍👩🏾	錫緊嘅一男一女 女人 女人 啡色皮膚	some
+👩🏾‍❤‍💋‍👩🏿	錫緊嘅一男一女 女人 女人 啡色皮膚 黑皮膚	some
+👩🏿‍❤‍💋‍👩🏻	錫緊嘅一男一女 女人 女人 黑皮膚 白皮膚	some
+👩🏿‍❤‍💋‍👩🏼	錫緊嘅一男一女 女人 女人 黑皮膚 黃皮膚	some
+👩🏿‍❤‍💋‍👩🏽	錫緊嘅一男一女 女人 女人 黑皮膚 淺啡色皮膚	some
+👩🏿‍❤‍💋‍👩🏾	錫緊嘅一男一女 女人 女人 黑皮膚 啡色皮膚	some
+👩🏿‍❤‍💋‍👩🏿	錫緊嘅一男一女 女人 女人 黑皮膚	some
+👩🏻‍❤‍👨🏻	戀愛中 女人 男人 白皮膚	some
+👩🏻‍❤‍👨🏼	戀愛中 女人 男人 白皮膚 黃皮膚	some
+👩🏻‍❤‍👨🏽	戀愛中 女人 男人 白皮膚 淺啡色皮膚	some
+👩🏻‍❤‍👨🏾	戀愛中 女人 男人 白皮膚 啡色皮膚	some
+👩🏻‍❤‍👨🏿	戀愛中 女人 男人 白皮膚 黑皮膚	some
+👩🏼‍❤‍👨🏻	戀愛中 女人 男人 黃皮膚 白皮膚	some
+👩🏼‍❤‍👨🏼	戀愛中 女人 男人 黃皮膚	some
+👩🏼‍❤‍👨🏽	戀愛中 女人 男人 黃皮膚 淺啡色皮膚	some
+👩🏼‍❤‍👨🏾	戀愛中 女人 男人 黃皮膚 啡色皮膚	some
+👩🏼‍❤‍👨🏿	戀愛中 女人 男人 黃皮膚 黑皮膚	some
+👩🏽‍❤‍👨🏻	戀愛中 女人 男人 淺啡色皮膚 白皮膚	some
+👩🏽‍❤‍👨🏼	戀愛中 女人 男人 淺啡色皮膚 黃皮膚	some
+👩🏽‍❤‍👨🏽	戀愛中 女人 男人 淺啡色皮膚	some
+👩🏽‍❤‍👨🏾	戀愛中 女人 男人 淺啡色皮膚 啡色皮膚	some
+👩🏽‍❤‍👨🏿	戀愛中 女人 男人 淺啡色皮膚 黑皮膚	some
+👩🏾‍❤‍👨🏻	戀愛中 女人 男人 啡色皮膚 白皮膚	some
+👩🏾‍❤‍👨🏼	戀愛中 女人 男人 啡色皮膚 黃皮膚	some
+👩🏾‍❤‍👨🏽	戀愛中 女人 男人 啡色皮膚 淺啡色皮膚	some
+👩🏾‍❤‍👨🏾	戀愛中 女人 男人 啡色皮膚	some
+👩🏾‍❤‍👨🏿	戀愛中 女人 男人 啡色皮膚 黑皮膚	some
+👩🏿‍❤‍👨🏻	戀愛中 女人 男人 黑皮膚 白皮膚	some
+👩🏿‍❤‍👨🏼	戀愛中 女人 男人 黑皮膚 黃皮膚	some
+👩🏿‍❤‍👨🏽	戀愛中 女人 男人 黑皮膚 淺啡色皮膚	some
+👩🏿‍❤‍👨🏾	戀愛中 女人 男人 黑皮膚 啡色皮膚	some
+👩🏿‍❤‍👨🏿	戀愛中 女人 男人 黑皮膚	some
+👩🏻‍❤‍👩🏻	戀愛中 女人 女人 白皮膚	some
+👩🏻‍❤‍👩🏼	戀愛中 女人 女人 白皮膚 黃皮膚	some
+👩🏻‍❤‍👩🏽	戀愛中 女人 女人 白皮膚 淺啡色皮膚	some
+👩🏻‍❤‍👩🏾	戀愛中 女人 女人 白皮膚 啡色皮膚	some
+👩🏻‍❤‍👩🏿	戀愛中 女人 女人 白皮膚 黑皮膚	some
+👩🏼‍❤‍👩🏻	戀愛中 女人 女人 黃皮膚 白皮膚	some
+👩🏼‍❤‍👩🏼	戀愛中 女人 女人 黃皮膚	some
+👩🏼‍❤‍👩🏽	戀愛中 女人 女人 黃皮膚 淺啡色皮膚	some
+👩🏼‍❤‍👩🏾	戀愛中 女人 女人 黃皮膚 啡色皮膚	some
+👩🏼‍❤‍👩🏿	戀愛中 女人 女人 黃皮膚 黑皮膚	some
+👩🏽‍❤‍👩🏻	戀愛中 女人 女人 淺啡色皮膚 白皮膚	some
+👩🏽‍❤‍👩🏼	戀愛中 女人 女人 淺啡色皮膚 黃皮膚	some
+👩🏽‍❤‍👩🏽	戀愛中 女人 女人 淺啡色皮膚	some
+👩🏽‍❤‍👩🏾	戀愛中 女人 女人 淺啡色皮膚 啡色皮膚	some
+👩🏽‍❤‍👩🏿	戀愛中 女人 女人 淺啡色皮膚 黑皮膚	some
+👩🏾‍❤‍👩🏻	戀愛中 女人 女人 啡色皮膚 白皮膚	some
+👩🏾‍❤‍👩🏼	戀愛中 女人 女人 啡色皮膚 黃皮膚	some
+👩🏾‍❤‍👩🏽	戀愛中 女人 女人 啡色皮膚 淺啡色皮膚	some
+👩🏾‍❤‍👩🏾	戀愛中 女人 女人 啡色皮膚	some
+👩🏾‍❤‍👩🏿	戀愛中 女人 女人 啡色皮膚 黑皮膚	some
+👩🏿‍❤‍👩🏻	戀愛中 女人 女人 黑皮膚 白皮膚	some
+👩🏿‍❤‍👩🏼	戀愛中 女人 女人 黑皮膚 黃皮膚	some
+👩🏿‍❤‍👩🏽	戀愛中 女人 女人 黑皮膚 淺啡色皮膚	some
+👩🏿‍❤‍👩🏾	戀愛中 女人 女人 黑皮膚 啡色皮膚	some
+👩🏿‍❤‍👩🏿	戀愛中 女人 女人 黑皮膚	some
+👩‍🦰	女人 紅發	some
+👩🏻‍🦰	女人 白皮膚紅發	some
+👩🏼‍🦰	女人 黃皮膚紅發	some
+👩🏽‍🦰	女人 淺啡色皮膚 紅髮	some
+👩🏾‍🦰	女人 啡色皮膚 紅髮	some
+👩🏿‍🦰	女人 黑皮膚紅發	some
+👩‍🦱	女人 曲髮	some
+👩🏻‍🦱	女人 白皮膚 曲髮	some
+👩🏼‍🦱	女人 黃皮膚 曲髮	some
+👩🏽‍🦱	女人 淺啡色皮膚 曲髮	some
+👩🏾‍🦱	女人 啡色皮膚 曲髮	some
+👩🏿‍🦱	女人 黑皮膚 曲髮	some
+👩‍🦳	女人 白頭髮	some
+👩🏻‍🦳	女人 白皮膚 白頭髮	some
+👩🏼‍🦳	女人 黃皮膚 白頭髮	some
+👩🏽‍🦳	女人 淺啡色皮膚 白頭髮	some
+👩🏾‍🦳	女人 啡色皮膚 白頭髮	some
+👩🏿‍🦳	女人 黑皮膚 白頭髮	some
+👩‍🦲	女人 禿頂	some
+👩🏻‍🦲	女人 白皮膚禿頂	some
+👩🏼‍🦲	女人 黃皮膚禿頂	some
+👩🏽‍🦲	女人 淺啡色皮膚 禿頭	some
+👩🏾‍🦲	女人 啡色皮膚 禿頭	some
+👩🏿‍🦲	女人 黑皮膚禿頂	some
+🧓🏻	老人家 白皮膚	some
+🧓🏼	老人家 黃皮膚	some
+🧓🏽	老人家 淺啡色皮膚	some
+🧓🏾	老人家 啡色皮膚	some
+🧓🏿	老人家 黑皮膚	some
+👴🏻	老伯 白皮膚	some
+👴🏼	老伯 黃皮膚	some
+👴🏽	老伯 淺啡色皮膚	some
+👴🏾	老伯 啡色皮膚	some
+👴🏿	老伯 黑皮膚	some
+👵🏻	老婆婆 白皮膚	some
+👵🏼	老婆婆 黃皮膚	some
+👵🏽	老婆婆 淺啡色皮膚	some
+👵🏾	老婆婆 啡色皮膚	some
+👵🏿	老婆婆 黑皮膚	some
+🙍🏻	皺眉嘅人 白皮膚	some
+🙍🏼	皺眉嘅人 黃皮膚	some
+🙍🏽	皺眉嘅人 淺啡色皮膚	some
+🙍🏾	皺眉嘅人 啡色皮膚	some
+🙍🏿	皺眉嘅人 黑皮膚	some
+🙍🏻‍♂	男子皺眉 白皮膚	some
+🙍🏼‍♂	男子皺眉 黃皮膚	some
+🙍🏽‍♂	男子皺眉 淺啡色皮膚	some
+🙍🏾‍♂	男子皺眉 啡色皮膚	some
+🙍🏿‍♂	男子皺眉 黑皮膚	some
+🙍🏻‍♀	女子皺眉 白皮膚	some
+🙍🏼‍♀	女子皺眉 黃皮膚	some
+🙍🏽‍♀	女子皺眉 淺啡色皮膚	some
+🙍🏾‍♀	女子皺眉 啡色皮膚	some
+🙍🏿‍♀	女子皺眉 黑皮膚	some
+🙎🏻	撅嘴嘅人 白皮膚	some
+🙎🏼	撅嘴嘅人 黃皮膚	some
+🙎🏽	撅嘴嘅人 淺啡色皮膚	some
+🙎🏾	撅嘴嘅人 啡色皮膚	some
+🙎🏿	撅嘴嘅人 黑皮膚	some
+🙎🏻‍♂	男子噘嘴 白皮膚	some
+🙎🏼‍♂	男子噘嘴 黃皮膚	some
+🙎🏽‍♂	男子噘嘴 淺啡色皮膚	some
+🙎🏾‍♂	男子噘嘴 啡色皮膚	some
+🙎🏿‍♂	男子噘嘴 黑皮膚	some
+🙎🏻‍♀	女子噘嘴 白皮膚	some
+🙎🏼‍♀	女子噘嘴 黃皮膚	some
+🙎🏽‍♀	女子噘嘴 淺啡色皮膚	some
+🙎🏾‍♀	女子噘嘴 啡色皮膚	some
+🙎🏿‍♀	女子噘嘴 黑皮膚	some
+🙅🏻	用手臂做出交叉手勢嘅人 白皮膚	some
+🙅🏼	用手臂做出交叉手勢嘅人 黃皮膚	some
+🙅🏽	用手臂做出交叉手勢嘅人 淺啡色皮膚	some
+🙅🏾	用手臂做出交叉手勢嘅人 啡色皮膚	some
+🙅🏿	用手臂做出交叉手勢嘅人 黑皮膚	some
+🙅🏻‍♂	用手臂做出交叉手勢嘅男人 白皮膚	some
+🙅🏼‍♂	用手臂做出交叉手勢嘅男人 黃皮膚	some
+🙅🏽‍♂	用手臂做出交叉手勢嘅男人 淺啡色皮膚	some
+🙅🏾‍♂	用手臂做出交叉手勢嘅男人 啡色皮膚	some
+🙅🏿‍♂	用手臂做出交叉手勢嘅男人 黑皮膚	some
+🙅🏻‍♀	用手臂做出交叉手勢嘅女人 白皮膚	some
+🙅🏼‍♀	用手臂做出交叉手勢嘅女人 黃皮膚	some
+🙅🏽‍♀	用手臂做出交叉手勢嘅女人 淺啡色皮膚	some
+🙅🏾‍♀	用手臂做出交叉手勢嘅女人 啡色皮膚	some
+🙅🏿‍♀	用手臂做出交叉手勢嘅女人 黑皮膚	some
+🙆🏻	用手勢表示 OK 嘅人 白皮膚	some
+🙆🏼	用手勢表示 OK 嘅人 黃皮膚	some
+🙆🏽	用手勢表示 OK 嘅人 淺啡色皮膚	some
+🙆🏾	用手勢表示 OK 嘅人 啡色皮膚	some
+🙆🏿	用手勢表示 OK 嘅人 黑皮膚	some
+🙆🏻‍♂	用手勢表示 OK 嘅男人 白皮膚	some
+🙆🏼‍♂	用手勢表示 OK 嘅男人 黃皮膚	some
+🙆🏽‍♂	用手勢表示 OK 嘅男人 淺啡色皮膚	some
+🙆🏾‍♂	用手勢表示 OK 嘅男人 啡色皮膚	some
+🙆🏿‍♂	用手勢表示 OK 嘅男人 黑皮膚	some
+🙆🏻‍♀	用手勢表示 OK 嘅女人 白皮膚	some
+🙆🏼‍♀	用手勢表示 OK 嘅女人 黃皮膚	some
+🙆🏽‍♀	用手勢表示 OK 嘅女人 淺啡色皮膚	some
+🙆🏾‍♀	用手勢表示 OK 嘅女人 啡色皮膚	some
+🙆🏿‍♀	用手勢表示 OK 嘅女人 黑皮膚	some
+💁🏻	攤開手嘅人 白皮膚	some
+💁🏼	攤開手嘅人 黃皮膚	some
+💁🏽	攤開手嘅人 淺啡色皮膚	some
+💁🏾	攤開手嘅人 啡色皮膚	some
+💁🏿	攤開手嘅人 黑皮膚	some
+💁🏻‍♂	男子抬手 白皮膚	some
+💁🏼‍♂	男子抬手 黃皮膚	some
+💁🏽‍♂	男子抬手 淺啡色皮膚	some
+💁🏾‍♂	男子抬手 啡色皮膚	some
+💁🏿‍♂	男子抬手 黑皮膚	some
+💁🏻‍♀	攤開手嘅女人 白皮膚	some
+💁🏼‍♀	攤開手嘅女人 黃皮膚	some
+💁🏽‍♀	攤開手嘅女人 淺啡色皮膚	some
+💁🏾‍♀	攤開手嘅女人 啡色皮膚	some
+💁🏿‍♀	攤開手嘅女人 黑皮膚	some
+🙋🏻	舉起一隻手 白皮膚	some
+🙋🏼	舉起一隻手 黃皮膚	some
+🙋🏽	舉起一隻手 淺啡色皮膚	some
+🙋🏾	舉起一隻手 啡色皮膚	some
+🙋🏿	舉起一隻手 黑皮膚	some
+🙋🏻‍♂	開心嘅男人舉起一隻手 白皮膚	some
+🙋🏼‍♂	開心嘅男人舉起一隻手 黃皮膚	some
+🙋🏽‍♂	開心嘅男人舉起一隻手 淺啡色皮膚	some
+🙋🏾‍♂	開心嘅男人舉起一隻手 啡色皮膚	some
+🙋🏿‍♂	開心嘅男人舉起一隻手 黑皮膚	some
+🙋🏻‍♀	開心嘅女人舉起一隻手 白皮膚	some
+🙋🏼‍♀	開心嘅女人舉起一隻手 黃皮膚	some
+🙋🏽‍♀	開心嘅女人舉起一隻手 淺啡色皮膚	some
+🙋🏾‍♀	開心嘅女人舉起一隻手 啡色皮膚	some
+🙋🏿‍♀	開心嘅女人舉起一隻手 黑皮膚	some
+🧏🏻	失聰者 白皮膚	some
+🧏🏼	失聰者 黃皮膚	some
+🧏🏽	聽障人士 淺啡色皮膚	some
+🧏🏾	聽障人士 啡色皮膚	some
+🧏🏿	失聰者 黑皮膚	some
+🧏🏻‍♂	聽障男人 白皮膚	some
+🧏🏼‍♂	聽障男人 黃皮膚	some
+🧏🏽‍♂	聽障男人 淺啡色皮膚	some
+🧏🏾‍♂	聽障男人 啡色皮膚	some
+🧏🏿‍♂	聽障男人 黑皮膚	some
+🧏🏻‍♀	聽障女人 白皮膚	some
+🧏🏼‍♀	聽障女人 黃皮膚	some
+🧏🏽‍♀	聽障女人 淺啡色皮膚	some
+🧏🏾‍♀	聽障女人 啡色皮膚	some
+🧏🏿‍♀	聽障女人 黑皮膚	some
+🙇🏻	鞠躬 白皮膚	some
+🙇🏼	鞠躬 黃皮膚	some
+🙇🏽	鞠躬 淺啡色皮膚	some
+🙇🏾	鞠躬 啡色皮膚	some
+🙇🏿	鞠躬 黑皮膚	some
+🙇🏻‍♂	鞠躬嘅男人 白皮膚	some
+🙇🏼‍♂	鞠躬嘅男人 黃皮膚	some
+🙇🏽‍♂	鞠躬嘅男人 淺啡色皮膚	some
+🙇🏾‍♂	鞠躬嘅男人 啡色皮膚	some
+🙇🏿‍♂	鞠躬嘅男人 黑皮膚	some
+🙇🏻‍♀	鞠躬嘅女人 白皮膚	some
+🙇🏼‍♀	鞠躬嘅女人 黃皮膚	some
+🙇🏽‍♀	鞠躬嘅女人 淺啡色皮膚	some
+🙇🏾‍♀	鞠躬嘅女人 啡色皮膚	some
+🙇🏿‍♀	鞠躬嘅女人 黑皮膚	some
+🤦🏻	遮住塊面 白皮膚	some
+🤦🏼	遮住塊面 黃皮膚	some
+🤦🏽	遮住塊面 淺啡色皮膚	some
+🤦🏾	遮住塊面 啡色皮膚	some
+🤦🏿	遮住塊面 黑皮膚	some
+🤦🏻‍♂	遮住面嘅男人 白皮膚	some
+🤦🏼‍♂	遮住面嘅男人 黃皮膚	some
+🤦🏽‍♂	遮住面嘅男人 淺啡色皮膚	some
+🤦🏾‍♂	遮住面嘅男人 啡色皮膚	some
+🤦🏿‍♂	遮住面嘅男人 黑皮膚	some
+🤦🏻‍♀	遮住面嘅女人 白皮膚	some
+🤦🏼‍♀	遮住面嘅女人 黃皮膚	some
+🤦🏽‍♀	遮住面嘅女人 淺啡色皮膚	some
+🤦🏾‍♀	遮住面嘅女人 啡色皮膚	some
+🤦🏿‍♀	遮住面嘅女人 黑皮膚	some
+🤷🏻	聳肩嘅人 白皮膚	some
+🤷🏼	聳肩嘅人 黃皮膚	some
+🤷🏽	聳肩嘅人 淺啡色皮膚	some
+🤷🏾	聳肩嘅人 啡色皮膚	some
+🤷🏿	聳肩嘅人 黑皮膚	some
+🤷🏻‍♂	聳肩嘅男人 白皮膚	some
+🤷🏼‍♂	聳肩嘅男人 黃皮膚	some
+🤷🏽‍♂	聳肩嘅男人 淺啡色皮膚	some
+🤷🏾‍♂	聳肩嘅男人 啡色皮膚	some
+🤷🏿‍♂	聳肩嘅男人 黑皮膚	some
+🤷🏻‍♀	聳肩嘅女人 白皮膚	some
+🤷🏼‍♀	聳肩嘅女人 黃皮膚	some
+🤷🏽‍♀	聳肩嘅女人 淺啡色皮膚	some
+🤷🏾‍♀	聳肩嘅女人 啡色皮膚	some
+🤷🏿‍♀	聳肩嘅女人 黑皮膚	some
+🧑🏻‍⚕	衛生工作者 白皮膚	some
+🧑🏼‍⚕	衛生工作者 黃皮膚	some
+🧑🏽‍⚕	醫護人員 淺啡色皮膚	some
+🧑🏾‍⚕	醫護人員 啡色皮膚	some
+🧑🏿‍⚕	衛生工作者 黑皮膚	some
+👨🏻‍⚕	男醫護人員 白皮膚	some
+👨🏼‍⚕	男醫護人員 黃皮膚	some
+👨🏽‍⚕	男醫護人員 淺啡色皮膚	some
+👨🏾‍⚕	男醫護人員 啡色皮膚	some
+👨🏿‍⚕	男醫護人員 黑皮膚	some
+👩🏻‍⚕	女醫護人員 白皮膚	some
+👩🏼‍⚕	女醫護人員 黃皮膚	some
+👩🏽‍⚕	女醫護人員 淺啡色皮膚	some
+👩🏾‍⚕	女醫護人員 啡色皮膚	some
+👩🏿‍⚕	女醫護人員 黑皮膚	some
+🧑🏻‍🎓	學生 白皮膚	some
+🧑🏼‍🎓	學生 黃皮膚	some
+🧑🏽‍🎓	學生 淺啡色皮膚	some
+🧑🏾‍🎓	學生 啡色皮膚	some
+🧑🏿‍🎓	學生 黑皮膚	some
+👨🏻‍🎓	男學生 白皮膚	some
+👨🏼‍🎓	男學生 黃皮膚	some
+👨🏽‍🎓	男學生 淺啡色皮膚	some
+👨🏾‍🎓	男學生 啡色皮膚	some
+👨🏿‍🎓	男學生 黑皮膚	some
+👩🏻‍🎓	女學生 白皮膚	some
+👩🏼‍🎓	女學生 黃皮膚	some
+👩🏽‍🎓	女學生 淺啡色皮膚	some
+👩🏾‍🎓	女學生 啡色皮膚	some
+👩🏿‍🎓	女學生 黑皮膚	some
+🧑🏻‍🏫	老師 白皮膚	some
+🧑🏼‍🏫	老師 黃皮膚	some
+🧑🏽‍🏫	老師 淺啡色皮膚	some
+🧑🏾‍🏫	老師 啡色皮膚	some
+🧑🏿‍🏫	老師 黑皮膚	some
+👨🏻‍🏫	男老師 白皮膚	some
+👨🏼‍🏫	男老師 黃皮膚	some
+👨🏽‍🏫	男老師 淺啡色皮膚	some
+👨🏾‍🏫	男老師 啡色皮膚	some
+👨🏿‍🏫	男老師 黑皮膚	some
+👩🏻‍🏫	女老師 白皮膚	some
+👩🏼‍🏫	女老師 黃皮膚	some
+👩🏽‍🏫	女老師 淺啡色皮膚	some
+👩🏾‍🏫	女老師 啡色皮膚	some
+👩🏿‍🏫	女老師 黑皮膚	some
+🧑🏻‍⚖	法官 白皮膚	some
+🧑🏼‍⚖	法官 黃皮膚	some
+🧑🏽‍⚖	法官 淺啡色皮膚	some
+🧑🏾‍⚖	法官 啡色皮膚	some
+🧑🏿‍⚖	法官 黑皮膚	some
+👨🏻‍⚖	男法官 白皮膚	some
+👨🏼‍⚖	男法官 黃皮膚	some
+👨🏽‍⚖	男法官 淺啡色皮膚	some
+👨🏾‍⚖	男法官 啡色皮膚	some
+👨🏿‍⚖	男法官 黑皮膚	some
+👩🏻‍⚖	女法官 白皮膚	some
+👩🏼‍⚖	女法官 黃皮膚	some
+👩🏽‍⚖	女法官 淺啡色皮膚	some
+👩🏾‍⚖	女法官 啡色皮膚	some
+👩🏿‍⚖	女法官 黑皮膚	some
+🧑🏻‍🌾	農民 白皮膚	some
+🧑🏼‍🌾	農民 黃皮膚	some
+🧑🏽‍🌾	農民 淺啡色皮膚	some
+🧑🏾‍🌾	農民 啡色皮膚	some
+🧑🏿‍🌾	農民 黑皮膚	some
+👨🏻‍🌾	男農夫 白皮膚	some
+👨🏼‍🌾	男農夫 黃皮膚	some
+👨🏽‍🌾	男農夫 淺啡色皮膚	some
+👨🏾‍🌾	男農夫 啡色皮膚	some
+👨🏿‍🌾	男農夫 黑皮膚	some
+👩🏻‍🌾	女農夫 白皮膚	some
+👩🏼‍🌾	女農夫 黃皮膚	some
+👩🏽‍🌾	女農夫 淺啡色皮膚	some
+👩🏾‍🌾	女農夫 啡色皮膚	some
+👩🏿‍🌾	女農夫 黑皮膚	some
+🧑🏻‍🍳	廚師 白皮膚	some
+🧑🏼‍🍳	廚師 黃皮膚	some
+🧑🏽‍🍳	廚師 淺啡色皮膚	some
+🧑🏾‍🍳	廚師 啡色皮膚	some
+🧑🏿‍🍳	廚師 黑皮膚	some
+👨🏻‍🍳	男廚師 白皮膚	some
+👨🏼‍🍳	男廚師 黃皮膚	some
+👨🏽‍🍳	男廚師 淺啡色皮膚	some
+👨🏾‍🍳	男廚師 啡色皮膚	some
+👨🏿‍🍳	男廚師 黑皮膚	some
+👩🏻‍🍳	女廚師 白皮膚	some
+👩🏼‍🍳	女廚師 黃皮膚	some
+👩🏽‍🍳	女廚師 淺啡色皮膚	some
+👩🏾‍🍳	女廚師 啡色皮膚	some
+👩🏿‍🍳	女廚師 黑皮膚	some
+🧑🏻‍🔧	技工 白皮膚	some
+🧑🏼‍🔧	技工 黃皮膚	some
+🧑🏽‍🔧	技工 淺啡色皮膚	some
+🧑🏾‍🔧	技工 啡色皮膚	some
+🧑🏿‍🔧	技工 黑皮膚	some
+👨🏻‍🔧	男技工 白皮膚	some
+👨🏼‍🔧	男技工 黃皮膚	some
+👨🏽‍🔧	男技工 淺啡色皮膚	some
+👨🏾‍🔧	男技工 啡色皮膚	some
+👨🏿‍🔧	男技工 黑皮膚	some
+👩🏻‍🔧	女技工 白皮膚	some
+👩🏼‍🔧	女技工 黃皮膚	some
+👩🏽‍🔧	女技工 淺啡色皮膚	some
+👩🏾‍🔧	女技工 啡色皮膚	some
+👩🏿‍🔧	女技工 黑皮膚	some
+🧑🏻‍🏭	工人 白皮膚	some
+🧑🏼‍🏭	工人 黃皮膚	some
+🧑🏽‍🏭	工廠作業員 淺啡色皮膚	some
+🧑🏾‍🏭	工廠作業員 啡色皮膚	some
+🧑🏿‍🏭	工人 黑皮膚	some
+👨🏻‍🏭	男工廠工人 白皮膚	some
+👨🏼‍🏭	男工廠工人 黃皮膚	some
+👨🏽‍🏭	男工廠工人 淺啡色皮膚	some
+👨🏾‍🏭	男工廠工人 啡色皮膚	some
+👨🏿‍🏭	男工廠工人 黑皮膚	some
+👩🏻‍🏭	女工廠工人 白皮膚	some
+👩🏼‍🏭	女工廠工人 黃皮膚	some
+👩🏽‍🏭	女工廠工人 淺啡色皮膚	some
+👩🏾‍🏭	女工廠工人 啡色皮膚	some
+👩🏿‍🏭	女工廠工人 黑皮膚	some
+🧑🏻‍💼	白領 白皮膚	some
+🧑🏼‍💼	白領 黃皮膚	some
+🧑🏽‍💼	上班族 淺啡色皮膚	some
+🧑🏾‍💼	上班族 啡色皮膚	some
+🧑🏿‍💼	白領 黑皮膚	some
+👨🏻‍💼	男職員 白皮膚	some
+👨🏼‍💼	男職員 黃皮膚	some
+👨🏽‍💼	男職員 淺啡色皮膚	some
+👨🏾‍💼	男職員 啡色皮膚	some
+👨🏿‍💼	男職員 黑皮膚	some
+👩🏻‍💼	女職員 白皮膚	some
+👩🏼‍💼	女職員 黃皮膚	some
+👩🏽‍💼	女職員 淺啡色皮膚	some
+👩🏾‍💼	女職員 啡色皮膚	some
+👩🏿‍💼	女職員 黑皮膚	some
+🧑🏻‍🔬	科學家 白皮膚	some
+🧑🏼‍🔬	科學家 黃皮膚	some
+🧑🏽‍🔬	科學家 淺啡色皮膚	some
+🧑🏾‍🔬	科學家 啡色皮膚	some
+🧑🏿‍🔬	科學家 黑皮膚	some
+👨🏻‍🔬	男科學家 白皮膚	some
+👨🏼‍🔬	男科學家 黃皮膚	some
+👨🏽‍🔬	男科學家 淺啡色皮膚	some
+👨🏾‍🔬	男科學家 啡色皮膚	some
+👨🏿‍🔬	男科學家 黑皮膚	some
+👩🏻‍🔬	女科學家 白皮膚	some
+👩🏼‍🔬	女科學家 黃皮膚	some
+👩🏽‍🔬	女科學家 淺啡色皮膚	some
+👩🏾‍🔬	女科學家 啡色皮膚	some
+👩🏿‍🔬	女科學家 黑皮膚	some
+🧑🏻‍💻	程式師 白皮膚	some
+🧑🏼‍💻	程式師 黃皮膚	some
+🧑🏽‍💻	工程師 淺啡色皮膚	some
+🧑🏾‍💻	工程師 啡色皮膚	some
+🧑🏿‍💻	程式師 黑皮膚	some
+👨🏻‍💻	男技術人員 白皮膚	some
+👨🏼‍💻	男技術人員 黃皮膚	some
+👨🏽‍💻	男技術人員 淺啡色皮膚	some
+👨🏾‍💻	男技術人員 啡色皮膚	some
+👨🏿‍💻	男技術人員 黑皮膚	some
+👩🏻‍💻	女技術人員 白皮膚	some
+👩🏼‍💻	女技術人員 黃皮膚	some
+👩🏽‍💻	女技術人員 淺啡色皮膚	some
+👩🏾‍💻	女技術人員 啡色皮膚	some
+👩🏿‍💻	女技術人員 黑皮膚	some
+🧑🏻‍🎤	歌手 白皮膚	some
+🧑🏼‍🎤	歌手 黃皮膚	some
+🧑🏽‍🎤	歌手 淺啡色皮膚	some
+🧑🏾‍🎤	歌手 啡色皮膚	some
+🧑🏿‍🎤	歌手 黑皮膚	some
+👨🏻‍🎤	男歌手 白皮膚	some
+👨🏼‍🎤	男歌手 黃皮膚	some
+👨🏽‍🎤	男歌手 淺啡色皮膚	some
+👨🏾‍🎤	男歌手 啡色皮膚	some
+👨🏿‍🎤	男歌手 黑皮膚	some
+👩🏻‍🎤	女歌手 白皮膚	some
+👩🏼‍🎤	女歌手 黃皮膚	some
+👩🏽‍🎤	女歌手 淺啡色皮膚	some
+👩🏾‍🎤	女歌手 啡色皮膚	some
+👩🏿‍🎤	女歌手 黑皮膚	some
+🧑🏻‍🎨	藝術家 白皮膚	some
+🧑🏼‍🎨	藝術家 黃皮膚	some
+🧑🏽‍🎨	藝術家 淺啡色皮膚	some
+🧑🏾‍🎨	藝術家 啡色皮膚	some
+🧑🏿‍🎨	藝術家 黑皮膚	some
+👨🏻‍🎨	男畫家 白皮膚	some
+👨🏼‍🎨	男畫家 黃皮膚	some
+👨🏽‍🎨	男畫家 淺啡色皮膚	some
+👨🏾‍🎨	男畫家 啡色皮膚	some
+👨🏿‍🎨	男畫家 黑皮膚	some
+👩🏻‍🎨	女畫家 白皮膚	some
+👩🏼‍🎨	女畫家 黃皮膚	some
+👩🏽‍🎨	女畫家 淺啡色皮膚	some
+👩🏾‍🎨	女畫家 啡色皮膚	some
+👩🏿‍🎨	女畫家 黑皮膚	some
+🧑🏻‍✈	飛行員 白皮膚	some
+🧑🏼‍✈	飛行員 黃皮膚	some
+🧑🏽‍✈	機長 淺啡色皮膚	some
+🧑🏾‍✈	機長 啡色皮膚	some
+🧑🏿‍✈	飛行員 黑皮膚	some
+👨🏻‍✈	男機師 白皮膚	some
+👨🏼‍✈	男機師 黃皮膚	some
+👨🏽‍✈	男機師 淺啡色皮膚	some
+👨🏾‍✈	男機師 啡色皮膚	some
+👨🏿‍✈	男機師 黑皮膚	some
+👩🏻‍✈	女機師 白皮膚	some
+👩🏼‍✈	女機師 黃皮膚	some
+👩🏽‍✈	女機師 淺啡色皮膚	some
+👩🏾‍✈	女機師 啡色皮膚	some
+👩🏿‍✈	女機師 黑皮膚	some
+🧑🏻‍🚀	宇航員 白皮膚	some
+🧑🏼‍🚀	宇航員 黃皮膚	some
+🧑🏽‍🚀	太空人 淺啡色皮膚	some
+🧑🏾‍🚀	太空人 啡色皮膚	some
+🧑🏿‍🚀	宇航員 黑皮膚	some
+👨🏻‍🚀	男宇航員 白皮膚	some
+👨🏼‍🚀	男宇航員 黃皮膚	some
+👨🏽‍🚀	男太空人 淺啡色皮膚	some
+👨🏾‍🚀	男太空人 啡色皮膚	some
+👨🏿‍🚀	男宇航員 黑皮膚	some
+👩🏻‍🚀	女宇航員 白皮膚	some
+👩🏼‍🚀	女宇航員 黃皮膚	some
+👩🏽‍🚀	女太空人 淺啡色皮膚	some
+👩🏾‍🚀	女太空人 啡色皮膚	some
+👩🏿‍🚀	女宇航員 黑皮膚	some
+🧑🏻‍🚒	消防員 白皮膚	some
+🧑🏼‍🚒	消防員 黃皮膚	some
+🧑🏽‍🚒	消防員 淺啡色皮膚	some
+🧑🏾‍🚒	消防員 啡色皮膚	some
+🧑🏿‍🚒	消防員 黑皮膚	some
+👨🏻‍🚒	男消防員 白皮膚	some
+👨🏼‍🚒	男消防員 黃皮膚	some
+👨🏽‍🚒	男消防員 淺啡色皮膚	some
+👨🏾‍🚒	男消防員 啡色皮膚	some
+👨🏿‍🚒	男消防員 黑皮膚	some
+👩🏻‍🚒	女消防員 白皮膚	some
+👩🏼‍🚒	女消防員 黃皮膚	some
+👩🏽‍🚒	女消防員 淺啡色皮膚	some
+👩🏾‍🚒	女消防員 啡色皮膚	some
+👩🏿‍🚒	女消防員 黑皮膚	some
+👮🏻	員警 白皮膚	some
+👮🏼	員警 黃皮膚	some
+👮🏽	員警 淺啡色皮膚	some
+👮🏾	員警 啡色皮膚	some
+👮🏿	員警 黑皮膚	some
+👮🏻‍♂	男員警 白皮膚	some
+👮🏼‍♂	男員警 黃皮膚	some
+👮🏽‍♂	男警 淺啡色皮膚	some
+👮🏾‍♂	男警 啡色皮膚	some
+👮🏿‍♂	男員警 黑皮膚	some
+👮🏻‍♀	女員警 白皮膚	some
+👮🏼‍♀	女員警 黃皮膚	some
+👮🏽‍♀	女警 淺啡色皮膚	some
+👮🏾‍♀	女警 啡色皮膚	some
+👮🏿‍♀	女員警 黑皮膚	some
+🕵🏻	偵探 白皮膚	some
+🕵🏼	偵探 黃皮膚	some
+🕵🏽	偵探 淺啡色皮膚	some
+🕵🏾	偵探 啡色皮膚	some
+🕵🏿	偵探 黑皮膚	some
+🕵🏻‍♂	男偵探 白皮膚	some
+🕵🏼‍♂	男偵探 黃皮膚	some
+🕵🏽‍♂	男偵探 淺啡色皮膚	some
+🕵🏾‍♂	男偵探 啡色皮膚	some
+🕵🏿‍♂	男偵探 黑皮膚	some
+🕵🏻‍♀	女偵探 白皮膚	some
+🕵🏼‍♀	女偵探 黃皮膚	some
+🕵🏽‍♀	女偵探 淺啡色皮膚	some
+🕵🏾‍♀	女偵探 啡色皮膚	some
+🕵🏿‍♀	女偵探 黑皮膚	some
+💂🏻	守衛 白皮膚	some
+💂🏼	守衛 黃皮膚	some
+💂🏽	守衛 淺啡色皮膚	some
+💂🏾	守衛 啡色皮膚	some
+💂🏿	守衛 黑皮膚	some
+💂🏻‍♂	男守衛 白皮膚	some
+💂🏼‍♂	男守衛 黃皮膚	some
+💂🏽‍♂	男守衛 淺啡色皮膚	some
+💂🏾‍♂	男守衛 啡色皮膚	some
+💂🏿‍♂	男守衛 黑皮膚	some
+💂🏻‍♀	女守衛 白皮膚	some
+💂🏼‍♀	女守衛 黃皮膚	some
+💂🏽‍♀	女守衛 淺啡色皮膚	some
+💂🏾‍♀	女守衛 啡色皮膚	some
+💂🏿‍♀	女守衛 黑皮膚	some
+🥷🏻	忍者 白皮膚	some
+🥷🏼	忍者 黃皮膚	some
+🥷🏽	忍者 淺啡色皮膚	some
+🥷🏾	忍者 啡色皮膚	some
+🥷🏿	忍者 黑皮膚	some
+👷🏻	建築工人 白皮膚	some
+👷🏼	建築工人 黃皮膚	some
+👷🏽	建築工人 淺啡色皮膚	some
+👷🏾	建築工人 啡色皮膚	some
+👷🏿	建築工人 黑皮膚	some
+👷🏻‍♂	男建築工人 白皮膚	some
+👷🏼‍♂	男建築工人 黃皮膚	some
+👷🏽‍♂	男建築工人 淺啡色皮膚	some
+👷🏾‍♂	男建築工人 啡色皮膚	some
+👷🏿‍♂	男建築工人 黑皮膚	some
+👷🏻‍♀	女建築工人 白皮膚	some
+👷🏼‍♀	女建築工人 黃皮膚	some
+👷🏽‍♀	女建築工人 淺啡色皮膚	some
+👷🏾‍♀	女建築工人 啡色皮膚	some
+👷🏿‍♀	女建築工人 黑皮膚	some
+🤴🏻	王子 白皮膚	some
+🤴🏼	王子 黃皮膚	some
+🤴🏽	王子 淺啡色皮膚	some
+🤴🏾	王子 啡色皮膚	some
+🤴🏿	王子 黑皮膚	some
+👸🏻	公主 白皮膚	some
+👸🏼	公主 黃皮膚	some
+👸🏽	公主 淺啡色皮膚	some
+👸🏾	公主 啡色皮膚	some
+👸🏿	公主 黑皮膚	some
+👳🏻	戴頭巾嘅人 白皮膚	some
+👳🏼	戴頭巾嘅人 黃皮膚	some
+👳🏽	戴頭巾嘅人 淺啡色皮膚	some
+👳🏾	戴頭巾嘅人 啡色皮膚	some
+👳🏿	戴頭巾嘅人 黑皮膚	some
+👳🏻‍♂	戴頭巾嘅男人 白皮膚	some
+👳🏼‍♂	戴頭巾嘅男人 黃皮膚	some
+👳🏽‍♂	戴頭巾嘅男人 淺啡色皮膚	some
+👳🏾‍♂	戴頭巾嘅男人 啡色皮膚	some
+👳🏿‍♂	戴頭巾嘅男人 黑皮膚	some
+👳🏻‍♀	戴頭巾嘅女人 白皮膚	some
+👳🏼‍♀	戴頭巾嘅女人 黃皮膚	some
+👳🏽‍♀	戴頭巾嘅女人 淺啡色皮膚	some
+👳🏾‍♀	戴頭巾嘅女人 啡色皮膚	some
+👳🏿‍♀	戴頭巾嘅女人 黑皮膚	some
+👲🏻	戴中式帽嘅男人 白皮膚	some
+👲🏼	戴中式帽嘅男人 黃皮膚	some
+👲🏽	戴中式帽嘅男人 淺啡色皮膚	some
+👲🏾	戴中式帽嘅男人 啡色皮膚	some
+👲🏿	戴中式帽嘅男人 黑皮膚	some
+🧕🏻	包頭巾嘅女人 白皮膚	some
+🧕🏼	包頭巾嘅女人 黃皮膚	some
+🧕🏽	包頭巾嘅女人 淺啡色皮膚	some
+🧕🏾	包頭巾嘅女人 啡色皮膚	some
+🧕🏿	包頭巾嘅女人 黑皮膚	some
+🤵🏻	著禮服嘅男人 白皮膚	some
+🤵🏼	著禮服嘅男人 黃皮膚	some
+🤵🏽	著禮服嘅男人 淺啡色皮膚	some
+🤵🏾	著禮服嘅男人 啡色皮膚	some
+🤵🏿	著禮服嘅男人 黑皮膚	some
+🤵🏻‍♂	穿禮服的男人 白皮膚	some
+🤵🏼‍♂	穿禮服的男人 黃皮膚	some
+🤵🏽‍♂	穿燕尾服的男人 淺啡色皮膚	some
+🤵🏾‍♂	穿燕尾服的男人 啡色皮膚	some
+🤵🏿‍♂	穿禮服的男人 黑皮膚	some
+🤵🏻‍♀	穿燕尾服的女人 白皮膚	some
+🤵🏼‍♀	穿燕尾服的女人 黃皮膚	some
+🤵🏽‍♀	穿燕尾服的女人 淺啡色皮膚	some
+🤵🏾‍♀	穿燕尾服的女人 啡色皮膚	some
+🤵🏿‍♀	穿燕尾服的女人 黑皮膚	some
+👰🏻	戴頭紗的人 白皮膚	some
+👰🏼	戴頭紗的人 黃皮膚	some
+👰🏽	披著頭紗的人 淺啡色皮膚	some
+👰🏾	披著頭紗的人 啡色皮膚	some
+👰🏿	戴頭紗的人 黑皮膚	some
+👰🏻‍♂	戴頭紗的男人 白皮膚	some
+👰🏼‍♂	戴頭紗的男人 黃皮膚	some
+👰🏽‍♂	披著頭紗的男人 淺啡色皮膚	some
+👰🏾‍♂	披著頭紗的男人 啡色皮膚	some
+👰🏿‍♂	戴頭紗的男人 黑皮膚	some
+👰🏻‍♀	披著頭紗的女人 白皮膚	some
+👰🏼‍♀	披著頭紗的女人 黃皮膚	some
+👰🏽‍♀	披著頭紗的女人 淺啡色皮膚	some
+👰🏾‍♀	披著頭紗的女人 啡色皮膚	some
+👰🏿‍♀	披著頭紗的女人 黑皮膚	some
+🤰🏻	孕婦 白皮膚	some
+🤰🏼	孕婦 黃皮膚	some
+🤰🏽	孕婦 淺啡色皮膚	some
+🤰🏾	孕婦 啡色皮膚	some
+🤰🏿	孕婦 黑皮膚	some
+🤱🏻	母乳餵哺 白皮膚	some
+🤱🏼	母乳餵哺 黃皮膚	some
+🤱🏽	母乳餵哺 淺啡色皮膚	some
+🤱🏾	母乳餵哺 啡色皮膚	some
+🤱🏿	母乳餵哺 黑皮膚	some
+👩🏻‍🍼	正在餵奶的媽媽 白皮膚	some
+👩🏼‍🍼	正在餵奶的媽媽 黃皮膚	some
+👩🏽‍🍼	正在餵奶的媽媽 淺啡色皮膚	some
+👩🏾‍🍼	正在餵奶的媽媽 啡色皮膚	some
+👩🏿‍🍼	正在餵奶的媽媽 黑皮膚	some
+👨🏻‍🍼	正在餵奶的男人 白皮膚	some
+👨🏼‍🍼	正在餵奶的男人 黃皮膚	some
+👨🏽‍🍼	正在餵奶的爸爸 淺啡色皮膚	some
+👨🏾‍🍼	正在餵奶的爸爸 啡色皮膚	some
+👨🏿‍🍼	正在餵奶的男人 黑皮膚	some
+🧑🏻‍🍼	正在餵奶的人 白皮膚	some
+🧑🏼‍🍼	正在餵奶的人 黃皮膚	some
+🧑🏽‍🍼	正在餵奶的人 淺啡色皮膚	some
+🧑🏾‍🍼	正在餵奶的人 啡色皮膚	some
+🧑🏿‍🍼	正在餵奶的人 黑皮膚	some
+👼🏻	天使嬰兒 白皮膚	some
+👼🏼	天使嬰兒 黃皮膚	some
+👼🏽	天使嬰兒 淺啡色皮膚	some
+👼🏾	天使嬰兒 啡色皮膚	some
+👼🏿	天使嬰兒 黑皮膚	some
+🎅🏻	聖誕老人 白皮膚	some
+🎅🏼	聖誕老人 黃皮膚	some
+🎅🏽	聖誕老人 淺啡色皮膚	some
+🎅🏾	聖誕老人 啡色皮膚	some
+🎅🏿	聖誕老人 黑皮膚	some
+🤶🏻	聖誕婆婆 白皮膚	some
+🤶🏼	聖誕婆婆 黃皮膚	some
+🤶🏽	聖誕婆婆 淺啡色皮膚	some
+🤶🏾	聖誕婆婆 啡色皮膚	some
+🤶🏿	聖誕婆婆 黑皮膚	some
+🧑🏻‍🎄	聖誕人 白皮膚	some
+🧑🏼‍🎄	聖誕人 黃皮膚	some
+🧑🏽‍🎄	跨性別聖誕老人 淺啡色皮膚	some
+🧑🏾‍🎄	跨性別聖誕老人 啡色皮膚	some
+🧑🏿‍🎄	聖誕人 黑皮膚	some
+🦸🏻	超人 白皮膚	some
+🦸🏼	超人 黃皮膚	some
+🦸🏽	超人 淺啡色皮膚	some
+🦸🏾	超人 啡色皮膚	some
+🦸🏿	超人 黑皮膚	some
+🦸🏻‍♂	男超人 白皮膚	some
+🦸🏼‍♂	男超人 黃皮膚	some
+🦸🏽‍♂	男超人 淺啡色皮膚	some
+🦸🏾‍♂	男超人 啡色皮膚	some
+🦸🏿‍♂	男超人 黑皮膚	some
+🦸🏻‍♀	女超級英雄 白皮膚	some
+🦸🏼‍♀	女超級英雄 黃皮膚	some
+🦸🏽‍♀	女超人 淺啡色皮膚	some
+🦸🏾‍♀	女超人 啡色皮膚	some
+🦸🏿‍♀	女超級英雄 黑皮膚	some
+🦹🏻	超級大壞蛋 白皮膚	some
+🦹🏼	超級大壞蛋 黃皮膚	some
+🦹🏽	超級反派 淺啡色皮膚	some
+🦹🏾	超級反派 啡色皮膚	some
+🦹🏿	超級大壞蛋 黑皮膚	some
+🦹🏻‍♂	男超級大壞蛋 白皮膚	some
+🦹🏼‍♂	男超級大壞蛋 黃皮膚	some
+🦹🏽‍♂	男超級反派 淺啡色皮膚	some
+🦹🏾‍♂	男超級反派 啡色皮膚	some
+🦹🏿‍♂	男超級大壞蛋 黑皮膚	some
+🦹🏻‍♀	女超級大壞蛋 白皮膚	some
+🦹🏼‍♀	女超級大壞蛋 黃皮膚	some
+🦹🏽‍♀	女超級反派 淺啡色皮膚	some
+🦹🏾‍♀	女超級反派 啡色皮膚	some
+🦹🏿‍♀	女超級大壞蛋 黑皮膚	some
+🧙🏻	巫師 白皮膚	some
+🧙🏼	巫師 黃皮膚	some
+🧙🏽	巫師 淺啡色皮膚	some
+🧙🏾	巫師 啡色皮膚	some
+🧙🏿	巫師 黑皮膚	some
+🧙🏻‍♂	男巫師 白皮膚	some
+🧙🏼‍♂	男巫師 黃皮膚	some
+🧙🏽‍♂	男巫師 淺啡色皮膚	some
+🧙🏾‍♂	男巫師 啡色皮膚	some
+🧙🏿‍♂	男巫師 黑皮膚	some
+🧙🏻‍♀	女法師 白皮膚	some
+🧙🏼‍♀	女法師 黃皮膚	some
+🧙🏽‍♀	女巫師 淺啡色皮膚	some
+🧙🏾‍♀	女巫師 啡色皮膚	some
+🧙🏿‍♀	女法師 黑皮膚	some
+🧚🏻	仙子 白皮膚	some
+🧚🏼	仙子 黃皮膚	some
+🧚🏽	仙子 淺啡色皮膚	some
+🧚🏾	仙子 啡色皮膚	some
+🧚🏿	仙子 黑皮膚	some
+🧚🏻‍♂	男仙子 白皮膚	some
+🧚🏼‍♂	男仙子 黃皮膚	some
+🧚🏽‍♂	男仙子 淺啡色皮膚	some
+🧚🏾‍♂	男仙子 啡色皮膚	some
+🧚🏿‍♂	男仙子 黑皮膚	some
+🧚🏻‍♀	女仙子 白皮膚	some
+🧚🏼‍♀	女仙子 黃皮膚	some
+🧚🏽‍♀	女仙子 淺啡色皮膚	some
+🧚🏾‍♀	女仙子 啡色皮膚	some
+🧚🏿‍♀	女仙子 黑皮膚	some
+🧛🏻	吸血鬼 白皮膚	some
+🧛🏼	吸血鬼 黃皮膚	some
+🧛🏽	吸血鬼 淺啡色皮膚	some
+🧛🏾	吸血鬼 啡色皮膚	some
+🧛🏿	吸血鬼 黑皮膚	some
+🧛🏻‍♂	男吸血鬼 白皮膚	some
+🧛🏼‍♂	男吸血鬼 黃皮膚	some
+🧛🏽‍♂	男吸血鬼 淺啡色皮膚	some
+🧛🏾‍♂	男吸血鬼 啡色皮膚	some
+🧛🏿‍♂	男吸血鬼 黑皮膚	some
+🧛🏻‍♀	女吸血鬼 白皮膚	some
+🧛🏼‍♀	女吸血鬼 黃皮膚	some
+🧛🏽‍♀	女吸血鬼 淺啡色皮膚	some
+🧛🏾‍♀	女吸血鬼 啡色皮膚	some
+🧛🏿‍♀	女吸血鬼 黑皮膚	some
+🧜🏻	人魚 白皮膚	some
+🧜🏼	人魚 黃皮膚	some
+🧜🏽	人魚 淺啡色皮膚	some
+🧜🏾	人魚 啡色皮膚	some
+🧜🏿	人魚 黑皮膚	some
+🧜🏻‍♂	男人魚 白皮膚	some
+🧜🏼‍♂	男人魚 黃皮膚	some
+🧜🏽‍♂	男人魚 淺啡色皮膚	some
+🧜🏾‍♂	男人魚 啡色皮膚	some
+🧜🏿‍♂	男人魚 黑皮膚	some
+🧜🏻‍♀	美人魚 白皮膚	some
+🧜🏼‍♀	美人魚 黃皮膚	some
+🧜🏽‍♀	美人魚 淺啡色皮膚	some
+🧜🏾‍♀	美人魚 啡色皮膚	some
+🧜🏿‍♀	美人魚 黑皮膚	some
+🧝🏻	精靈 白皮膚	some
+🧝🏼	精靈 黃皮膚	some
+🧝🏽	精靈 淺啡色皮膚	some
+🧝🏾	精靈 啡色皮膚	some
+🧝🏿	精靈 黑皮膚	some
+🧝🏻‍♂	男小精靈 白皮膚	some
+🧝🏼‍♂	男小精靈 黃皮膚	some
+🧝🏽‍♂	男精靈 淺啡色皮膚	some
+🧝🏾‍♂	男精靈 啡色皮膚	some
+🧝🏿‍♂	男小精靈 黑皮膚	some
+🧝🏻‍♀	女小精靈 白皮膚	some
+🧝🏼‍♀	女小精靈 黃皮膚	some
+🧝🏽‍♀	女精靈 淺啡色皮膚	some
+🧝🏾‍♀	女精靈 啡色皮膚	some
+🧝🏿‍♀	女小精靈 黑皮膚	some
+💆🏻	接受頭部按摩嘅人 白皮膚	some
+💆🏼	接受頭部按摩嘅人 黃皮膚	some
+💆🏽	接受頭部按摩嘅人 淺啡色皮膚	some
+💆🏾	接受頭部按摩嘅人 啡色皮膚	some
+💆🏿	接受頭部按摩嘅人 黑皮膚	some
+💆🏻‍♂	接受頭部按摩嘅男人 白皮膚	some
+💆🏼‍♂	接受頭部按摩嘅男人 黃皮膚	some
+💆🏽‍♂	接受頭部按摩嘅男人 淺啡色皮膚	some
+💆🏾‍♂	接受頭部按摩嘅男人 啡色皮膚	some
+💆🏿‍♂	接受頭部按摩嘅男人 黑皮膚	some
+💆🏻‍♀	接受頭部按摩嘅女人 白皮膚	some
+💆🏼‍♀	接受頭部按摩嘅女人 黃皮膚	some
+💆🏽‍♀	接受頭部按摩嘅女人 淺啡色皮膚	some
+💆🏾‍♀	接受頭部按摩嘅女人 啡色皮膚	some
+💆🏿‍♀	接受頭部按摩嘅女人 黑皮膚	some
+💇🏻	剪頭髮 白皮膚	some
+💇🏼	剪頭髮 黃皮膚	some
+💇🏽	剪頭髮 淺啡色皮膚	some
+💇🏾	剪頭髮 啡色皮膚	some
+💇🏿	剪頭髮 黑皮膚	some
+💇🏻‍♂	剪緊頭髮嘅男人 白皮膚	some
+💇🏼‍♂	剪緊頭髮嘅男人 黃皮膚	some
+💇🏽‍♂	剪緊頭髮嘅男人 淺啡色皮膚	some
+💇🏾‍♂	剪緊頭髮嘅男人 啡色皮膚	some
+💇🏿‍♂	剪緊頭髮嘅男人 黑皮膚	some
+💇🏻‍♀	剪緊頭髮嘅女人 白皮膚	some
+💇🏼‍♀	剪緊頭髮嘅女人 黃皮膚	some
+💇🏽‍♀	剪緊頭髮嘅女人 淺啡色皮膚	some
+💇🏾‍♀	剪緊頭髮嘅女人 啡色皮膚	some
+💇🏿‍♀	剪緊頭髮嘅女人 黑皮膚	some
+🚶🏻	行人 白皮膚	some
+🚶🏼	行人 黃皮膚	some
+🚶🏽	行人 淺啡色皮膚	some
+🚶🏾	行人 啡色皮膚	some
+🚶🏿	行人 黑皮膚	some
+🚶🏻‍♂	行路嘅男人 白皮膚	some
+🚶🏼‍♂	行路嘅男人 黃皮膚	some
+🚶🏽‍♂	行路嘅男人 淺啡色皮膚	some
+🚶🏾‍♂	行路嘅男人 啡色皮膚	some
+🚶🏿‍♂	行路嘅男人 黑皮膚	some
+🚶🏻‍♀	行路嘅女人 白皮膚	some
+🚶🏼‍♀	行路嘅女人 黃皮膚	some
+🚶🏽‍♀	行路嘅女人 淺啡色皮膚	some
+🚶🏾‍♀	行路嘅女人 啡色皮膚	some
+🚶🏿‍♀	行路嘅女人 黑皮膚	some
+🧍🏻	企係度嘅人 白皮膚	some
+🧍🏼	企係度嘅人 黃皮膚	some
+🧍🏽	企係度嘅人 淺啡色皮膚	some
+🧍🏾	企係度嘅人 啡色皮膚	some
+🧍🏿	企係度嘅人 黑皮膚	some
+🧍🏻‍♂	企係度嘅男人 白皮膚	some
+🧍🏼‍♂	企係度嘅男人 黃皮膚	some
+🧍🏽‍♂	企係度嘅男人 淺啡色皮膚	some
+🧍🏾‍♂	企係度嘅男人 啡色皮膚	some
+🧍🏿‍♂	企係度嘅男人 黑皮膚	some
+🧍🏻‍♀	企係度嘅女人 白皮膚	some
+🧍🏼‍♀	企係度嘅女人 黃皮膚	some
+🧍🏽‍♀	企係度嘅女人 淺啡色皮膚	some
+🧍🏾‍♀	企係度嘅女人 啡色皮膚	some
+🧍🏿‍♀	企係度嘅女人 黑皮膚	some
+🧎🏻	跪係度嘅人 白皮膚	some
+🧎🏼	跪係度嘅人 黃皮膚	some
+🧎🏽	跪係度嘅人 淺啡色皮膚	some
+🧎🏾	跪係度嘅人 啡色皮膚	some
+🧎🏿	跪係度嘅人 黑皮膚	some
+🧎🏻‍♂	跪係度嘅男人 白皮膚	some
+🧎🏼‍♂	跪係度嘅男人 黃皮膚	some
+🧎🏽‍♂	跪係度嘅男人 淺啡色皮膚	some
+🧎🏾‍♂	跪係度嘅男人 啡色皮膚	some
+🧎🏿‍♂	跪係度嘅男人 黑皮膚	some
+🧎🏻‍♀	跪係度嘅女人 白皮膚	some
+🧎🏼‍♀	跪係度嘅女人 黃皮膚	some
+🧎🏽‍♀	跪係度嘅女人 淺啡色皮膚	some
+🧎🏾‍♀	跪係度嘅女人 啡色皮膚	some
+🧎🏿‍♀	跪係度嘅女人 黑皮膚	some
+🧑🏻‍🦯	拎白杖嘅人 白皮膚	some
+🧑🏼‍🦯	拎白杖嘅人 黃皮膚	some
+🧑🏽‍🦯	拎白杖嘅人 淺啡色皮膚	some
+🧑🏾‍🦯	拎白杖嘅人 啡色皮膚	some
+🧑🏿‍🦯	拎白杖嘅人 黑皮膚	some
+👨🏻‍🦯	拎白杖嘅男人 白皮膚	some
+👨🏼‍🦯	拎白杖嘅男人 黃皮膚	some
+👨🏽‍🦯	拎白杖嘅男人 淺啡色皮膚	some
+👨🏾‍🦯	拎白杖嘅男人 啡色皮膚	some
+👨🏿‍🦯	拎白杖嘅男人 黑皮膚	some
+👩🏻‍🦯	拎白杖嘅女人 白皮膚	some
+👩🏼‍🦯	拎白杖嘅女人 黃皮膚	some
+👩🏽‍🦯	拎白杖嘅女人 淺啡色皮膚	some
+👩🏾‍🦯	拎白杖嘅女人 啡色皮膚	some
+👩🏿‍🦯	拎白杖嘅女人 黑皮膚	some
+🧑🏻‍🦼	坐電動輪椅的人 白皮膚	some
+🧑🏼‍🦼	坐電動輪椅的人 黃皮膚	some
+🧑🏽‍🦼	坐電動輪椅的人 淺啡色皮膚	some
+🧑🏾‍🦼	坐電動輪椅的人 啡色皮膚	some
+🧑🏿‍🦼	坐電動輪椅的人 黑皮膚	some
+👨🏻‍🦼	坐電動輪椅嘅男人 白皮膚	some
+👨🏼‍🦼	坐電動輪椅嘅男人 黃皮膚	some
+👨🏽‍🦼	坐電動輪椅嘅男人 淺啡色皮膚	some
+👨🏾‍🦼	坐電動輪椅嘅男人 啡色皮膚	some
+👨🏿‍🦼	坐電動輪椅嘅男人 黑皮膚	some
+👩🏻‍🦼	坐電動輪椅嘅女人 白皮膚	some
+👩🏼‍🦼	坐電動輪椅嘅女人 黃皮膚	some
+👩🏽‍🦼	坐電動輪椅嘅女人 淺啡色皮膚	some
+👩🏾‍🦼	坐電動輪椅嘅女人 啡色皮膚	some
+👩🏿‍🦼	坐電動輪椅嘅女人 黑皮膚	some
+🧑🏻‍🦽	坐手動輪椅的人 白皮膚	some
+🧑🏼‍🦽	坐手動輪椅的人 黃皮膚	some
+🧑🏽‍🦽	坐手動輪椅的人 淺啡色皮膚	some
+🧑🏾‍🦽	坐手動輪椅的人 啡色皮膚	some
+🧑🏿‍🦽	坐手動輪椅的人 黑皮膚	some
+👨🏻‍🦽	坐手動輪椅的男人 白皮膚	some
+👨🏼‍🦽	坐手動輪椅的男人 黃皮膚	some
+👨🏽‍🦽	坐手動輪椅嘅男人 淺啡色皮膚	some
+👨🏾‍🦽	坐手動輪椅嘅男人 啡色皮膚	some
+👨🏿‍🦽	坐手動輪椅嘅男人 黑皮膚	some
+👩🏻‍🦽	坐手動輪椅嘅女人 白皮膚	some
+👩🏼‍🦽	坐手動輪椅嘅女人 黃皮膚	some
+👩🏽‍🦽	坐手動輪椅嘅女人 淺啡色皮膚	some
+👩🏾‍🦽	坐手動輪椅嘅女人 啡色皮膚	some
+👩🏿‍🦽	坐手動輪椅嘅女人 黑皮膚	some
+🏃🏻	跑步嘅人 白皮膚	some
+🏃🏼	跑步嘅人 黃皮膚	some
+🏃🏽	跑步嘅人 淺啡色皮膚	some
+🏃🏾	跑步嘅人 啡色皮膚	some
+🏃🏿	跑步嘅人 黑皮膚	some
+🏃🏻‍♂	男跑手 白皮膚	some
+🏃🏼‍♂	男跑手 黃皮膚	some
+🏃🏽‍♂	男跑手 淺啡色皮膚	some
+🏃🏾‍♂	男跑手 啡色皮膚	some
+🏃🏿‍♂	男跑手 黑皮膚	some
+🏃🏻‍♀	女跑手 白皮膚	some
+🏃🏼‍♀	女跑手 黃皮膚	some
+🏃🏽‍♀	女跑手 淺啡色皮膚	some
+🏃🏾‍♀	女跑手 啡色皮膚	some
+🏃🏿‍♀	女跑手 黑皮膚	some
+💃🏻	跳舞嘅女人 白皮膚	some
+💃🏼	跳舞嘅女人 黃皮膚	some
+💃🏽	跳舞嘅女人 淺啡色皮膚	some
+💃🏾	跳舞嘅女人 啡色皮膚	some
+💃🏿	跳舞嘅女人 黑皮膚	some
+🕺🏻	跳舞嘅男人 白皮膚	some
+🕺🏼	跳舞嘅男人 黃皮膚	some
+🕺🏽	跳舞嘅男人 淺啡色皮膚	some
+🕺🏾	跳舞嘅男人 啡色皮膚	some
+🕺🏿	跳舞嘅男人 黑皮膚	some
+🕴🏻	著住西裝飄浮嘅男人 白皮膚	some
+🕴🏼	著住西裝飄浮嘅男人 黃皮膚	some
+🕴🏽	著住西裝飄浮嘅男人 淺啡色皮膚	some
+🕴🏾	著住西裝飄浮嘅男人 啡色皮膚	some
+🕴🏿	著住西裝飄浮嘅男人 黑皮膚	some
+🧖🏻	焗桑拿嘅人 白皮膚	some
+🧖🏼	焗桑拿嘅人 黃皮膚	some
+🧖🏽	焗桑拿嘅人 淺啡色皮膚	some
+🧖🏾	焗桑拿嘅人 啡色皮膚	some
+🧖🏿	焗桑拿嘅人 黑皮膚	some
+🧖🏻‍♂	焗桑拿嘅男人 白皮膚	some
+🧖🏼‍♂	焗桑拿嘅男人 黃皮膚	some
+🧖🏽‍♂	焗桑拿嘅男人 淺啡色皮膚	some
+🧖🏾‍♂	焗桑拿嘅男人 啡色皮膚	some
+🧖🏿‍♂	焗桑拿嘅男人 黑皮膚	some
+🧖🏻‍♀	焗桑拿嘅女人 白皮膚	some
+🧖🏼‍♀	焗桑拿嘅女人 黃皮膚	some
+🧖🏽‍♀	焗桑拿嘅女人 淺啡色皮膚	some
+🧖🏾‍♀	焗桑拿嘅女人 啡色皮膚	some
+🧖🏿‍♀	焗桑拿嘅女人 黑皮膚	some
+🧗🏻	攀岩嘅人 白皮膚	some
+🧗🏼	攀岩嘅人 黃皮膚	some
+🧗🏽	攀岩嘅人 淺啡色皮膚	some
+🧗🏾	攀岩嘅人 啡色皮膚	some
+🧗🏿	攀岩嘅人 黑皮膚	some
+🧗🏻‍♂	攀岩嘅男人 白皮膚	some
+🧗🏼‍♂	攀岩嘅男人 黃皮膚	some
+🧗🏽‍♂	攀岩嘅男人 淺啡色皮膚	some
+🧗🏾‍♂	攀岩嘅男人 啡色皮膚	some
+🧗🏿‍♂	攀岩嘅男人 黑皮膚	some
+🧗🏻‍♀	攀岩嘅女人 白皮膚	some
+🧗🏼‍♀	攀岩嘅女人 黃皮膚	some
+🧗🏽‍♀	攀岩嘅女人 淺啡色皮膚	some
+🧗🏾‍♀	攀岩嘅女人 啡色皮膚	some
+🧗🏿‍♀	攀岩嘅女人 黑皮膚	some
+🏇🏻	騎馬 白皮膚	some
+🏇🏼	騎馬 黃皮膚	some
+🏇🏽	騎馬 淺啡色皮膚	some
+🏇🏾	騎馬 啡色皮膚	some
+🏇🏿	騎馬 黑皮膚	some
+🏂🏻	單板滑雪的人 白皮膚	some
+🏂🏼	單板滑雪的人 黃皮膚	some
+🏂🏽	單板滑雪的人 淺啡色皮膚	some
+🏂🏾	單板滑雪的人 啡色皮膚	some
+🏂🏿	單板滑雪的人 黑皮膚	some
+🏌🏻	打高爾夫球 白皮膚	some
+🏌🏼	打高爾夫球 黃皮膚	some
+🏌🏽	打高爾夫球 淺啡色皮膚	some
+🏌🏾	打高爾夫球 啡色皮膚	some
+🏌🏿	打高爾夫球 黑皮膚	some
+🏌🏻‍♂	打高爾夫球嘅男人 白皮膚	some
+🏌🏼‍♂	打高爾夫球嘅男人 黃皮膚	some
+🏌🏽‍♂	打高爾夫球嘅男人 淺啡色皮膚	some
+🏌🏾‍♂	打高爾夫球嘅男人 啡色皮膚	some
+🏌🏿‍♂	打高爾夫球嘅男人 黑皮膚	some
+🏌🏻‍♀	打高爾夫球嘅女人 白皮膚	some
+🏌🏼‍♀	打高爾夫球嘅女人 黃皮膚	some
+🏌🏽‍♀	打高爾夫球嘅女人 淺啡色皮膚	some
+🏌🏾‍♀	打高爾夫球嘅女人 啡色皮膚	some
+🏌🏿‍♀	打高爾夫球嘅女人 黑皮膚	some
+🏄🏻	滑浪 白皮膚	some
+🏄🏼	滑浪 黃皮膚	some
+🏄🏽	滑浪 淺啡色皮膚	some
+🏄🏾	滑浪 啡色皮膚	some
+🏄🏿	滑浪 黑皮膚	some
+🏄🏻‍♂	滑浪嘅男人 白皮膚	some
+🏄🏼‍♂	滑浪嘅男人 黃皮膚	some
+🏄🏽‍♂	滑浪嘅男人 淺啡色皮膚	some
+🏄🏾‍♂	滑浪嘅男人 啡色皮膚	some
+🏄🏿‍♂	滑浪嘅男人 黑皮膚	some
+🏄🏻‍♀	滑浪嘅女人 白皮膚	some
+🏄🏼‍♀	滑浪嘅女人 黃皮膚	some
+🏄🏽‍♀	滑浪嘅女人 淺啡色皮膚	some
+🏄🏾‍♀	滑浪嘅女人 啡色皮膚	some
+🏄🏿‍♀	滑浪嘅女人 黑皮膚	some
+🚣🏻	撐艇 白皮膚	some
+🚣🏼	撐艇 黃皮膚	some
+🚣🏽	撐艇 淺啡色皮膚	some
+🚣🏾	撐艇 啡色皮膚	some
+🚣🏿	撐艇 黑皮膚	some
+🚣🏻‍♂	撐艇嘅男人 白皮膚	some
+🚣🏼‍♂	撐艇嘅男人 黃皮膚	some
+🚣🏽‍♂	撐艇嘅男人 淺啡色皮膚	some
+🚣🏾‍♂	撐艇嘅男人 啡色皮膚	some
+🚣🏿‍♂	撐艇嘅男人 黑皮膚	some
+🚣🏻‍♀	撐艇嘅女人 白皮膚	some
+🚣🏼‍♀	撐艇嘅女人 黃皮膚	some
+🚣🏽‍♀	撐艇嘅女人 淺啡色皮膚	some
+🚣🏾‍♀	撐艇嘅女人 啡色皮膚	some
+🚣🏿‍♀	撐艇嘅女人 黑皮膚	some
+🏊🏻	游水 白皮膚	some
+🏊🏼	游水 黃皮膚	some
+🏊🏽	游水 淺啡色皮膚	some
+🏊🏾	游水 啡色皮膚	some
+🏊🏿	游水 黑皮膚	some
+🏊🏻‍♂	男泳手 白皮膚	some
+🏊🏼‍♂	男泳手 黃皮膚	some
+🏊🏽‍♂	男泳手 淺啡色皮膚	some
+🏊🏾‍♂	男泳手 啡色皮膚	some
+🏊🏿‍♂	男泳手 黑皮膚	some
+🏊🏻‍♀	女泳手 白皮膚	some
+🏊🏼‍♀	女泳手 黃皮膚	some
+🏊🏽‍♀	女泳手 淺啡色皮膚	some
+🏊🏾‍♀	女泳手 啡色皮膚	some
+🏊🏿‍♀	女泳手 黑皮膚	some
+⛹🏻	打緊波嘅人 白皮膚	some
+⛹🏼	打緊波嘅人 黃皮膚	some
+⛹🏽	打緊波嘅人 淺啡色皮膚	some
+⛹🏾	打緊波嘅人 啡色皮膚	some
+⛹🏿	打緊波嘅人 黑皮膚	some
+⛹🏻‍♂	打緊波嘅男人 白皮膚	some
+⛹🏼‍♂	打緊波嘅男人 黃皮膚	some
+⛹🏽‍♂	打緊波嘅男人 淺啡色皮膚	some
+⛹🏾‍♂	打緊波嘅男人 啡色皮膚	some
+⛹🏿‍♂	打緊波嘅男人 黑皮膚	some
+⛹🏻‍♀	打緊波嘅女人 白皮膚	some
+⛹🏼‍♀	打緊波嘅女人 黃皮膚	some
+⛹🏽‍♀	打緊波嘅女人 淺啡色皮膚	some
+⛹🏾‍♀	打緊波嘅女人 啡色皮膚	some
+⛹🏿‍♀	打緊波嘅女人 黑皮膚	some
+🏋🏻	舉重 白皮膚	some
+🏋🏼	舉重 黃皮膚	some
+🏋🏽	舉重 淺啡色皮膚	some
+🏋🏾	舉重 啡色皮膚	some
+🏋🏿	舉重 黑皮膚	some
+🏋🏻‍♂	男舉重員 白皮膚	some
+🏋🏼‍♂	男舉重員 黃皮膚	some
+🏋🏽‍♂	男舉重員 淺啡色皮膚	some
+🏋🏾‍♂	男舉重員 啡色皮膚	some
+🏋🏿‍♂	男舉重員 黑皮膚	some
+🏋🏻‍♀	女舉重員 白皮膚	some
+🏋🏼‍♀	女舉重員 黃皮膚	some
+🏋🏽‍♀	女舉重員 淺啡色皮膚	some
+🏋🏾‍♀	女舉重員 啡色皮膚	some
+🏋🏿‍♀	女舉重員 黑皮膚	some
+🚴🏻	踩單車 白皮膚	some
+🚴🏼	踩單車 黃皮膚	some
+🚴🏽	踩單車 淺啡色皮膚	some
+🚴🏾	踩單車 啡色皮膚	some
+🚴🏿	踩單車 黑皮膚	some
+🚴🏻‍♂	男單車手 白皮膚	some
+🚴🏼‍♂	男單車手 黃皮膚	some
+🚴🏽‍♂	男單車手 淺啡色皮膚	some
+🚴🏾‍♂	男單車手 啡色皮膚	some
+🚴🏿‍♂	男單車手 黑皮膚	some
+🚴🏻‍♀	女單車手 白皮膚	some
+🚴🏼‍♀	女單車手 黃皮膚	some
+🚴🏽‍♀	女單車手 淺啡色皮膚	some
+🚴🏾‍♀	女單車手 啡色皮膚	some
+🚴🏿‍♀	女單車手 黑皮膚	some
+🚵🏻	踩爬山單車 白皮膚	some
+🚵🏼	踩爬山單車 黃皮膚	some
+🚵🏽	踩爬山單車 淺啡色皮膚	some
+🚵🏾	踩爬山單車 啡色皮膚	some
+🚵🏿	踩爬山單車 黑皮膚	some
+🚵🏻‍♂	踩爬山單車嘅男人 白皮膚	some
+🚵🏼‍♂	踩爬山單車嘅男人 黃皮膚	some
+🚵🏽‍♂	踩爬山單車嘅男人 淺啡色皮膚	some
+🚵🏾‍♂	踩爬山單車嘅男人 啡色皮膚	some
+🚵🏿‍♂	踩爬山單車嘅男人 黑皮膚	some
+🚵🏻‍♀	踩爬山單車嘅女人 白皮膚	some
+🚵🏼‍♀	踩爬山單車嘅女人 黃皮膚	some
+🚵🏽‍♀	踩爬山單車嘅女人 淺啡色皮膚	some
+🚵🏾‍♀	踩爬山單車嘅女人 啡色皮膚	some
+🚵🏿‍♀	踩爬山單車嘅女人 黑皮膚	some
+🤸🏻	側手翻 白皮膚	some
+🤸🏼	側手翻 黃皮膚	some
+🤸🏽	側手翻 淺啡色皮膚	some
+🤸🏾	側手翻 啡色皮膚	some
+🤸🏿	側手翻 黑皮膚	some
+🤸🏻‍♂	打側手翻嘅男人 白皮膚	some
+🤸🏼‍♂	打側手翻嘅男人 黃皮膚	some
+🤸🏽‍♂	打側手翻嘅男人 淺啡色皮膚	some
+🤸🏾‍♂	打側手翻嘅男人 啡色皮膚	some
+🤸🏿‍♂	打側手翻嘅男人 黑皮膚	some
+🤸🏻‍♀	打側手翻嘅女人 白皮膚	some
+🤸🏼‍♀	打側手翻嘅女人 黃皮膚	some
+🤸🏽‍♀	打側手翻嘅女人 淺啡色皮膚	some
+🤸🏾‍♀	打側手翻嘅女人 啡色皮膚	some
+🤸🏿‍♀	打側手翻嘅女人 黑皮膚	some
+🤽🏻	水球 白皮膚	some
+🤽🏼	水球 黃皮膚	some
+🤽🏽	水球 淺啡色皮膚	some
+🤽🏾	水球 啡色皮膚	some
+🤽🏿	水球 黑皮膚	some
+🤽🏻‍♂	打水球嘅男人 白皮膚	some
+🤽🏼‍♂	打水球嘅男人 黃皮膚	some
+🤽🏽‍♂	打水球嘅男人 淺啡色皮膚	some
+🤽🏾‍♂	打水球嘅男人 啡色皮膚	some
+🤽🏿‍♂	打水球嘅男人 黑皮膚	some
+🤽🏻‍♀	打水球嘅女人 白皮膚	some
+🤽🏼‍♀	打水球嘅女人 黃皮膚	some
+🤽🏽‍♀	打水球嘅女人 淺啡色皮膚	some
+🤽🏾‍♀	打水球嘅女人 啡色皮膚	some
+🤽🏿‍♀	打水球嘅女人 黑皮膚	some
+🤾🏻	手球 白皮膚	some
+🤾🏼	手球 黃皮膚	some
+🤾🏽	手球 淺啡色皮膚	some
+🤾🏾	手球 啡色皮膚	some
+🤾🏿	手球 黑皮膚	some
+🤾🏻‍♂	打手球嘅男人 白皮膚	some
+🤾🏼‍♂	打手球嘅男人 黃皮膚	some
+🤾🏽‍♂	打手球嘅男人 淺啡色皮膚	some
+🤾🏾‍♂	打手球嘅男人 啡色皮膚	some
+🤾🏿‍♂	打手球嘅男人 黑皮膚	some
+🤾🏻‍♀	打手球嘅女人 白皮膚	some
+🤾🏼‍♀	打手球嘅女人 黃皮膚	some
+🤾🏽‍♀	打手球嘅女人 淺啡色皮膚	some
+🤾🏾‍♀	打手球嘅女人 啡色皮膚	some
+🤾🏿‍♀	打手球嘅女人 黑皮膚	some
+🤹🏻	耍雜技 白皮膚	some
+🤹🏼	耍雜技 黃皮膚	some
+🤹🏽	耍雜技 淺啡色皮膚	some
+🤹🏾	耍雜技 啡色皮膚	some
+🤹🏿	耍雜技 黑皮膚	some
+🤹🏻‍♂	耍雜技嘅男人 白皮膚	some
+🤹🏼‍♂	耍雜技嘅男人 黃皮膚	some
+🤹🏽‍♂	耍雜技嘅男人 淺啡色皮膚	some
+🤹🏾‍♂	耍雜技嘅男人 啡色皮膚	some
+🤹🏿‍♂	耍雜技嘅男人 黑皮膚	some
+🤹🏻‍♀	耍雜技嘅女人 白皮膚	some
+🤹🏼‍♀	耍雜技嘅女人 黃皮膚	some
+🤹🏽‍♀	耍雜技嘅女人 淺啡色皮膚	some
+🤹🏾‍♀	耍雜技嘅女人 啡色皮膚	some
+🤹🏿‍♀	耍雜技嘅女人 黑皮膚	some
+🧘🏻	盤腿坐嘅人 白皮膚	some
+🧘🏼	盤腿坐嘅人 黃皮膚	some
+🧘🏽	盤腿坐嘅人 淺啡色皮膚	some
+🧘🏾	盤腿坐嘅人 啡色皮膚	some
+🧘🏿	盤腿坐嘅人 黑皮膚	some
+🧘🏻‍♂	盤腿坐嘅男人 白皮膚	some
+🧘🏼‍♂	盤腿坐嘅男人 黃皮膚	some
+🧘🏽‍♂	盤腿坐嘅男人 淺啡色皮膚	some
+🧘🏾‍♂	盤腿坐嘅男人 啡色皮膚	some
+🧘🏿‍♂	盤腿坐嘅男人 黑皮膚	some
+🧘🏻‍♀	盤腿坐嘅女人 白皮膚	some
+🧘🏼‍♀	盤腿坐嘅女人 黃皮膚	some
+🧘🏽‍♀	盤腿坐嘅女人 淺啡色皮膚	some
+🧘🏾‍♀	盤腿坐嘅女人 啡色皮膚	some
+🧘🏿‍♀	盤腿坐嘅女人 黑皮膚	some
+🛀🏻	浸浴嘅人 白皮膚	some
+🛀🏼	浸浴嘅人 黃皮膚	some
+🛀🏽	浸浴嘅人 淺啡色皮膚	some
+🛀🏾	浸浴嘅人 啡色皮膚	some
+🛀🏿	浸浴嘅人 黑皮膚	some
+🛌🏻	瞓覺 白皮膚	some
+🛌🏼	瞓覺 黃皮膚	some
+🛌🏽	瞓覺 淺啡色皮膚	some
+🛌🏾	瞓覺 啡色皮膚	some
+🛌🏿	瞓覺 黑皮膚	some
+🧑🏻‍🤝‍🧑🏻	拖手的人 白皮膚	some
+🧑🏻‍🤝‍🧑🏼	拖手的人 白皮膚 黃皮膚	some
+🧑🏻‍🤝‍🧑🏽	拖手的人 白皮膚 淺啡色皮膚	some
+🧑🏻‍🤝‍🧑🏾	拖手的人 白皮膚 啡色皮膚	some
+🧑🏻‍🤝‍🧑🏿	拖手的人 白皮膚 黑皮膚	some
+🧑🏼‍🤝‍🧑🏻	拖手的人 黃皮膚 白皮膚	some
+🧑🏼‍🤝‍🧑🏼	拖手的人 黃皮膚	some
+🧑🏼‍🤝‍🧑🏽	拖手的人 黃皮膚 淺啡色皮膚	some
+🧑🏼‍🤝‍🧑🏾	拖手的人 黃皮膚 啡色皮膚	some
+🧑🏼‍🤝‍🧑🏿	拖手的人 黃皮膚 黑皮膚	some
+🧑🏽‍🤝‍🧑🏻	拖手的人 淺啡色皮膚 白皮膚	some
+🧑🏽‍🤝‍🧑🏼	拖手的人 淺啡色皮膚 黃皮膚	some
+🧑🏽‍🤝‍🧑🏽	拖手的人 淺啡色皮膚	some
+🧑🏽‍🤝‍🧑🏾	拖手的人 淺啡色皮膚 啡色皮膚	some
+🧑🏽‍🤝‍🧑🏿	拖手的人 淺啡色皮膚 黑皮膚	some
+🧑🏾‍🤝‍🧑🏻	拖手的人 啡色皮膚 白皮膚	some
+🧑🏾‍🤝‍🧑🏼	拖手的人 啡色皮膚 黃皮膚	some
+🧑🏾‍🤝‍🧑🏽	拖手的人 啡色皮膚 淺啡色皮膚	some
+🧑🏾‍🤝‍🧑🏾	拖手的人 啡色皮膚	some
+🧑🏾‍🤝‍🧑🏿	拖手的人 啡色皮膚 黑皮膚	some
+🧑🏿‍🤝‍🧑🏻	拖手的人 黑皮膚 白皮膚	some
+🧑🏿‍🤝‍🧑🏼	拖手的人 黑皮膚 黃皮膚	some
+🧑🏿‍🤝‍🧑🏽	拖手的人 黑皮膚 淺啡色皮膚	some
+🧑🏿‍🤝‍🧑🏾	拖手的人 黑皮膚 啡色皮膚	some
+🧑🏿‍🤝‍🧑🏿	拖手的人 黑皮膚	some
+👭🏻	兩個女人拖住手 白皮膚	some
+👩🏻‍🤝‍👩🏼	兩個女人拖住手 白皮膚 黃皮膚	some
+👩🏻‍🤝‍👩🏽	兩個女人拖住手 白皮膚 淺啡色皮膚	some
+👩🏻‍🤝‍👩🏾	兩個女人拖住手 白皮膚 啡色皮膚	some
+👩🏻‍🤝‍👩🏿	兩個女人拖住手 白皮膚 黑皮膚	some
+👩🏼‍🤝‍👩🏻	兩個女人拖住手 黃皮膚 白皮膚	some
+👭🏼	兩個女人拖住手 黃皮膚	some
+👩🏼‍🤝‍👩🏽	兩個女人拖住手 黃皮膚 淺啡色皮膚	some
+👩🏼‍🤝‍👩🏾	兩個女人拖住手 黃皮膚 啡色皮膚	some
+👩🏼‍🤝‍👩🏿	兩個女人拖住手 黃皮膚 黑皮膚	some
+👩🏽‍🤝‍👩🏻	兩個女人拖住手 淺啡色皮膚 白皮膚	some
+👩🏽‍🤝‍👩🏼	兩個女人拖住手 淺啡色皮膚 黃皮膚	some
+👭🏽	兩個女人拖住手 淺啡色皮膚	some
+👩🏽‍🤝‍👩🏾	兩個女人拖住手 淺啡色皮膚 啡色皮膚	some
+👩🏽‍🤝‍👩🏿	兩個女人拖住手 淺啡色皮膚 黑皮膚	some
+👩🏾‍🤝‍👩🏻	兩個女人拖住手 啡色皮膚 白皮膚	some
+👩🏾‍🤝‍👩🏼	兩個女人拖住手 啡色皮膚 黃皮膚	some
+👩🏾‍🤝‍👩🏽	兩個女人拖住手 啡色皮膚 淺啡色皮膚	some
+👭🏾	兩個女人拖住手 啡色皮膚	some
+👩🏾‍🤝‍👩🏿	兩個女人拖住手 啡色皮膚 黑皮膚	some
+👩🏿‍🤝‍👩🏻	兩個女人拖住手 黑皮膚 白皮膚	some
+👩🏿‍🤝‍👩🏼	兩個女人拖住手 黑皮膚 黃皮膚	some
+👩🏿‍🤝‍👩🏽	兩個女人拖住手 黑皮膚 淺啡色皮膚	some
+👩🏿‍🤝‍👩🏾	兩個女人拖住手 黑皮膚 啡色皮膚	some
+👭🏿	兩個女人拖住手 黑皮膚	some
+👫🏻	一男一女拖住手 白皮膚	some
+👩🏻‍🤝‍👨🏼	一男一女拖住手 白皮膚 黃皮膚	some
+👩🏻‍🤝‍👨🏽	一男一女拖住手 白皮膚 淺啡色皮膚	some
+👩🏻‍🤝‍👨🏾	一男一女拖住手 白皮膚 啡色皮膚	some
+👩🏻‍🤝‍👨🏿	一男一女拖住手 白皮膚 黑皮膚	some
+👩🏼‍🤝‍👨🏻	一男一女拖住手 黃皮膚 白皮膚	some
+👫🏼	一男一女拖住手 黃皮膚	some
+👩🏼‍🤝‍👨🏽	一男一女拖住手 黃皮膚 淺啡色皮膚	some
+👩🏼‍🤝‍👨🏾	一男一女拖住手 黃皮膚 啡色皮膚	some
+👩🏼‍🤝‍👨🏿	一男一女拖住手 黃皮膚 黑皮膚	some
+👩🏽‍🤝‍👨🏻	一男一女拖住手 淺啡色皮膚 白皮膚	some
+👩🏽‍🤝‍👨🏼	一男一女拖住手 淺啡色皮膚 黃皮膚	some
+👫🏽	一男一女拖住手 淺啡色皮膚	some
+👩🏽‍🤝‍👨🏾	一男一女拖住手 淺啡色皮膚 啡色皮膚	some
+👩🏽‍🤝‍👨🏿	一男一女拖住手 淺啡色皮膚 黑皮膚	some
+👩🏾‍🤝‍👨🏻	一男一女拖住手 啡色皮膚 白皮膚	some
+👩🏾‍🤝‍👨🏼	一男一女拖住手 啡色皮膚 黃皮膚	some
+👩🏾‍🤝‍👨🏽	一男一女拖住手 啡色皮膚 淺啡色皮膚	some
+👫🏾	一男一女拖住手 啡色皮膚	some
+👩🏾‍🤝‍👨🏿	一男一女拖住手 啡色皮膚 黑皮膚	some
+👩🏿‍🤝‍👨🏻	一男一女拖住手 黑皮膚 白皮膚	some
+👩🏿‍🤝‍👨🏼	一男一女拖住手 黑皮膚 黃皮膚	some
+👩🏿‍🤝‍👨🏽	一男一女拖住手 黑皮膚 淺啡色皮膚	some
+👩🏿‍🤝‍👨🏾	一男一女拖住手 黑皮膚 啡色皮膚	some
+👫🏿	一男一女拖住手 黑皮膚	some
+👬🏻	兩個男人拖住手 白皮膚	some
+👨🏻‍🤝‍👨🏼	兩個男人拖住手 白皮膚 黃皮膚	some
+👨🏻‍🤝‍👨🏽	兩個男人拖住手 白皮膚 淺啡色皮膚	some
+👨🏻‍🤝‍👨🏾	兩個男人拖住手 白皮膚 啡色皮膚	some
+👨🏻‍🤝‍👨🏿	兩個男人拖住手 白皮膚 黑皮膚	some
+👨🏼‍🤝‍👨🏻	兩個男人拖住手 黃皮膚 白皮膚	some
+👬🏼	兩個男人拖住手 黃皮膚	some
+👨🏼‍🤝‍👨🏽	兩個男人拖住手 黃皮膚 淺啡色皮膚	some
+👨🏼‍🤝‍👨🏾	兩個男人拖住手 黃皮膚 啡色皮膚	some
+👨🏼‍🤝‍👨🏿	兩個男人拖住手 黃皮膚 黑皮膚	some
+👨🏽‍🤝‍👨🏻	兩個男人拖住手 淺啡色皮膚 白皮膚	some
+👨🏽‍🤝‍👨🏼	兩個男人拖住手 淺啡色皮膚 黃皮膚	some
+👬🏽	兩個男人拖住手 淺啡色皮膚	some
+👨🏽‍🤝‍👨🏾	兩個男人拖住手 淺啡色皮膚 啡色皮膚	some
+👨🏽‍🤝‍👨🏿	兩個男人拖住手 淺啡色皮膚 黑皮膚	some
+👨🏾‍🤝‍👨🏻	兩個男人拖住手 啡色皮膚 白皮膚	some
+👨🏾‍🤝‍👨🏼	兩個男人拖住手 啡色皮膚 黃皮膚	some
+👨🏾‍🤝‍👨🏽	兩個男人拖住手 啡色皮膚 淺啡色皮膚	some
+👬🏾	兩個男人拖住手 啡色皮膚	some
+👨🏾‍🤝‍👨🏿	兩個男人拖住手 啡色皮膚 黑皮膚	some
+👨🏿‍🤝‍👨🏻	兩個男人拖住手 黑皮膚 白皮膚	some
+👨🏿‍🤝‍👨🏼	兩個男人拖住手 黑皮膚 黃皮膚	some
+👨🏿‍🤝‍👨🏽	兩個男人拖住手 黑皮膚 淺啡色皮膚	some
+👨🏿‍🤝‍👨🏾	兩個男人拖住手 黑皮膚 啡色皮膚	some
+👬🏿	兩個男人拖住手 黑皮膚	some
+💏🏻	錫緊嘅一男一女 白皮膚	some
+💏🏼	錫緊嘅一男一女 黃皮膚	some
+💏🏽	錫緊嘅一男一女 淺啡色皮膚	some
+💏🏾	錫緊嘅一男一女 啡色皮膚	some
+💏🏿	錫緊嘅一男一女 黑皮膚	some
+👩‍❤‍💋‍👨	錫緊嘅一男一女 女人 男人	some
+👨‍❤‍💋‍👨	錫緊嘅一男一女 男人 男人	some
+👩‍❤‍💋‍👩	錫緊嘅一男一女 女人 女人	some
+💑🏻	戀愛中 白皮膚	some
+💑🏼	戀愛中 黃皮膚	some
+💑🏽	戀愛中 淺啡色皮膚	some
+💑🏾	戀愛中 啡色皮膚	some
+💑🏿	戀愛中 黑皮膚	some
+👩‍❤‍👨	戀愛中 女人 男人	some
+👨‍❤‍👨	戀愛中 男人 男人	some
+👩‍❤‍👩	戀愛中 女人 女人	some
+👨‍👩‍👦	家庭 男人女人男孩	some
+👨‍👩‍👧	家庭 男人女人女孩	some
+👨‍👩‍👧‍👦	家庭 男人女人女孩男孩	some
+👨‍👩‍👦‍👦	家庭 男人女人男孩男孩	some
+👨‍👩‍👧‍👧	家庭 男人女人女孩女孩	some
+👨‍👨‍👦	家庭 男人男人男孩	some
+👨‍👨‍👧	家庭 男人男人女孩	some
+👨‍👨‍👧‍👦	家庭 男人男人女孩男孩	some
+👨‍👨‍👦‍👦	家庭 男人男人男孩男孩	some
+👨‍👨‍👧‍👧	家庭 男人男人女孩女孩	some
+👩‍👩‍👦	家庭 女人女人男孩	some
+👩‍👩‍👧	家庭 女人女人女孩	some
+👩‍👩‍👧‍👦	家庭 女人女人女孩男孩	some
+👩‍👩‍👦‍👦	家庭 女人女人男孩男孩	some
+👩‍👩‍👧‍👧	家庭 女人女人女孩女孩	some
+👨‍👦	家庭 男人男孩	some
+👨‍👦‍👦	家庭 男人男孩男孩	some
+👨‍👧	家庭 男人女孩	some
+👨‍👧‍👦	家庭 男人女孩男孩	some
+👨‍👧‍👧	家庭 男人女孩女孩	some
+👩‍👦	家庭 女人男孩	some
+👩‍👦‍👦	家庭 女人男孩男孩	some
+👩‍👧	家庭 女人女孩	some
+👩‍👧‍👦	家庭 女人女孩男孩	some
+👩‍👧‍👧	家庭 女人女孩女孩	some
+	Apple Logo	some
+
+🏴󠁭󠁤󠁳󠁮󠁿	德涅斯特河沿岸摩爾達維亞共和國旗	some
+🏴󠁧󠁥󠁡󠁢󠁿	阿布哈茲旗	some
+🇦🇨	阿森松島旗	some
+🇦🇩	安道爾旗	some
+🇦🇪	阿聯酋旗	some
+🇦🇫	阿富汗旗	some
+🇦🇬	安提瓜和巴布達旗	some
+🇦🇮	安圭拉旗	some
+🇦🇱	阿爾巴尼亞旗	some
+🇦🇲	亞美尼亞旗	some
+🇦🇴	安哥拉旗	some
+🇦🇶	南極洲旗	some
+🇦🇷	阿根廷旗	some
+🇦🇸	美屬薩摩亞旗	some
+🇦🇹	奧地利旗	some
+🇦🇺	澳洲旗	some
+🇦🇼	阿魯巴旗	some
+🇦🇽	奧蘭群島旗	some
+🇦🇿	亞塞拜疆旗	some
+🇧🇦	波斯尼亞和黑塞哥維那旗	some
+🇧🇧	巴貝多旗	some
+🇧🇩	孟加拉國旗	some
+🇧🇪	比利時旗	some
+🇧🇫	布基納法索旗	some
+🇧🇬	保加利亞旗	some
+🇧🇭	巴林旗	some
+🇧🇮	布隆迪旗	some
+🇧🇯	貝寧旗	some
+🇧🇱	聖巴泰勒米旗	some
+🇧🇲	百慕達旗	some
+🇧🇳	汶萊旗	some
+🇧🇴	玻利維亞旗	some
+🇧🇶	荷屬加勒比區旗	some
+🇧🇷	巴西旗	some
+🇧🇸	巴哈馬旗	some
+🇧🇹	不丹旗	some
+🇧🇻	鮑威特島旗	some
+🇧🇼	博茨瓦納旗	some
+🇧🇾	白羅斯旗	some
+🇧🇿	伯利茲旗	some
+🇨🇦	加拿大旗	some
+🇨🇨	科科斯（基林）群島旗	some
+🇨🇩	剛果民主共和國旗	some
+🇨🇫	中非共和國旗	some
+🇨🇬	剛果共和國旗	some
+🇨🇭	瑞士旗	some
+🇨🇮	象牙海岸旗	some
+🇨🇰	科克群島旗	some
+🇨🇱	智利旗	some
+🇨🇲	喀麥隆旗	some
+🇨🇳	中華人民共和國旗	some
+🇨🇴	哥倫比亞旗	some
+🇨🇵	克利珀頓島旗	some
+🇨🇷	哥斯達黎加旗	some
+🇨🇺	古巴旗	some
+🇨🇻	維德角旗	some
+🇨🇼	庫拉索旗	some
+🇨🇽	聖誕島旗	some
+🇨🇾	賽普勒斯旗	some
+🇨🇿	捷克旗	some
+🇩🇪	德國旗	some
+🇩🇬	迪戈加西亞島旗	some
+🇩🇯	吉布地旗	some
+🇩🇰	丹麥旗	some
+🇩🇲	多明尼克旗	some
+🇩🇴	多明尼加共和國旗	some
+🇩🇿	阿爾及利亞旗	some
+🇪🇦	休達及梅利利亞旗	some
+🇪🇨	厄瓜多爾旗	some
+🇪🇪	愛沙尼亞旗	some
+🇪🇬	埃及旗	some
+🇪🇭	西撒哈拉旗	some
+🇪🇷	厄立特裡亞旗	some
+🇪🇸	西班牙旗	some
+🇪🇹	埃塞俄比亞旗	some
+🇪🇺	歐盟旗	some
+🇫🇮	芬蘭旗	some
+🇫🇯	斐濟旗	some
+🇫🇰	福克蘭群島旗	some
+🇫🇲	密克羅尼西亞旗	some
+🇫🇴	法羅群島旗	some
+🇫🇷	法國旗	some
+🇬🇦	加蓬旗	some
+🇬🇧	英國旗	some
+🇬🇩	格林納達旗	some
+🇬🇪	格魯吉亞旗	some
+🇬🇫	法屬圭亞那旗	some
+🇬🇬	根西島旗	some
+🇬🇭	加納旗	some
+🇬🇮	直布羅陀旗	some
+🇬🇱	格陵蘭旗	some
+🇬🇲	岡比亞旗	some
+🇬🇳	幾內亞旗	some
+🇬🇵	瓜德羅普旗	some
+🇬🇶	赤道幾內亞旗	some
+🇬🇷	希臘旗	some
+🇬🇸	南佐治亞島與南桑威奇群島旗	some
+🇬🇹	危地馬拉旗	some
+🇬🇺	關島旗	some
+🇬🇼	幾內亞比紹旗	some
+🇬🇾	圭亞那旗	some
+🇭🇰	香港特別行政區旗	some
+🇭🇲	赫德島和麥克唐納群島旗	some
+🇭🇳	洪都拉斯旗	some
+🇭🇷	克羅地亞旗	some
+🇭🇹	海地旗	some
+🇭🇺	匈牙利旗	some
+🇮🇨	迦納利群島旗	some
+🇮🇩	印尼旗	some
+🇮🇪	愛爾蘭旗	some
+🇮🇱	以色列旗	some
+🇮🇲	馬恩島旗	some
+🇮🇳	印度旗	some
+🇮🇴	英屬印度洋領地旗	some
+🇮🇶	伊拉克旗	some
+🇮🇷	伊朗旗	some
+🇮🇸	冰島旗	some
+🇮🇹	義大利旗	some
+🇯🇪	澤西島旗	some
+🇯🇲	牙買加旗	some
+🇯🇴	約旦旗	some
+🇯🇵	日本旗	some
+🇰🇪	肯尼亞旗	some
+🇰🇬	吉爾吉斯旗	some
+🇰🇭	柬埔寨旗	some
+🇰🇮	吉里巴斯旗	some
+🇰🇲	科摩羅旗	some
+🇰🇳	聖基茨和尼維斯旗	some
+🇰🇵	朝鮮旗	some
+🇰🇷	韓國旗	some
+🇰🇼	科威特旗	some
+🇰🇾	開曼群島旗	some
+🇰🇿	哈薩克旗	some
+🇱🇦	老撾旗	some
+🇱🇧	黎巴嫩旗	some
+🇱🇨	聖盧西亞旗	some
+🇱🇮	列支敦士登旗	some
+🇱🇰	斯裡蘭卡旗	some
+🇱🇷	利比裡亞旗	some
+🇱🇸	賴索托旗	some
+🇱🇹	立陶宛旗	some
+🇱🇺	盧森堡旗	some
+🇱🇻	拉脫維亞旗	some
+🇱🇾	利比亞旗	some
+🇲🇦	摩洛哥旗	some
+🇲🇨	摩納哥旗	some
+🇲🇩	摩爾多瓦旗	some
+🇲🇪	黑山旗	some
+🇲🇫	法屬聖馬丁旗	some
+🇲🇬	馬達加斯加旗	some
+🇲🇭	馬紹爾群島旗	some
+🇲🇰	北馬其頓旗	some
+🇲🇱	馬裡旗	some
+🇲🇲	緬甸旗	some
+🇲🇳	蒙古旗	some
+🇲🇴	中國澳門特別行政區旗	some
+🇲🇵	北馬裡亞納群島旗	some
+🇲🇶	馬提尼克旗	some
+🇲🇷	毛裡塔尼亞旗	some
+🇲🇸	蒙塞拉特島旗	some
+🇲🇹	馬耳他旗	some
+🇲🇺	模里西斯旗	some
+🇲🇻	馬爾代夫旗	some
+🇲🇼	馬拉維旗	some
+🇲🇽	墨西哥旗	some
+🇲🇾	馬來西亞旗	some
+🇲🇿	莫桑比克旗	some
+🇳🇦	納米比亞旗	some
+🇳🇨	新赫裡多尼亞旗	some
+🇳🇪	尼日爾旗	some
+🇳🇫	諾福克島旗	some
+🇳🇬	尼日利亞旗	some
+🇳🇮	尼加拉瓜旗	some
+🇳🇱	荷蘭旗	some
+🇳🇴	挪威旗	some
+🇳🇵	尼泊爾旗	some
+🇳🇷	瑙魯旗	some
+🇳🇺	紐埃旗	some
+🇳🇿	紐西蘭旗	some
+🇴🇲	阿曼旗	some
+🇵🇦	巴拿馬旗	some
+🇵🇪	秘魯旗	some
+🇵🇫	法屬波利尼西亞旗	some
+🇵🇬	巴布亞新幾內亞旗	some
+🇵🇭	菲律賓旗	some
+🇵🇰	巴基斯坦旗	some
+🇵🇱	波蘭旗	some
+🇵🇲	聖匹島旗	some
+🇵🇳	皮特肯島旗	some
+🇵🇷	波多黎各旗	some
+🇵🇸	巴勒斯坦領土旗	some
+🇵🇹	葡萄牙旗	some
+🇵🇼	帛琉旗	some
+🇵🇾	巴拉圭旗	some
+🇶🇦	卡塔爾旗	some
+🇷🇪	留尼旺旗	some
+🇷🇴	羅馬尼亞旗	some
+🇷🇸	塞爾維亞旗	some
+🇷🇺	俄羅斯旗	some
+🇷🇼	盧旺達旗	some
+🇸🇦	沙特阿拉伯旗	some
+🇸🇧	所羅門群島旗	some
+🇸🇨	塞舌爾旗	some
+🇸🇩	蘇丹旗	some
+🇸🇪	瑞典旗	some
+🇸🇬	星加坡旗	some
+🇸🇭	聖赫勒拿旗	some
+🇸🇮	斯洛文尼亞旗	some
+🇸🇯	斯瓦爾巴特群島及揚馬延島旗	some
+🇸🇰	斯洛伐克旗	some
+🇸🇱	獅子山旗	some
+🇸🇲	聖馬力諾旗	some
+🇸🇳	塞內加爾旗	some
+🇸🇴	索馬裡旗	some
+🇸🇷	蘇裡南旗	some
+🇸🇸	南蘇丹旗	some
+🇸🇹	聖多美和普林西比旗	some
+🇸🇻	薩爾瓦多旗	some
+🇸🇽	荷屬聖馬丁旗	some
+🇸🇾	敘利亞旗	some
+🇸🇿	斯威士蘭旗	some
+🇹🇦	崔斯坦達庫尼亞群島旗	some
+🇹🇨	特克斯和凱科斯群島旗	some
+🇹🇩	查德旗	some
+🇹🇫	法屬南部領地旗	some
+🇹🇬	多哥共和國旗	some
+🇹🇭	泰國旗	some
+🇹🇯	塔吉克旗	some
+🇹🇰	托克勞旗	some
+🇹🇱	東帝汶旗	some
+🇹🇲	土庫曼旗	some
+🇹🇳	突尼斯旗	some
+🇹🇴	湯加旗	some
+🇹🇷	土耳其旗	some
+🇹🇹	千里達和多巴哥旗	some
+🇹🇻	圖瓦盧旗	some
+🇹🇼	台灣旗	some
+🇹🇿	坦桑尼亞旗	some
+🇺🇦	烏克蘭旗	some
+🇺🇬	烏幹達旗	some
+🇺🇲	美國本土外小島嶼旗	some
+🇺🇳	聯合國旗	some
+🇺🇸	美國旗	some
+🇺🇾	烏拉圭旗	some
+🇺🇿	烏茲別克旗	some
+🇻🇦	梵諦岡旗	some
+🇻🇨	聖文森特和格林納丁斯旗	some
+🇻🇪	委內瑞拉旗	some
+🇻🇬	英屬維爾京群島旗	some
+🇻🇮	美屬維爾京群島旗	some
+🇻🇳	越南旗	some
+🇻🇺	瓦努阿圖旗	some
+🇼🇫	瓦利斯和富圖納旗	some
+🇼🇸	薩摩亞旗	some
+🇽🇰	科索沃旗	some
+🇾🇪	也門旗	some
+🇾🇹	馬約特旗	some
+🇿🇦	南非旗	some
+🇿🇲	贊比亞旗	some
+🇿🇼	津巴布韋旗	some
+🏴󠁧󠁢󠁥󠁮󠁧󠁿	英格蘭旗	some
+🏴󠁧󠁢󠁳󠁣󠁴󠁿	蘇格蘭旗	some
+🏴󠁧󠁢󠁷󠁬󠁳󠁿	威爾斯旗	some
+
+#️⃣	按鍵井號	some
+*⃣	按鍵星號	some
+🔟	按鍵 10	some
+0⃣	按鍵 0	some
+1⃣	按鍵 1	some
+2⃣	按鍵 2	some
+3⃣	按鍵 3	some
+4⃣	按鍵 4	some
+5⃣	按鍵 5	some
+6⃣	按鍵 6	some
+7⃣	按鍵 7	some
+8⃣	按鍵 8	some
+9⃣	按鍵 9	some

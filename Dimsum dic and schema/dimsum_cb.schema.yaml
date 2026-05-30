@@ -1,0 +1,157 @@
+# Rime schema
+# encoding: utf-8
+
+schema:
+  schema_id: dimsum_cb
+  name: "點心粵語點字 (記憶版)"
+  version: "1.1"
+  author:
+    - Dimsum Group
+
+menu:
+  page_size: 9
+
+engine:
+  processors:
+    - chord_composer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - table_translator
+
+# 拼字器：替換字典編碼
+speller:
+  # 移除了數字 0-9，確保上方實體數字鍵可以正常選字！
+  alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"#$%&'()*+,-./:;<=>?@[\\]^_"
+  delimiter: " "
+  algebra:
+    - 'xform/g/G/'
+    - 'xform/h/H/'
+    - 'xform/1/A/'
+    - 'xform/2/B/'
+    - 'xform/3/C/'
+    - 'xform/4/D/'
+    - 'xform/5/E/'
+    - 'xform/6/F/'
+    - 'xform/7/I/'
+    - 'xform/8/J/'
+    - 'xform/9/K/'
+    - 'xform/0/N/'      # 修復：將字典裡的 0 完美對應到 N
+
+# 快捷鍵綁定
+key_binder:
+  bindings:
+    - { when: has_menu, accept: h, send: Down }
+    - { when: has_menu, accept: g, send: Up }
+    - { when: composing, accept: Return, send: commit_raw_input }
+    - { when: composing, accept: Control+Return, send: commit_raw_input }
+
+# 並擊模組
+chord_composer:
+  alphabet: "afdsjkl"
+  algebra:
+    - 'xform/^f$/a/'
+    - 'xform/^d$/A/'
+    - "xform/^s$/'/"
+    - 'xform/^j$/@/'
+    - 'xform/^k$/"/'
+    - 'xform/^l$/,/'
+    - 'xform/^fd$/b/'
+    - 'xform/^fs$/k/'
+    - 'xform/^fj$/c/'
+    - 'xform/^fk$/e/'
+    - 'xform/^fl$/*/'
+    - 'xform/^ds$/B/'
+    - 'xform/^dj$/i/'
+    - 'xform/^dk$/C/'
+    - 'xform/^dl$/E/'
+    - 'xform~^sj$~/~'     # 修復：正斜線
+    - 'xform/^sk$/K/'
+    - 'xform/^sl$/-/'
+    - 'xform/^jk$/^/'
+    - 'xform/^jl$/./'
+    - 'xform/^kl$/;/'
+    - 'xform/^fds$/l/'
+    - 'xform/^fdj$/f/'
+    - 'xform/^fdk$/H/'
+    - 'xform/^fdl$/</'
+    - 'xform/^fsj$/m/'
+    - 'xform/^fsk$/o/'
+    - 'xform/^fsl$/u/'
+    - 'xform/^fjk$/d/'
+    - 'xform/^fjl$/%/'
+    - 'xform/^fkl$/:/'
+    - 'xform/^dsj$/s/'
+    - 'xform/^dsk$/F/'
+    - 'xform/^dsl$/J/'
+    - 'xform/^djk$/j/'
+    - 'xform/^djl$/[/'
+    - 'xform/^dkl$/D/'
+    - 'xform/^sjk$/>/'
+    - 'xform/^sjl$/+/'
+    - 'xform/^skl$/N/'    # 修復：改用 N 代替 0
+    - 'xform/^jkl$/_/'
+    - 'xform/^fdsj$/p/'
+    - 'xform/^fdsk$/r/'
+    - 'xform/^fdsl$/v/'
+    - 'xform/^fdjk$/G/'
+    - 'xform/^fdjl$/$/'
+    - 'xform~^fdkl$~\\~'  # 修復：反斜線
+    - 'xform/^fsjk$/n/'
+    - 'xform/^fsjl$/x/'
+    - 'xform/^fskl$/z/'
+    - 'xform/^fjkl$/?/'
+    - 'xform/^dsjk$/t/'
+    - 'xform/^dsjl$/!/'
+    - 'xform/^dskl$/I/'
+    - 'xform/^djkl$/w/'
+    - 'xform/^sjkl$/#/'
+    - 'xform/^fdsjk$/q/'
+    - 'xform/^fdsjl$/&/'
+    - 'xform/^fdskl$/(/'
+    - 'xform/^fdjkl$/]/'
+    - 'xform/^fsjkl$/y/'
+    - 'xform/^dsjkl$/)/'
+    - 'xform/^fdsjkl$/=/'
+# --- 新增：a 鍵大寫字母專屬組合 ---
+    - 'xform/^af$/A/'
+    - 'xform/^afd$/B/'
+    - 'xform/^afj$/C/'
+    - 'xform/^afjk$/D/'
+    - 'xform/^afk$/E/'
+    - 'xform/^afdj$/F/'
+    - 'xform/^afdjk$/G/'
+    - 'xform/^afdk$/H/'
+    - 'xform/^adj$/I/'
+    - 'xform/^adjk$/J/'
+    - 'xform/^afs$/K/'
+    - 'xform/^afds$/L/'
+    - 'xform/^afsj$/M/'
+    - 'xform/^afsjk$/N/'
+    - 'xform/^afsk$/O/'
+    - 'xform/^afdsj$/P/'
+    - 'xform/^afdsjk$/Q/'
+    - 'xform/^afdsk$/R/'
+    - 'xform/^adsj$/S/'
+    - 'xform/^adsjk$/T/'
+    - 'xform/^afsl$/U/'
+    - 'xform/^afdsl$/V/'
+    - 'xform/^adjkl$/W/'
+    - 'xform/^afsjl$/X/'
+    - 'xform/^afsjkl$/Y/'
+    - 'xform/^afskl$/Z/'
+
+translator:
+  dictionary: dimsum_cb
+  enable_user_dict: true
+  enable_sentence: true
+  enable_completion: false
