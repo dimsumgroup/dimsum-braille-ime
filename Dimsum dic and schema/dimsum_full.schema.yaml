@@ -1,10 +1,11 @@
+#刪除control enter上字
 # Rime schema
 # encoding: utf-8
 
 schema:
   schema_id: dimsum_full
   name: "點心粵語點字 (一陽指模式)"
-  version: "1.1"
+  version: "1"
   author:
     - Dimsum group
 
@@ -39,10 +40,8 @@ speller:
 # 快捷鍵綁定
 key_binder:
   bindings:
-    # 🔥 刪除了 h (下一頁) 和 g (上一頁) 的綁定，把這兩個鍵還給打字使用
-    # (找字請統一使用方向鍵的「上」與「下」)
+    # (揀字請統一使用上下方向鍵)
     - { when: composing, accept: Return, send: commit_raw_input }
-    - { when: composing, accept: Control+Return, send: commit_raw_input }
 
 translator:
   dictionary: dimsum_cb
