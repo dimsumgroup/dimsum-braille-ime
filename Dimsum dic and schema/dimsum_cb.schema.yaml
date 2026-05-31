@@ -1,10 +1,11 @@
+#刪除control enter上字
 # Rime schema
 # encoding: utf-8
 
 schema:
   schema_id: dimsum_cb
   name: "點心粵語點字 (記憶版)"
-  version: "1.1"
+  version: "1"
   author:
     - Dimsum Group
 
@@ -53,7 +54,6 @@ key_binder:
     - { when: has_menu, accept: h, send: Down }
     - { when: has_menu, accept: g, send: Up }
     - { when: composing, accept: Return, send: commit_raw_input }
-    - { when: composing, accept: Control+Return, send: commit_raw_input }
 
 # 並擊模組
 chord_composer:
