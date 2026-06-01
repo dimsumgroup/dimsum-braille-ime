@@ -1,3 +1,4 @@
+#Caps Lock commit code
 # Rime schema
 # encoding: utf-8
 
@@ -8,11 +9,22 @@ schema:
   author:
     - Dimsum Group
 
+#強制 Caps Lock 為純英文，並封殺 Shift 單按切換
+ascii_composer:
+  good_old_caps_lock: true
+  switch_key:
+    Caps_Lock: commit_code
+    Shift_L: noop
+    Shift_R: noop
+    Control_L: noop
+    Control_R: noop
+
 menu:
   page_size: 9
 
 engine:
   processors:
+    - ascii_composer
     - chord_composer
     - key_binder
     - speller
