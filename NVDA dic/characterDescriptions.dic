@@ -1,20 +1,7 @@
 #Traditional Chinese (Hong Kong) characterDescriptions.dic 
 #A part of NonVisual Desktop Access (NVDA)
 #URL: https://www.nvda-project.org/
-#Copyright (C) 2026 T.Y. <005tylee@gmail.com>
-#Copyright (c) 2010-2011 World Light Information Limited and Hong Kong Blind Union.
-#This file is covered by the GNU General Public License.
-#Integrated from Traditional Chinese (Taiwan) CharacterDiscription.dic
-# Other sources:
-#1 https://humanum.arts.cuhk.edu.hk/Lexis/lexi-can/  
-#2 https://humanum.arts.cuhk.edu.hk/Lexis/lexi-mf/
-#3 https://pedia.cloud.edu.tw/
-#4 https://chardb.iis.sinica.edu.tw/
-#5 https://dict.revised.moe.edu.tw/
-#6 https://ctext.org/dictionary.pl?if=gb
-#7 https://www.zdic.net
-#8 https://www.edbchinese.hk/lexlist_ch/
-#9 https://lib.ctcn.edu.tw/chtdict/
+#Copyright (C) 2026 Dimsum Group <dimsumgroup@outlook.com>
 
 
 "	(開單引號)
