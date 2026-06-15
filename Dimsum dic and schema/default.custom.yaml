@@ -1,0 +1,15 @@
+customization:
+  distribution_code_name: Weasel
+  distribution_version: VERSION_MAJOR.VERSION_MINOR.VERSION_PATCH
+  generator: "Rime::SwitcherSettings"
+  modified_time: "Tue Apr 21 16:17:22 2026"
+  rime_version: 1.16.1
+patch:
+  menu:
+    page_size: 9
+  schema_list:
+    - {schema: dimsum_cb}
+    - {schema: dimsum_cb_std}
+    - {schema: dimsum_full}
+  "switcher/hotkeys":
+    - "Control+grave"
