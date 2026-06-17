@@ -1,4 +1,5 @@
-﻿#Traditional Chinese (Hong Kong) cldr.dic
+﻿#2026-06-17
+#Traditional Chinese (Hong Kong) cldr.dic
 #A part of NonVisual Desktop Access (NVDA)
 #URL: https://www.dimsumbrl.work/
 #Copyright (C) 2026 Dimsum Group <dimsumgroup@outlook.com>
@@ -252,7 +253,8 @@ symbols:
 😤	傲慢	some
 😡	怒火中燒	some
 😠	憤怒	some
-🤬	嘴巴上有符號嘅表情	some
+🤬	嘴巴上有符號嘅憤怒表情	some
+🫩	有眼袋嘅表情	some
 😈	惡魔微笑	some
 👿	生氣的惡魔	some
 💀	頭骨	some
@@ -507,6 +509,11 @@ symbols:
 🫱	向右的手	some
 🫲	向左的手	some
 🫳	掌心朝下	some
+🫳🏻	掌心朝下 白皮膚some
+🫳🏼	掌心朝下 黃皮膚	some
+🫳🏽	掌心朝下 淺啡色皮膚	some
+🫳🏾	掌心朝下 啡色皮膚	some
+🫳🏿	掌心朝下 黑皮膚	some
 🫴	手掌向上	some
 🫵	食指指向觀眾	some
 🫶	雙手做心形手勢	some
@@ -812,6 +819,7 @@ symbols:
 🍉	西瓜	some
 🍊	橙	some
 🍋	檸檬	some
+🍋‍🟩	青檸	some
 🍌	香蕉	some
 🍍	菠蘿	some
 🥭	芒果	some
