@@ -1,8 +1,11 @@
-#2026-06-20
+#2026-06-21 新增用戶自定詞庫
 ---
 name: dimsum_cb
-version: "6.0"
+version: "7.0"
 sort: by_weight
+
+import_tables:
+  - dimsum_cb.user
 ...
 #澳門地名
 廣東大馬路	q;at8t+1mb,lv1	1000877
