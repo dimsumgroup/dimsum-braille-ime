@@ -60,7 +60,7 @@ NVDA / JAWS 螢幕閱讀器支援
 * 1. 直接上字：按下「空白鍵 (Space)」即可直接送出第一個候選字。為了令使用者打字更快，如果選詞只有一個，會發出音效，使用者可直接按下space上字
 
 
-* 2. 瀏覽找字：按「下方向鍵 Thames」或字母「H」鍵往下瀏覽；按「上方向鍵」或字母「G」鍵往上瀏覽。您也可以按「上翻頁 (Page Up)」與「下翻頁 (Page Down)」鍵進行大範圍翻頁。找到需要的字後，按空白鍵即可上字。
+* 2. 瀏覽找字：按「下方向鍵」或字母「H」鍵往下瀏覽；按「上方向鍵」或字母「G」鍵往上瀏覽。您也可以按「上翻頁 (Page Up)」與「下翻頁 (Page Down)」鍵進行大範圍翻頁。找到需要的字後，按空白鍵即可上字。
 
 
 * 3. 快速選字：聽到想要的字時，直接按下鍵盤上方那一排的「實體數字鍵 (1 到 9)」，即可快速送出對應編號的候選字。
@@ -167,7 +167,7 @@ NVDA / JAWS 螢幕閱讀器支援
 ## 📧 聯絡方式
 
 * **電子郵件**：dimsumgroup@outlook.com
-* **GitHub**：[@dimsumgroup](https://www.google.com/search?q=https%3A%2F%2Fgithub.com%2Fdimsumgroup)
+* **GitHub**：[@dimsumgroup](https://github.com/dimsumgroup/dimsum-braille-ime)
 
 ---
 
