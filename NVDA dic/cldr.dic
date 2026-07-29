@@ -1,4 +1,4 @@
-﻿#2026-06-17
+﻿#2026-07-28
 #Traditional Chinese (Hong Kong) cldr.dic
 #A part of NonVisual Desktop Access (NVDA)
 #URL: https://www.dimsumbrl.work/
@@ -1663,7 +1663,7 @@ symbols:
 🆒	Cool 按鈕	some
 🆓	免費按鈕	some
 ℹ	資料	some
-🆔	身份	some
+🆔	身分識別標誌	some
 Ⓜ	圓圈中嘅 M	some
 🆕	NEW 按鈕	some
 🆖	NG 按鈕	some
@@ -3606,7 +3606,7 @@ symbols:
 🇬🇺	關島旗	some
 🇬🇼	幾內亞比紹旗	some
 🇬🇾	圭亞那旗	some
-🇭🇰	香港特別行政區旗	some
+🇭🇰	中國香港特別行政區旗	some
 🇭🇲	赫德島和麥克唐納群島旗	some
 🇭🇳	洪都拉斯旗	some
 🇭🇷	克羅地亞旗	some
