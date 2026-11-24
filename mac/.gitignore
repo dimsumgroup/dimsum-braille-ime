@@ -1,0 +1,17 @@
+# macOS Finder metadata
+.DS_Store
+
+# Local build and distribution output
+/build/
+/DimsumManager.app/
+/DimsumVoiceHelper.app/
+/dimsum_tool
+/Squirrel-*.pkg
+/*.dmg
+/*.zip
+
+# Local state
+/config/
+*.log
+__pycache__/
+*.pyc

@@ -1,0 +1,18 @@
+# Rime settings
+# encoding: utf-8
+# 點心粵語點字輸入法 — Squirrel 外觀設定（VoiceOver 無障礙優化版）
+#
+# 重要：為讓 VoiceOver 能讀出候選字，啟用 inline_candidate 和 inline_preedit。
+# 這樣輸入碼和候選字會直接顯示在應用程式的文字輸入框內，
+# VoiceOver 可以讀取文字框中的內容。
+patch:
+  # —— VoiceOver 無障礙核心設定 ——
+  "style/inline_preedit": true        # 在文字框內顯示輸入碼（VoiceOver 可讀）
+  "style/inline_candidate": true      # 在文字框內顯示候選字（VoiceOver 可讀）
+  "style/candidate_format": "%c. %@"  # 候選格式：編號. 候選字
+
+  # —— 外觀設定 ——
+  "style/color_scheme": aqua          # aqua 為 Rime 內建配色（淺色）
+  "style/font_point": 12              # 候選窗字級 12pt
+  "style/horizontal": false           # false = 直排候選窗
+  "style/label_font_point": 12        # 候選編號字級
