@@ -4,7 +4,7 @@
 
 # 🔍 什麼是點心粵語點字輸入法？
 
-點心粵語點字輸入法（Dimsum Braille IME）是一款專為香港視障人士設計的粵語點字輸入工具，支援 Windows 系統，並與 NVDA 螢幕閱讀器完全相容。
+點心粵語點字輸入法（Dimsum Braille IME）是一款專為香港視障人士設計的粵語點字輸入工具，支援 Windows 和 macOS。Windows 版支援 NVDA，macOS 版提供候選報讀及 VoiceOver、TurnOver 查配詞。
 本輸入法採用 Rime（中州韻）引擎，提供高效、準確的粵語點字輸入體驗，適合日常打字、學習及工作。
 支援關鍵功能包括：
 •
@@ -23,7 +23,13 @@ NVDA / JAWS 螢幕閱讀器支援
 
 ## 📥 快速開始
 
-### 安裝步驟
+### macOS
+
+適用於 macOS 13 或更新版本。從 GitHub Releases 下載 Mac 的 DMG，打開後把 DimsumManager 拖到「應用程式」。DMG 內附安裝及使用說明。
+
+[下載 Mac 版](https://github.com/dimsumgroup/dimsum-braille-ime/releases) · [安裝及使用說明](mac/安裝及使用說明.txt) · [Mac 原始碼及編譯方法](mac/BUILD.md)
+
+### Windows 安裝步驟
 
 1. 下載安裝檔案
 [https://github.com/dimsumgroup/dimsum-braille-ime/releases/latest](https://github.com/dimsumgroup/dimsum-braille-ime/releases/latest)

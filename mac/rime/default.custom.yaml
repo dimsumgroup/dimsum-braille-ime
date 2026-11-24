@@ -1,0 +1,17 @@
+# Rime settings
+# encoding: utf-8
+# 點心粵語點字輸入法 — macOS（Squirrel）設定
+# 註：distribution_code_name 已由 Weasel 改為 Squirrel；patch 內容跨平台通用
+customization:
+  distribution_code_name: Squirrel
+  generator: "Rime::SwitcherSettings"
+  rime_version: 1.11
+patch:
+  menu:
+    page_size: 9
+  schema_list:
+    - {schema: dimsum_cb}
+    - {schema: dimsum_cb_std}
+    - {schema: dimsum_full}
+  "switcher/hotkeys":
+    - "Control+grave"

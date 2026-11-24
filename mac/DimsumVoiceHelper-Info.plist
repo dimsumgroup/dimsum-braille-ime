@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+    <key>CFBundlePackageType</key><string>APPL</string>
+    <key>CFBundleExecutable</key><string>DimsumVoiceHelper</string>
+    <key>CFBundleIdentifier</key><string>com.dimsum.braille.vo-helper</string>
+    <key>CFBundleName</key><string>DimsumVoiceHelper</string>
+    <key>CFBundleDisplayName</key><string>點心語音報讀助手</string>
+    <key>CFBundleVersion</key><string>1.2.1</string>
+    <key>CFBundleShortVersionString</key><string>1.2.1</string>
+    <key>LSMinimumSystemVersion</key><string>13.0</string>
+    <key>LSUIElement</key><true/>
+    <key>NSHighResolutionCapable</key><true/>
+    <key>NSAppleEventsUsageDescription</key><string>查詢配詞時，讀取 VoiceOver 最近一次的報讀文字。</string>
+</dict>
+</plist>
