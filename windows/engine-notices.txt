@@ -1,0 +1,11 @@
+內附輸入引擎使用 rime/weasel 0.17.4.0 公開發行檔嘅原廠二進位檔。
+原始碼（GPL-3.0）及建置方法：
+https://github.com/rime/weasel/tree/9cc96e20dc71b80876b12f689bb5863c76c2a7ed
+https://github.com/rime/weasel/releases/tag/0.17.4
+下載附件 SHA-256：
+cf509534a8f5f8af9c98ed7cbb8f135439f145a8cbe7e50ede42bb5b5ab45c29
+
+點心重新封裝引擎安裝程式，保留上游二進位檔同共用設定。原廠附送嘅輸入方案同字庫已排除。
+點心安裝程式原始碼及建置步驟見同一份來源封裝內嘅 installer/engine.nsi 同 prepare-assets.py。
+點心專用輸入法名稱由 Windows TSF 語言設定登記。
+單候選提示音使用執行於輸入引擎內的 Rime Lua 模組判斷，並由同一用家的點心背景程序播放。
