@@ -13,7 +13,7 @@ static class Program
     [STAThread]
     static void Main(string[] args)
     {
-        if (args.Length > 0 && args[0] is "--restore-nvda-dictionaries" or "--finish-setup" or "--hide-machine-entries"
+        if (args.Length > 0 && args[0] is "--finish-setup" or "--hide-machine-entries"
             or "--install-engine" or "--after-install" or "--remove-components" or "--prepare-legacy-engine"
             or "--finish-legacy-cleanup" or "--remove-engine-machine" or "--retire-legacy-on-removal"
             or "--check-nvda-addon" or "--install-nvda-addon")
@@ -22,14 +22,6 @@ static class Program
             {
                 switch (args[0])
                 {
-                    case "--restore-nvda-dictionaries" when args.Length == 1:
-                        var restore = NvdaDictionaries.RestoreInstalled();
-                        string result = restore.Restored > 0 ? $"已從備份還原 {restore.Restored} 份 NVDA 配詞檔。請重新啟動 NVDA。" :
-                            "未有需要由備份還原嘅 NVDA 配詞檔。";
-                        if (restore.Missing > 0)
-                            result += $"{Environment.NewLine}{restore.Missing} 份檔案搵唔到原有備份。可以用原廠安裝程式修復 NVDA。";
-                        MessageBox.Show(result, Title);
-                        break;
                     case "--check-nvda-addon" when args.Length == 1:
                         string data = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DimsumInput");
                         if (NvdaAddon.ShouldOffer(data)) Environment.ExitCode = 6;

@@ -48,6 +48,7 @@ sealed class LegacyUpgrade(Workspace workspace)
 
         string id = state.Id.ToString("N");
         string backup = Path.Combine(BackupFolder, id);
+        string nvdaBackup = Path.Combine(backup, NvdaDictionaries.BackupFolder);
         string stage = "備份用家資料";
         try
         {
@@ -66,6 +67,9 @@ sealed class LegacyUpgrade(Workspace workspace)
                 MachineLegacyUpgrade.CopyTree(workspace.Rime, Path.Combine(backup, "Rime"));
                 state = Advance(state, Stage.DataSaved);
             }
+
+            stage = "備份 NVDA 配詞檔";
+            NvdaDictionaries.BackupInstalledDictionaries(NvdaDictionaries.FindInstallation(), nvdaBackup);
 
             if (state.Stage < Stage.EngineReady)
             {
@@ -96,7 +100,10 @@ sealed class LegacyUpgrade(Workspace workspace)
             ClearOldUserEntries(backup);
             Advance(state, Stage.Complete);
             workspace.ConfigureStartup(retireLegacy: true);
-            return "已更新輸入引擎並移除舊版自動更新元件。已保留學習記錄、自訂詞庫同設定。";
+            string result = "已更新輸入引擎並移除舊版自動更新元件。已保留學習記錄、自訂詞庫同設定。";
+            return Directory.Exists(nvdaBackup)
+                ? result + Environment.NewLine + $"NVDA 現存配詞檔已備份到「{nvdaBackup}」。"
+                : result;
         }
         catch (Exception error)
         {

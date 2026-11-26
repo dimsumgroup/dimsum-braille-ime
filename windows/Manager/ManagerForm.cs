@@ -85,13 +85,6 @@ sealed class ManagerForm : Form
             return "點心配詞已更新。NVDA 附加元件會讀取新版本。";
         }, recheckData: true);
         AddButton("另存配詞表供 NVDA 獨立使用(&Y)", () => Task.FromResult(ExportPronunciations()));
-        AddButton("還原 NVDA 原有配詞檔", async () =>
-        {
-            if (!Confirm("會用舊版點心嘅備份，還原辨認到曾被覆寫嘅 NVDA 安裝配詞檔。繼續嗎？")) return "";
-            await WindowsSetup.RunAdminAsync("--restore-nvda-dictionaries");
-            return "";
-        });
-
         var shift = new CheckBox { AutoSize = true, Text = "單按 Shift 切換中英文", Checked = workspace.Settings.ShiftSwitch };
         var sound = new CheckBox { AutoSize = true, Text = "只有一個候選時播放提示音", Checked = workspace.SoundEnabled };
         Add(shift);
