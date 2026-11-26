@@ -17,5 +17,6 @@
 - `UseDimsumReviewDescription` 只控制 NVDA 檢閱當前字元指令第二下。`LookupGesture` 獨立查最近報讀，保留原句畀用家比較。由管理器集中設定。點心可另存三份配詞及備份 NVDA 安裝字典，附加元件直接讀管理器已下載或內附資料。
 - 舊版遷移備份已安裝 NVDA 嘅現存中文配詞檔，目的地係當次遷移備份下嘅 `NVDA舊配詞表備份/`，安裝目錄只用作讀取來源。
 - 精簡引擎使用固定版本 Weasel 0.17.4.0 原廠二進位檔。`prepare-assets.py` 驗證原始安裝檔 SHA-256；`installer/engine.nsi` 定義重封裝。完整來源位置見 `engine-notices.txt`。
-- 調整介面要驗證 NVDA 鍵盤操作、可聚焦欄位同讀出嚟嘅名稱。步驟 01、02 係首次設定，日常功能使用普通按鈕。查配詞快捷鍵嘅編輯、錄製同清除共用 `LookupGesture`，按「儲存報讀設定」先寫入。
+- 調整介面要驗證 NVDA 鍵盤操作、可聚焦欄位同讀出嚟嘅名稱。步驟 01、02 係首次設定，日常功能使用普通按鈕。設定即時套用。查配詞快捷鍵嘅編輯、錄製同清除共用 `LookupGesture`，手動輸入喺離開欄位或按 Enter 時驗證。
+- `Manager/InputLanguages.cs` 先核對揀定語言有點心，再移除其他點心項目。台灣 Weasel 須核對內附引擎嘅安裝標記。普通重新部署只管 Rime 資料。
 - `tests/reporting.py ..` 由呢個目錄用 Python 執行，`tests/reporting.lua` 用 Lua 執行。Windows 實機重點包括更新提示、快捷鍵錄製同清除、換語言、遷移、單候選提示，以及 NVDA 開關各模式嘅行為。

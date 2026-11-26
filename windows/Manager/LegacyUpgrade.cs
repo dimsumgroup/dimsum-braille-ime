@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.Text.Json;
 using Microsoft.Win32;
 
@@ -34,7 +33,7 @@ sealed class LegacyUpgrade(Workspace workspace)
             MachineLegacyUpgrade.HasOwnedTask();
     }
 
-    public async Task<string?> RunAsync(IWin32Window owner, ushort language, Action<string> progress)
+    public async Task<string?> RunAsync(IWin32Window owner, InputLanguageChoice language, Action<string> progress, bool makeDefault)
     {
         var state = ReadState();
         if (state?.Stage == Stage.Complete) state = null;
@@ -78,7 +77,7 @@ sealed class LegacyUpgrade(Workspace workspace)
                 string? engineRoot = Path.GetDirectoryName(Workspace.FindDeployer());
                 if (engineRoot is not null && MachineLegacyUpgrade.IsWithin(engineRoot, workspace.Rime))
                     throw new IOException("用家資料位於輸入引擎資料夾內。請先將用家資料移到其他位置，再更新引擎。");
-                await WindowsSetup.RunAdminAsync("--prepare-legacy-engine", id, language.ToString(CultureInfo.InvariantCulture));
+                await WindowsSetup.RunAdminAsync("--prepare-legacy-engine", id);
                 state = Advance(state, Stage.EngineReady);
             }
 
@@ -88,8 +87,7 @@ sealed class LegacyUpgrade(Workspace workspace)
                 progress("正在部署點心並加入輸入法。");
                 RestoreEngineSettings(backup);
                 WindowsSetup.StartAvailableEngine();
-                if (!WindowsSetup.IsOurProfile(language)) language = WindowsSetup.HongKong;
-                await workspace.CompleteSetupAsync(language, makeDefault: false, legacyMigration: true);
+                await workspace.CompleteSetupAsync(language, makeDefault, legacyMigration: true);
                 state = Advance(state, Stage.Deployed);
             }
 

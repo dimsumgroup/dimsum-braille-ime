@@ -30,7 +30,7 @@ static class Program
                         NvdaAddon.Install();
                         break;
                     case "--finish-setup" when args.Length == 2 && ushort.TryParse(args[1], out ushort language):
-                        WindowsSetup.RegisterWithFallback(language);
+                        WindowsSetup.RegisterProfile(language);
                         break;
                     case "--hide-machine-entries":
                         WindowsSetup.HideMachineEntries();
@@ -38,13 +38,8 @@ static class Program
                     case "--install-engine":
                         WindowsSetup.InstallBundledEngineAsync().GetAwaiter().GetResult();
                         break;
-                    case "--prepare-legacy-engine" when args.Length == 3 && ushort.TryParse(args[2], out ushort detected):
+                    case "--prepare-legacy-engine" when args.Length == 2:
                         MachineLegacyUpgrade.PrepareEngineAsync(args[1]).GetAwaiter().GetResult();
-                        try { WindowsSetup.RegisterWithFallback(detected); }
-                        catch (Exception error)
-                        {
-                            throw new IOException($"「登記新版輸入法」失敗。{Environment.NewLine}{error.Message}（0x{error.HResult:X8}）", error);
-                        }
                         break;
                     case "--finish-legacy-cleanup" when args.Length == 2:
                         MachineLegacyUpgrade.FinalizeCleanup(args[1]);

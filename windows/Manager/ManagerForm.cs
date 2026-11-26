@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Windows.Forms.Automation;
 
 namespace Dimsum;
@@ -7,7 +8,13 @@ sealed class ManagerForm : Form
     const string ReviewDescription = "用 NVDA 原有快捷鍵連按兩下，讀出檢閱游標所在字嘅點心配詞。關閉後會用返 NVDA 原有解釋。";
     const string LookupLabel = "查最近報讀配詞快捷鍵（可留空）";
     const string LookupDescription = "有設定快捷鍵，就可以查 NVDA 最近讀過嘅字詞或句子。呢個快捷鍵同上面嘅開關各自生效。即係話，就算上面關閉咗，呢度你設定咗快捷鍵，你就可以好快咁對比兩套字表嘅解釋。";
+    const string ShortcutFormatError = "快捷鍵請用 Control、Alt、Shift 或 Windows 加英文字母、數字或 F1 至 F12。";
     readonly Workspace workspace;
+    readonly SemaphoreSlim settingChanges = new(1, 1);
+    readonly ComboBox inputLanguage = new() { DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "點心輸入法語言", Width = 360 };
+    readonly Label shortcutError = new() { AutoSize = true, Visible = false, TabStop = false };
+    bool updatingSettings;
+    bool choseInputLanguage;
     readonly TableLayoutPanel form = new() { Dock = DockStyle.Fill, AutoScroll = true, ColumnCount = 1, Padding = new Padding(14) };
     readonly TextBox status = new() { Multiline = true, ReadOnly = true, Dock = DockStyle.Fill, ScrollBars = ScrollBars.Vertical, Height = 170, AccessibleName = "操作結果/版本" };
     readonly TextBox gesture = new() { MaxLength = 55, AccessibleName = LookupLabel, AccessibleDescription = LookupDescription, Width = 270 };
@@ -26,17 +33,28 @@ sealed class ManagerForm : Form
         form.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         Controls.Add(form);
 
-        ushort targetLanguage = WindowsSetup.PreferredLanguage();
         var migration = new LegacyUpgrade(workspace);
         AddButton("01 安裝 Rime 輸入引擎（未安裝時）(&E)", async () =>
         {
             if (!await WindowsSetup.InstallEngineAsync()) return "已經裝有輸入引擎。可以揀步驟 02。";
             return "已安裝輸入引擎。請揀步驟 02。";
         });
+        Add(new Label { AutoSize = true, Text = "點心輸入法語言" });
+        var initialLanguages = WindowsSetup.LanguageChoices([new(CultureInfo.CurrentUICulture.Name, []),
+            new(InputLanguage.CurrentInputLanguage.Culture.Name, [])]);
+        inputLanguage.Items.AddRange(initialLanguages);
+        inputLanguage.SelectedItem = initialLanguages.FirstOrDefault(choice => WindowsSetup.SameLanguage(choice.Tag, workspace.Settings.InputLanguageTag)) ??
+            initialLanguages.FirstOrDefault(choice => choice.Id == WindowsSetup.PreferredLanguage()) ?? initialLanguages[0];
+        inputLanguage.SelectionChangeCommitted += (_, _) => choseInputLanguage = true;
+        Add(inputLanguage);
         var defaultIme = new CheckBox { AutoSize = true, Text = "將點心設為目前預設輸入法" };
         Add(defaultIme);
         AddButton("02 設定並部署點心(&T)", async () =>
-            await migration.RunAsync(this, targetLanguage, RefreshStatus) ?? await workspace.CompleteSetupAsync(targetLanguage, defaultIme.Checked));
+        {
+            var language = (InputLanguageChoice)inputLanguage.SelectedItem!;
+            return await migration.RunAsync(this, language, RefreshStatus, defaultIme.Checked) ??
+                await workspace.CompleteSetupAsync(language, defaultIme.Checked);
+        });
         AddButton("安裝 NVDA 附加元件（NVDA使用者專用）(&N)", () =>
         {
             NvdaAddon.Install();
@@ -89,21 +107,14 @@ sealed class ManagerForm : Form
         var sound = new CheckBox { AutoSize = true, Text = "只有一個候選時播放提示音", Checked = workspace.SoundEnabled };
         Add(shift);
         Add(sound);
-        AddButton("儲存打字設定", async () =>
-        {
-            bool previousShift = workspace.Settings.ShiftSwitch;
-            bool? previousSound = workspace.Settings.SingleCandidateSound;
-            workspace.Settings.ShiftSwitch = shift.Checked;
-            workspace.Settings.SingleCandidateSound = sound.Checked;
-            try { await workspace.DeployAsync(reporting: true); }
-            catch
+        BindSetting(shift, () => workspace.Settings.ShiftSwitch, value => workspace.Settings.ShiftSwitch = value,
+            "已套用 Shift 切換設定。", async () =>
             {
-                workspace.Settings.ShiftSwitch = previousShift;
-                workspace.Settings.SingleCandidateSound = previousSound;
-                throw;
-            }
-            return "已儲存打字設定。";
-        });
+                if (workspace.Settings.Initialized) await workspace.DeployAsync(reporting: true, settingsOnly: true);
+                else workspace.Save();
+            });
+        BindSetting(sound, () => workspace.SoundEnabled, value => workspace.Settings.SingleCandidateSound = value,
+            "已套用單一候選提示音設定。");
 
         var modes = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "NVDA 候選報讀模式", Width = 500 };
         modes.Items.AddRange(["關閉點心候選報讀（使用原有 NVDA 設定）",
@@ -113,46 +124,53 @@ sealed class ManagerForm : Form
         modes.SelectedIndex = Math.Max(0, Array.IndexOf(choices, workspace.Settings.ReportingMode));
         Add(new Label { Text = "NVDA 候選報讀模式", AutoSize = true });
         Add(modes);
+        modes.SelectionChangeCommitted += async (_, _) =>
+        {
+            string mode = choices[modes.SelectedIndex];
+            await ApplySettingAsync(mode, () => workspace.Settings.ReportingMode, value => workspace.Settings.ReportingMode = value,
+                previous => { if (choices[modes.SelectedIndex] == mode) modes.SelectedIndex = Math.Max(0, Array.IndexOf(choices, previous)); },
+                "已套用候選報讀模式。", async () =>
+                {
+                    if (mode != "off" && workspace.Settings.Initialized && workspace.ReportingNeedsDeployment)
+                        await workspace.DeployAsync(reporting: true, settingsOnly: true);
+                    else workspace.Save();
+                });
+        };
         var pronunciations = new CheckBox { AutoSize = true, Text = "候選用配詞報讀(&W)", Checked = workspace.Settings.PronounceCandidates };
         Add(pronunciations);
+        BindSetting(pronunciations, () => workspace.Settings.PronounceCandidates,
+            value => workspace.Settings.PronounceCandidates = value, "已套用候選配詞設定。");
         Add(new Label { Text = "NVDA 查配詞", AutoSize = true });
         var review = new CheckBox { Text = "使用點心字詞解釋", AccessibleDescription = ReviewDescription,
             AutoSize = true, Checked = workspace.Settings.UseDimsumReviewDescription };
         Add(review);
+        BindSetting(review, () => workspace.Settings.UseDimsumReviewDescription,
+            value => workspace.Settings.UseDimsumReviewDescription = value, "已套用點心字詞解釋設定。");
         AddExplanation(ReviewDescription);
         Add(new Label { Text = LookupLabel, AutoSize = true });
         gesture.Text = workspace.Settings.LookupGesture;
         Add(gesture);
         AddExplanation(LookupDescription);
-        AddButton("按下查配詞快捷鍵(&K)", () =>
+        Add(shortcutError);
+        gesture.TextChanged += (_, _) => shortcutError.Visible = false;
+        gesture.Leave += async (_, _) => { if (gesture.Modified) await SaveShortcutAsync(); };
+        gesture.KeyDown += async (_, e) =>
+        {
+            if (e.KeyCode != Keys.Enter || e.Modifiers != Keys.None) return;
+            e.SuppressKeyPress = true;
+            await SaveShortcutAsync();
+        };
+        AddAction("按下查配詞快捷鍵(&K)", async () =>
         {
             using var capture = new ShortcutCapture();
-            if (capture.ShowDialog(this) != DialogResult.OK) return Task.FromResult("");
+            if (capture.ShowDialog(this) != DialogResult.OK) return;
             gesture.Text = capture.Shortcut;
-            return Task.FromResult($"已記下 {capture.Shortcut}。按「儲存報讀設定」生效。");
+            await SaveShortcutAsync();
         });
-        AddButton("清除查配詞快捷鍵", () =>
+        AddAction("清除查配詞快捷鍵", async () =>
         {
             gesture.Clear();
-            return Task.FromResult("快捷鍵已留空。按「儲存報讀設定」生效。");
-        });
-        AddButton("儲存報讀設定(&S)", async () =>
-        {
-            string shortcut = gesture.Text.Trim();
-            if (shortcut.Length > 0 && !System.Text.RegularExpressions.Regex.IsMatch(shortcut,
-                @"\A(?:(?:control|alt|shift|windows)\+){1,3}(?:[a-z0-9]|f(?:[1-9]|1[0-2]))\z",
-                System.Text.RegularExpressions.RegexOptions.IgnoreCase))
-                throw new IOException("快捷鍵請用 Control、Alt、Shift 或 Windows 加英文字母、數字或 F1 至 F12。");
-            workspace.Settings.UseDimsumReviewDescription = review.Checked;
-            workspace.Settings.LookupGesture = shortcut;
-            workspace.Save();
-            string mode = choices[modes.SelectedIndex];
-            if (workspace.Settings.Initialized && mode != "off" && workspace.ReportingNeedsDeployment)
-                await workspace.DeployAsync(reporting: true);
-            workspace.Settings.ReportingMode = mode;
-            workspace.Settings.PronounceCandidates = pronunciations.Checked;
-            workspace.Save();
-            return "已儲存報讀設定。";
+            await SaveShortcutAsync();
         });
 
         Add(new Label { Text = "操作結果/版本", AutoSize = true });
@@ -167,24 +185,124 @@ sealed class ManagerForm : Form
         AddButton("一併移除點心及輸入引擎", () => BeginRemoval(removeEngine: true));
         RefreshStatus(Workspace.FindDeployer() is null ? "首次使用請揀步驟 01，再揀步驟 02。" :
             workspace.SetupComplete ? "點心設定已完成。" : "已有輸入引擎。首次使用或升級後，請揀步驟 02。");
-        Shown += async (_, _) => await CheckDataUpdatesAsync();
-        if (firstLaunch)
-            Shown += async (_, _) =>
+        Shown += async (_, _) =>
+        {
+            _ = CheckDataUpdatesAsync();
+            ushort preferred = WindowsSetup.PreferredLanguage();
+            UserInputLanguage[] configured = [];
+            try { configured = await WindowsSetup.GetUserInputLanguagesAsync(); }
+            catch (Exception error) when (error is IOException or System.ComponentModel.Win32Exception)
             {
-                try
+                if (this.IsDisposed || this.Disposing) return;
+                RefreshStatus(error.Message);
+            }
+            if (this.IsDisposed || this.Disposing) return;
+            string? existing = WindowsSetup.ExistingDimsumLanguage(configured);
+            var languages = WindowsSetup.LanguageChoices(configured);
+            var userChoice = inputLanguage.SelectedItem as InputLanguageChoice;
+            string? saved = workspace.Settings.InputLanguageTag ?? existing;
+            inputLanguage.Items.Clear();
+            inputLanguage.Items.AddRange(languages);
+            inputLanguage.SelectedItem = (choseInputLanguage ? languages.FirstOrDefault(choice => choice.Tag == userChoice?.Tag) : null) ??
+                languages.FirstOrDefault(choice => WindowsSetup.SameLanguage(choice.Tag, saved)) ??
+                languages.FirstOrDefault(choice => WindowsSetup.SameLanguage(choice.Tag, configured.FirstOrDefault()?.Tag) &&
+                    (choice.Id & 0x03ff) == (preferred & 0x03ff)) ??
+                languages.FirstOrDefault(choice => choice.Id == preferred) ?? languages[0];
+            if (!firstLaunch) return;
+            try
+            {
+                var language = (InputLanguageChoice)inputLanguage.SelectedItem!;
+                if (migration.NeedsUpgrade())
+                    await RunOperationAsync(async () => await migration.RunAsync(this, language, RefreshStatus, defaultIme.Checked) ?? "");
+                else if (workspace.SetupComplete && workspace.Settings.Initialized)
                 {
-                    if (migration.NeedsUpgrade())
-                        await RunOperationAsync(async () => await migration.RunAsync(this, targetLanguage, RefreshStatus) ?? "");
-                    else if (workspace.SetupComplete && workspace.Settings.Initialized &&
-                             workspace.Settings.ReportingMode != "off" && workspace.ReportingNeedsDeployment)
+                    bool normalize = saved is not null && WindowsSetup.IsDimsumEnabled(configured, language);
+                    bool updateReporter = workspace.Settings.ReportingMode != "off" && workspace.ReportingNeedsDeployment;
+                    if (normalize || updateReporter)
                         await RunOperationAsync(async () =>
                         {
-                            await workspace.DeployAsync(reporting: true);
-                            return "已更新點心候選報讀。";
+                            if (updateReporter) await workspace.DeployAsync(reporting: true);
+                            if (!normalize) return "已更新點心候選報讀。請揀輸入法語言，再按步驟 02。";
+                            await WindowsSetup.EnableOnlyDimsumLanguageAsync(language, makeDefault: false);
+                            workspace.Settings.InputLanguageTag = language.Tag;
+                            workspace.Save();
+                            return $"已加入點心到「{language.Label}」。";
                         });
+                    else if (existing is null)
+                        RefreshStatus("選擇點心輸入法語言後，按步驟 02 完成設定。");
                 }
-                catch (Exception error) { RefreshStatus(error.Message); }
-            };
+            }
+            catch (Exception error) { RefreshStatus(error.Message); }
+        };
+    }
+
+    void BindSetting(CheckBox option, Func<bool> read, Action<bool> write, string message, Func<Task>? deploy = null)
+    {
+        option.CheckedChanged += async (_, _) =>
+        {
+            if (updatingSettings) return;
+            bool requested = option.Checked;
+            await ApplySettingAsync(requested, read, write, previous =>
+            {
+                if (option.Checked == requested) option.Checked = previous;
+            }, message, deploy);
+        };
+    }
+
+    async Task ApplySettingAsync<T>(T value, Func<T> read, Action<T> write, Action<T> restoreControl,
+        string message, Func<Task>? deploy = null)
+    {
+        await settingChanges.WaitAsync();
+        try
+        {
+            T previous = read();
+            if (EqualityComparer<T>.Default.Equals(value, previous)) return;
+            try
+            {
+                write(value);
+                if (deploy is not null) await deploy();
+                else workspace.Save();
+            }
+            catch (Exception error)
+            {
+                write(previous);
+                updatingSettings = true;
+                try { restoreControl(previous); }
+                finally { updatingSettings = false; }
+                string failure = $"未能套用設定。{Environment.NewLine}{error.Message}";
+                RefreshStatus(failure);
+                MessageBox.Show(this, failure, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            RefreshStatus(message);
+            AnnounceSetting(message);
+        }
+        finally { settingChanges.Release(); }
+    }
+
+    Task SaveShortcutAsync()
+    {
+        string shortcut = gesture.Text.Trim();
+        if (!ShortcutCapture.ValidShortcut(shortcut))
+        {
+            shortcutError.Text = ShortcutFormatError;
+            shortcutError.Visible = true;
+            RefreshStatus(ShortcutFormatError);
+            AnnounceSetting(ShortcutFormatError);
+            return Task.CompletedTask;
+        }
+        gesture.Text = shortcut;
+        gesture.Modified = false;
+        return ApplySettingAsync(shortcut, () => workspace.Settings.LookupGesture, value => workspace.Settings.LookupGesture = value,
+            previous => { if (gesture.Text == shortcut) gesture.Text = previous; },
+            shortcut.Length > 0 ? $"查配詞快捷鍵已設為 {shortcut}。" : "已清除查配詞快捷鍵。");
+    }
+
+    void AnnounceSetting(string message)
+    {
+        if (ActiveForm == this)
+            status.AccessibilityObject.RaiseAutomationNotification(AutomationNotificationKind.Other,
+                AutomationNotificationProcessing.CurrentThenMostRecent, message);
     }
 
     Task<string> BeginRemoval(bool removeEngine)
@@ -253,15 +371,24 @@ sealed class ManagerForm : Form
     bool Confirm(string message) => MessageBox.Show(this, message, Text,
         MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes;
 
-    void AddButton(string title, Func<Task<string>> action, bool recheckData = false)
+    void AddButton(string title, Func<Task<string>> action, bool recheckData = false) =>
+        AddAction(title, () => RunOperationAsync(action, recheckData));
+
+    void AddAction(string title, Func<Task> action)
     {
         var button = new Button { Text = title, AutoSize = true, MinimumSize = new Size(300, 29) };
-        button.Click += async (_, _) => await RunOperationAsync(action, recheckData);
+        button.Click += async (_, _) => await action();
         Add(button);
     }
 
     async Task RunOperationAsync(Func<Task<string>> action, bool recheckData = false)
     {
+        await settingChanges.WaitAsync();
+        if (IsDisposed || Disposing || !form.Enabled)
+        {
+            settingChanges.Release();
+            return;
+        }
         form.Enabled = false;
         try
         {
@@ -274,6 +401,7 @@ sealed class ManagerForm : Form
             form.Enabled = true;
             status.Focus();
             status.Select(0, 0);
+            settingChanges.Release();
             if (recheckData) _ = CheckDataUpdatesAsync();
         }
     }
@@ -325,7 +453,8 @@ sealed class ManagerForm : Form
 
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
-        if (!form.Enabled && e.CloseReason == CloseReason.UserClosing) e.Cancel = true;
+        if ((!form.Enabled || settingChanges.CurrentCount == 0) && e.CloseReason == CloseReason.UserClosing) e.Cancel = true;
+        else if (gesture.Modified && e.CloseReason == CloseReason.UserClosing) _ = SaveShortcutAsync();
         base.OnFormClosing(e);
     }
 }

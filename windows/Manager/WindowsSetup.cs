@@ -28,6 +28,7 @@ static partial class WindowsSetup
             return false;
         }
         await RunAdminAsync("--install-engine");
+        await RemoveTemporaryTaiwanTipAsync();
         return true;
     }
 
@@ -146,16 +147,6 @@ static partial class WindowsSetup
                 tsfPath, (uint)tsfPath.Length, 0, substitute, 0, enabled, 0));
         }
         finally { Marshal.FinalReleaseComObject(manager); }
-    }
-
-    public static void RegisterWithFallback(ushort language)
-    {
-        RegisterProfile(HongKong);
-        if (language != HongKong)
-        {
-            try { RegisterProfile(language); }
-            catch (COMException) { /* The Hong Kong profile remains available. */ }
-        }
     }
 
     public static IEnumerable<string> UserProfiles(bool legacyOnly = false)

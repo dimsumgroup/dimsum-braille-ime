@@ -18,6 +18,7 @@ sealed class Preferences
     public bool? SingleCandidateSound { get; set; }
     public bool ShiftSwitch { get; set; } = true;
     public string? SetupVersion { get; set; }
+    public string? InputLanguageTag { get; set; }
     public bool Initialized { get; set; }
     public string ReportingMode { get; set; } = "standard";
     public bool UseDimsumReviewDescription { get; set; } = true;
@@ -74,27 +75,54 @@ sealed class Workspace
 
     public void Save()
     {
-        WriteAtomic(SettingsPath, JsonSerializer.SerializeToUtf8Bytes(Settings));
-        string soundService = Path.Combine(data, SingletonSound.Service);
-        if (Settings.Initialized) WriteAtomic(soundService, []);
-        else File.Delete(soundService);
-        string soundFlag = Path.Combine(data, SingletonSound.Flag);
-        if (Settings.Initialized && SoundEnabled)
-            WriteAtomic(soundFlag, []);
-        else File.Delete(soundFlag);
-        string flag = Path.Combine(data, "candidate-reporting-enabled");
-        if (Settings.Initialized && Settings.ReportingMode != "off")
-            WriteAtomic(flag, []);
-        else
+        string reporting = Path.Combine(data, "candidate-reporting-enabled");
+        bool reportCandidates = Settings.Initialized && Settings.ReportingMode != "off";
+        (string Path, bool Enabled)[] flags =
+        [
+            (Path.Combine(data, SingletonSound.Service), Settings.Initialized),
+            (Path.Combine(data, SingletonSound.Flag), Settings.Initialized && SoundEnabled),
+            (reporting, reportCandidates)
+        ];
+        var changed = new List<(string Path, bool Enabled)>();
+        try
         {
-            File.Delete(flag);
+            foreach (var flag in flags)
+            {
+                bool previous = File.Exists(flag.Path);
+                if (previous == flag.Enabled) continue;
+                SetFlag(flag.Path, flag.Enabled);
+                changed.Add((flag.Path, previous));
+            }
+            WriteAtomic(SettingsPath, JsonSerializer.SerializeToUtf8Bytes(Settings));
+        }
+        catch (Exception error)
+        {
+            try
+            {
+                foreach (var flag in Enumerable.Reverse(changed)) SetFlag(flag.Path, flag.Enabled);
+            }
+            catch (Exception rollback)
+            {
+                throw new IOException($"{error.Message}{Environment.NewLine}未能復原先前嘅報讀或提示音設定。{rollback.Message}", error);
+            }
+            throw;
+        }
+        if (!reportCandidates)
+        {
             foreach (string suffix in new[] { "1", "2", "1.tmp", "2.tmp" })
             {
                 try { File.Delete(Path.Combine(data, "candidate-report-" + suffix)); }
-                catch (IOException) { }
+                catch (Exception error) when (error is IOException or UnauthorizedAccessException) { }
             }
         }
     }
+
+    static void SetFlag(string path, bool enabled)
+    {
+        if (enabled) WriteAtomic(path, []);
+        else File.Delete(path);
+    }
+
     public string Status()
     {
         string stage = File.Exists(Pending) ? "有字庫等待部署。" : "暫無待部署字庫。";
@@ -299,26 +327,16 @@ sealed class Workspace
             Process.Start(new ProcessStartInfo(Environment.ProcessPath!, "--sound") { UseShellExecute = false })?.Dispose();
     }
 
-    public async Task<string> CompleteSetupAsync(ushort language, bool makeDefault, bool legacyMigration = false)
+    public async Task<string> CompleteSetupAsync(InputLanguageChoice language, bool makeDefault, bool legacyMigration = false)
     {
         await DeployAsync(applyPending: true, reporting: true, legacyMigration: legacyMigration);
-        if (!WindowsSetup.IsOurProfile(language))
-            await WindowsSetup.RunAdminAsync("--finish-setup", language.ToString(System.Globalization.CultureInfo.InvariantCulture));
-        if (!WindowsSetup.IsOurProfile(language))
-            language = WindowsSetup.HongKong;
-        if (!WindowsSetup.EnableProfileForUser(language, makeDefault))
-        {
-            if (language == WindowsSetup.HongKong || !WindowsSetup.IsOurProfile(WindowsSetup.HongKong) ||
-                !WindowsSetup.EnableProfileForUser(WindowsSetup.HongKong, makeDefault))
-                throw new IOException("已部署點心。Windows 未能加入點心到目前語言。");
-            language = WindowsSetup.HongKong;
-        }
+        await WindowsSetup.EnableOnlyDimsumLanguageAsync(language, makeDefault);
+        Settings.InputLanguageTag = language.Tag;
         Settings.SetupVersion = AppVersion;
         Save();
         WindowsSetup.StartAvailableEngine();
-        WindowsSetup.RemoveUserProfiles(WindowsSetup.UserProfiles(legacyOnly: true));
         await WindowsSetup.HideInstallationEntriesAsync();
-        return $"已部署點心，並加入到{System.Globalization.CultureInfo.GetCultureInfo(language).DisplayName}。";
+        return $"已部署點心，並加入到「{language.Label}」。";
     }
 
     public async Task<(WindowsSetup.EngineOutcome Engine, bool RestartNvda)> RemoveAsync(bool removeEngine)
@@ -377,7 +395,7 @@ sealed class Workspace
     }
 
     public async Task DeployAsync(bool applyPending = false, string? importFile = null, bool reporting = false,
-        bool legacyMigration = false)
+        bool legacyMigration = false, bool settingsOnly = false)
     {
         if (!legacyMigration && new LegacyUpgrade(this).NeedsUpgrade())
             throw new IOException("請先按步驟 02 完成舊版遷移，再部署點心。");
@@ -453,6 +471,8 @@ sealed class Workspace
         byte[] custom = changes.TryGetValue(UserDictionary, out var nextCustom) ? nextCustom : File.ReadAllBytes(Path.Combine(Rime, UserDictionary));
         string version = InspectDictionary(primary, "dimsum_cb", primary: true);
         InspectDictionary(custom, "dimsum_cb.user", primary: false);
+        string? previousDictionary = Settings.AppliedDictionary;
+        bool previousInitialized = Settings.Initialized;
         StartJournal(changes.Keys);
         try
         {
@@ -468,9 +488,14 @@ sealed class Workspace
                         throw new IOException($"未確認報讀設定已部署（{schema}）。請確認方案已加入輸入方案選單。");
                 }
             }
+            Settings.AppliedDictionary = $"{version} · SHA-256 {Hash(primary)[..12]}";
+            Settings.Initialized = true;
+            Save();
         }
         catch (Exception error)
         {
+            Settings.AppliedDictionary = previousDictionary;
+            Settings.Initialized = previousInitialized;
             try { await RecoverAsync(deployer); }
             catch (Exception rollback)
             {
@@ -479,12 +504,12 @@ sealed class Workspace
             throw new IOException($"{error.Message}{Environment.NewLine}已復原部署前嘅來源檔案。", error);
         }
         CloseJournal();
-        Settings.AppliedDictionary = $"{version} · SHA-256 {Hash(primary)[..12]}";
-        Settings.Initialized = true;
-        Save();
         if (applyPending) File.Delete(Pending);
-        ConfigureStartup(retireLegacy: true);
-        StartSound();
+        if (!settingsOnly)
+        {
+            ConfigureStartup(retireLegacy: true);
+            StartSound();
+        }
     }
 
     static string InsertPatch(string document, string line)

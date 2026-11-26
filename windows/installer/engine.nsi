@@ -34,6 +34,21 @@ Section "Engine"
     StrCpy $1 1
   ${EndIf}
 
+  ; Track whether this bundle owns the stock Taiwan switcher entry.
+  ClearErrors
+  ReadRegDWORD $2 HKLM "${UNINSTALL_REG}" "DimsumOwnTaiwanTip"
+  ${If} ${Errors}
+    SetRegView 64
+    ReadRegStr $3 HKLM "SOFTWARE\Microsoft\CTF\TIP\{A3F4CDED-B1E9-41EE-9CA6-7B4D0DE6CB0A}\LanguageProfile\0x00000404\{3D02CAB6-2B8E-4781-BA20-1C9267529467}" "Description"
+    SetRegView 32
+    StrCpy $2 0
+    ${If} $3 == ""
+    ${OrIf} $3 == "點心粵語點字輸入法"
+    ${OrIf} $1 == 1
+      StrCpy $2 1
+    ${EndIf}
+  ${EndIf}
+
   SetOutPath "$INSTDIR"
   SetOverwrite on
   File "LICENSE.txt"
@@ -72,6 +87,7 @@ Section "Engine"
   WriteRegStr HKLM "${UNINSTALL_REG}" "UninstallString" '"$INSTDIR\uninstall.exe"'
   WriteRegDWORD HKLM "${UNINSTALL_REG}" "SystemComponent" 1
   WriteRegDWORD HKLM "${UNINSTALL_REG}" "DimsumOwnRuntimeData" $1
+  WriteRegDWORD HKLM "${UNINSTALL_REG}" "DimsumOwnTaiwanTip" $2
   WriteUninstaller "$INSTDIR\uninstall.exe"
   SetRegView 64
   WriteRegStr HKLM "${RUN_REG}" "WeaselServer" '"$INSTDIR\WeaselServer.exe"'
