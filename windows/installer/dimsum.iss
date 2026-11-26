@@ -34,13 +34,13 @@ Name: "desktopicon"; Description: "建立桌面捷徑"; Flags: unchecked
 
 [Files]
 Source: "..\dist\manager\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\README.md"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#ManagerName}"; Filename: "{app}\DimsumManager.exe"
 Name: "{autodesktop}\{#ManagerName}"; Filename: "{app}\DimsumManager.exe"; Tasks: desktopicon
 
 [InstallDelete]
+Type: files; Name: "{app}\README.md"
 Type: files; Name: "{autoprograms}\點心粵語點字管理器.lnk"
 
 [Registry]

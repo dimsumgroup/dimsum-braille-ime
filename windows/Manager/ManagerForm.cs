@@ -64,6 +64,13 @@ sealed class ManagerForm : Form
         repair.Click += async (_, _) => await RunOperationAsync(() => SetupAsync((InputLanguageChoice)inputLanguage.SelectedItem!, repair: true));
         Add(repair);
         UpdateSetupAction();
+        AddButton("使用說明(&H)", () =>
+        {
+            string guide = Path.Combine(AppContext.BaseDirectory, "安裝及使用說明_Win.txt");
+            if (!File.Exists(guide)) throw new FileNotFoundException("搵唔到使用說明檔案。請重新安裝點心管理器。");
+            Program.Open(guide);
+            return Task.FromResult("已開啟使用說明。");
+        });
         AddButton("安裝 NVDA 附加元件（NVDA使用者專用）(&N)", () =>
         {
             NvdaAddon.Install();
