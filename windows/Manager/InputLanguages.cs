@@ -49,6 +49,24 @@ static partial class WindowsSetup
         .Concat(["en-HK", "en-US", "zh-HK", "zh-TW"])
         .Select(LanguageChoice).OfType<InputLanguageChoice>().DistinctBy(choice => choice.Tag, IgnoreCase).ToArray();
 
+    internal static InputLanguageChoice? DetectSetupLanguage(ushort current, IReadOnlyList<UserInputLanguage> configured)
+    {
+        if (current == 0) return null;
+        string layoutPrefix = $"{current:X4}:";
+        var layouts = configured.Where(language => Tips(language).Any(tip => tip.StartsWith(layoutPrefix, StringComparison.OrdinalIgnoreCase)))
+            .Select(language => LanguageChoice(language.Tag)).OfType<InputLanguageChoice>().DistinctBy(choice => choice.Id).ToArray();
+        if (layouts.Length > 0) return layouts.Length == 1 ? layouts[0] : null;
+
+        var choices = configured.Select(language => LanguageChoice(language.Tag)).OfType<InputLanguageChoice>()
+            .DistinctBy(choice => choice.Id).ToArray();
+        var exact = choices.FirstOrDefault(choice => choice.Id == current);
+        if (exact is not null) return exact;
+        // A regional language can share a keyboard layout with another locale.
+        // Use it only when it is the sole configured choice in that language.
+        var shared = choices.Where(choice => (choice.Id & 0x03ff) == (current & 0x03ff)).ToArray();
+        return shared.Length == 1 ? shared[0] : null;
+    }
+
     internal static string? ExistingDimsumLanguage(IEnumerable<UserInputLanguage> configured)
     {
         var active = configured.Where(language => Tips(language).Any(IsDimsumTip)).Select(language => language.Tag).ToArray();
@@ -126,16 +144,6 @@ static partial class WindowsSetup
         catch (JsonException error) { throw new IOException("未能辨認 Windows 輸入語言。", error); }
     }
 
-    public static async Task RemoveTemporaryTaiwanTipAsync()
-    {
-        if (!BundledTaiwanTip()) return;
-        var current = await GetUserInputLanguagesAsync();
-        if (!current.SelectMany(Tips).Contains(TaiwanEngineTip, IgnoreCase)) return;
-        if (!InstallLayoutOrTip(TaiwanEngineTip, RemoveLayout) ||
-            (await GetUserInputLanguagesAsync()).SelectMany(Tips).Contains(TaiwanEngineTip, IgnoreCase))
-            throw new IOException("未能移除內附引擎加入嘅中文（台灣）Weasel。可以喺步驟 02 再試。");
-    }
-
     public static async Task EnableOnlyDimsumLanguageAsync(InputLanguageChoice choice, bool makeDefault)
     {
         if (!IsOurProfile(choice.Id))
@@ -162,7 +170,7 @@ static partial class WindowsSetup
             RemoveUserProfiles(old);
             var current = await GetUserInputLanguagesAsync();
             if (!IsDimsumEnabled(current, choice) || current.SelectMany(Tips).Intersect(old, IgnoreCase).Any())
-                throw new IOException("已加入點心，但 Windows 仍然顯示其他點心輸入法項目。請再試步驟 02。");
+                throw new IOException("已加入點心，但 Windows 仍然顯示其他點心輸入法項目。請再套用輸入法語言。");
         }
     }
 }

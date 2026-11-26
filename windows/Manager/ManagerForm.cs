@@ -11,10 +11,15 @@ sealed class ManagerForm : Form
     const string ShortcutFormatError = "快捷鍵請用 Control、Alt、Shift 或 Windows 加英文字母、數字或 F1 至 F12。";
     readonly Workspace workspace;
     readonly SemaphoreSlim settingChanges = new(1, 1);
+    readonly Button setupAction = new() { AutoSize = true, MinimumSize = new Size(300, 29) };
+    readonly Button repair = new() { AutoSize = true, MinimumSize = new Size(300, 29), Text = "修復點心(&F)" };
+    readonly CheckBox defaultIme = new() { AutoSize = true, Text = "將點心設為目前預設輸入法" };
     readonly ComboBox inputLanguage = new() { DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "點心輸入法語言", Width = 360 };
     readonly Label shortcutError = new() { AutoSize = true, Visible = false, TabStop = false };
     bool updatingSettings;
     bool choseInputLanguage;
+    bool setupReady;
+    readonly LegacyUpgrade migration;
     readonly TableLayoutPanel form = new() { Dock = DockStyle.Fill, AutoScroll = true, ColumnCount = 1, Padding = new Padding(14) };
     readonly TextBox status = new() { Multiline = true, ReadOnly = true, Dock = DockStyle.Fill, ScrollBars = ScrollBars.Vertical, Height = 170, AccessibleName = "操作結果/版本" };
     readonly TextBox gesture = new() { MaxLength = 55, AccessibleName = LookupLabel, AccessibleDescription = LookupDescription, Width = 270 };
@@ -23,7 +28,7 @@ sealed class ManagerForm : Form
     string operationStatus = "";
     string announcedUpdates = "";
 
-    public ManagerForm(Workspace workspace, bool firstLaunch)
+    public ManagerForm(Workspace workspace, bool firstLaunch, ushort installerLanguage)
     {
         this.workspace = workspace;
         Text = Program.Title;
@@ -33,12 +38,8 @@ sealed class ManagerForm : Form
         form.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         Controls.Add(form);
 
-        var migration = new LegacyUpgrade(workspace);
-        AddButton("01 安裝 Rime 輸入引擎（未安裝時）(&E)", async () =>
-        {
-            if (!await WindowsSetup.InstallEngineAsync()) return "已經裝有輸入引擎。可以揀步驟 02。";
-            return "已安裝輸入引擎。請揀步驟 02。";
-        });
+        migration = new LegacyUpgrade(workspace);
+        setupReady = !firstLaunch && workspace.SetupComplete && Workspace.FindDeployer() is not null;
         Add(new Label { AutoSize = true, Text = "點心輸入法語言" });
         var initialLanguages = WindowsSetup.LanguageChoices([new(CultureInfo.CurrentUICulture.Name, []),
             new(InputLanguage.CurrentInputLanguage.Culture.Name, [])]);
@@ -46,15 +47,23 @@ sealed class ManagerForm : Form
         inputLanguage.SelectedItem = initialLanguages.FirstOrDefault(choice => WindowsSetup.SameLanguage(choice.Tag, workspace.Settings.InputLanguageTag)) ??
             initialLanguages.FirstOrDefault(choice => choice.Id == WindowsSetup.PreferredLanguage()) ?? initialLanguages[0];
         inputLanguage.SelectionChangeCommitted += (_, _) => choseInputLanguage = true;
+        inputLanguage.SelectedIndexChanged += (_, _) => UpdateSetupAction();
+        defaultIme.CheckedChanged += (_, _) => UpdateSetupAction();
         Add(inputLanguage);
-        var defaultIme = new CheckBox { AutoSize = true, Text = "將點心設為目前預設輸入法" };
         Add(defaultIme);
-        AddButton("02 設定並部署點心(&T)", async () =>
+        setupAction.Click += async (_, _) => await RunOperationAsync(async () =>
         {
             var language = (InputLanguageChoice)inputLanguage.SelectedItem!;
-            return await migration.RunAsync(this, language, RefreshStatus, defaultIme.Checked) ??
-                await workspace.CompleteSetupAsync(language, defaultIme.Checked);
+            if (!setupReady) return await SetupAsync(language, repair: false);
+            string result = await workspace.ApplyInputLanguageAsync(language, defaultIme.Checked);
+            defaultIme.Checked = false;
+            UpdateSetupAction();
+            return result;
         });
+        Add(setupAction);
+        repair.Click += async (_, _) => await RunOperationAsync(() => SetupAsync((InputLanguageChoice)inputLanguage.SelectedItem!, repair: true));
+        Add(repair);
+        UpdateSetupAction();
         AddButton("安裝 NVDA 附加元件（NVDA使用者專用）(&N)", () =>
         {
             NvdaAddon.Install();
@@ -183,57 +192,111 @@ sealed class ManagerForm : Form
         Add(new Label { Text = "移除點心粵語點字輸入法", AutoSize = true });
         AddButton("只移除點心，保留輸入引擎", () => BeginRemoval(removeEngine: false));
         AddButton("一併移除點心及輸入引擎", () => BeginRemoval(removeEngine: true));
-        RefreshStatus(Workspace.FindDeployer() is null ? "首次使用請揀步驟 01，再揀步驟 02。" :
-            workspace.SetupComplete ? "點心設定已完成。" : "已有輸入引擎。首次使用或升級後，請揀步驟 02。");
+        SetSetupControlsEnabled(!firstLaunch);
+        RefreshStatus(firstLaunch ? "正在確認安裝時嘅 Windows 輸入語言。" : SetupStatus());
         Shown += async (_, _) =>
         {
             _ = CheckDataUpdatesAsync();
             ushort preferred = WindowsSetup.PreferredLanguage();
             UserInputLanguage[] configured = [];
+            string? detectionError = null;
             try { configured = await WindowsSetup.GetUserInputLanguagesAsync(); }
             catch (Exception error) when (error is IOException or System.ComponentModel.Win32Exception)
             {
-                if (this.IsDisposed || this.Disposing) return;
-                RefreshStatus(error.Message);
+                detectionError = error.Message;
             }
-            if (this.IsDisposed || this.Disposing) return;
+            if (IsDisposed || Disposing) return;
             string? existing = WindowsSetup.ExistingDimsumLanguage(configured);
             var languages = WindowsSetup.LanguageChoices(configured);
-            var userChoice = inputLanguage.SelectedItem as InputLanguageChoice;
+            var previousChoice = inputLanguage.SelectedItem as InputLanguageChoice;
+            var detected = firstLaunch ? WindowsSetup.DetectSetupLanguage(installerLanguage, configured) : null;
             string? saved = workspace.Settings.InputLanguageTag ?? existing;
             inputLanguage.Items.Clear();
             inputLanguage.Items.AddRange(languages);
-            inputLanguage.SelectedItem = (choseInputLanguage ? languages.FirstOrDefault(choice => choice.Tag == userChoice?.Tag) : null) ??
+            inputLanguage.SelectedItem = detected ??
+                (choseInputLanguage ? languages.FirstOrDefault(choice => choice.Tag == previousChoice?.Tag) : null) ??
                 languages.FirstOrDefault(choice => WindowsSetup.SameLanguage(choice.Tag, saved)) ??
-                languages.FirstOrDefault(choice => WindowsSetup.SameLanguage(choice.Tag, configured.FirstOrDefault()?.Tag) &&
-                    (choice.Id & 0x03ff) == (preferred & 0x03ff)) ??
+                WindowsSetup.DetectSetupLanguage(preferred, configured) ??
                 languages.FirstOrDefault(choice => choice.Id == preferred) ?? languages[0];
-            if (!firstLaunch) return;
-            try
+            if (!firstLaunch)
             {
-                var language = (InputLanguageChoice)inputLanguage.SelectedItem!;
-                if (migration.NeedsUpgrade())
-                    await RunOperationAsync(async () => await migration.RunAsync(this, language, RefreshStatus, defaultIme.Checked) ?? "");
-                else if (workspace.SetupComplete && workspace.Settings.Initialized)
-                {
-                    bool normalize = saved is not null && WindowsSetup.IsDimsumEnabled(configured, language);
-                    bool updateReporter = workspace.Settings.ReportingMode != "off" && workspace.ReportingNeedsDeployment;
-                    if (normalize || updateReporter)
-                        await RunOperationAsync(async () =>
-                        {
-                            if (updateReporter) await workspace.DeployAsync(reporting: true);
-                            if (!normalize) return "已更新點心候選報讀。請揀輸入法語言，再按步驟 02。";
-                            await WindowsSetup.EnableOnlyDimsumLanguageAsync(language, makeDefault: false);
-                            workspace.Settings.InputLanguageTag = language.Tag;
-                            workspace.Save();
-                            return $"已加入點心到「{language.Label}」。";
-                        });
-                    else if (existing is null)
-                        RefreshStatus("選擇點心輸入法語言後，按步驟 02 完成設定。");
-                }
+                if (setupReady && detectionError is null &&
+                    !languages.Any(choice => WindowsSetup.SameLanguage(choice.Tag, saved) && WindowsSetup.IsDimsumEnabled(configured, choice)))
+                    setupReady = false;
+                UpdateSetupAction();
+                RefreshStatus(detectionError ?? SetupStatus());
+                return;
             }
-            catch (Exception error) { RefreshStatus(error.Message); }
+
+            SetSetupControlsEnabled(true);
+            if (detected is not null)
+                await RunOperationAsync(() => SetupAsync(detected, repair: false));
+            else
+                await RunOperationAsync(() =>
+                {
+                    workspace.MarkSetupPending();
+                    return Task.FromResult("未能確認安裝時嘅 Windows 輸入語言。請揀語言，再按「繼續設定點心」。" +
+                        (detectionError is null ? "" : Environment.NewLine + detectionError));
+                });
         };
+    }
+
+    void SetSetupControlsEnabled(bool enabled)
+    {
+        inputLanguage.Enabled = enabled;
+        defaultIme.Enabled = enabled;
+        setupAction.Enabled = enabled;
+        repair.Enabled = enabled;
+    }
+
+    void UpdateSetupAction()
+    {
+        setupAction.Text = setupReady ? "套用輸入法語言(&T)" : "繼續設定點心(&T)";
+        setupAction.Visible = !setupReady || defaultIme.Checked ||
+            (inputLanguage.SelectedItem is InputLanguageChoice language &&
+             !WindowsSetup.SameLanguage(language.Tag, workspace.Settings.InputLanguageTag));
+    }
+
+    string SetupStatus()
+    {
+        if (!setupReady) return "點心設定尚未完成。可以按「繼續設定點心」。";
+        return workspace.Settings.InputLanguageTag is { } tag && WindowsSetup.LanguageChoice(tag) is { } language
+            ? $"點心設定已完成。目前輸入法語言係「{language.Label}」。"
+            : "點心設定已完成。";
+    }
+
+    async Task<string> SetupAsync(InputLanguageChoice language, bool repair)
+    {
+        setupReady = false;
+        UpdateSetupAction();
+        workspace.MarkSetupPending();
+        try
+        {
+            string? migrated = await migration.RunAsync(this, language, RefreshStatus, defaultIme.Checked);
+            if (migrated == "") return "已暫停舊版遷移。準備好後可以按「繼續設定點心」。";
+            string result;
+            if (migrated is null)
+            {
+                if (Workspace.FindDeployer() is null)
+                {
+                    RefreshStatus("正在安裝 Rime 輸入引擎。");
+                    try { await WindowsSetup.InstallEngineAsync(); }
+                    catch (Exception error) { throw new IOException($"未能完成輸入引擎安裝。{Environment.NewLine}{error.Message}", error); }
+                }
+                result = await workspace.CompleteSetupAsync(language, defaultIme.Checked, progress: RefreshStatus, forceDeploy: repair);
+            }
+            else
+                result = Workspace.LanguageAppliedMessage(language) + Environment.NewLine + migrated;
+            setupReady = true;
+            defaultIme.Checked = false;
+            return result;
+        }
+        catch
+        {
+            workspace.MarkSetupPending();
+            throw;
+        }
+        finally { UpdateSetupAction(); }
     }
 
     void BindSetting(CheckBox option, Func<bool> read, Action<bool> write, string message, Func<Task>? deploy = null)

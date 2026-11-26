@@ -20,16 +20,14 @@ static partial class WindowsSetup
     static readonly Guid Profile = new("8CF77989-1DE6-4846-ACF9-96054DBD642B");
     const uint RemoveLayout = 1;
 
-    public static async Task<bool> InstallEngineAsync()
+    public static async Task InstallEngineAsync()
     {
         if (Workspace.FindDeployer() is not null)
         {
             await HideInstallationEntriesAsync();
-            return false;
+            return;
         }
         await RunAdminAsync("--install-engine");
-        await RemoveTemporaryTaiwanTipAsync();
-        return true;
     }
 
     public static async Task InstallBundledEngineAsync(bool forceUpgrade = false)
@@ -45,7 +43,7 @@ static partial class WindowsSetup
         await RunProcessAsync(installer, elevate: false, "/S", "/T", "/L=1028");
         string? server = EngineServerPath();
         if (server is null || Workspace.FindDeployer() is null)
-            throw new IOException("未搵到已安裝嘅輸入引擎。請再試步驟 01。");
+            throw new IOException("未搵到已安裝嘅輸入引擎。請重新設定點心。");
         var version = FileVersionInfo.GetVersionInfo(server);
         if (version.FileMajorPart != 0 || version.FileMinorPart != 17 || version.FileBuildPart != 4)
             throw new IOException("未能確認內附輸入引擎版本已安裝。");

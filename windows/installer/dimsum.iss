@@ -26,8 +26,8 @@ RestartApplications=no
 Name: "zh"; MessagesFile: "compiler:Languages\ChineseTraditional.isl"
 
 [Messages]
-zh.FinishedLabel=安裝完成。按「完成」開啟點心粵語點字輸入法管理器。
-zh.FinishedLabelNoIcons=安裝完成。按「完成」開啟點心粵語點字輸入法管理器。
+zh.FinishedLabel=管理器已安裝。按「完成」設定點心並開啟管理器。
+zh.FinishedLabelNoIcons=管理器已安裝。按「完成」設定點心並開啟管理器。
 
 [Tasks]
 Name: "desktopicon"; Description: "建立桌面捷徑"; Flags: unchecked
@@ -67,6 +67,10 @@ const
 
 function FindWindowEx(Parent, Previous: HWND; ClassName, WindowName: LongWord): HWND;
   external 'FindWindowExW@user32.dll stdcall';
+function GetForegroundWindow: HWND;
+  external 'GetForegroundWindow@user32.dll stdcall';
+function GetKeyboardLayout(ThreadId: LongWord): LongWord;
+  external 'GetKeyboardLayout@user32.dll stdcall';
 function IsWindowVisible(Window: HWND): Boolean;
   external 'IsWindowVisible@user32.dll stdcall';
 function GetWindowThreadProcessId(Window: HWND; var ProcessID: LongWord): LongWord;
@@ -82,7 +86,25 @@ function CreateFile(Path: String; Access, Share, Security, Creation, Flags: Long
 function CloseHandle(Handle: THandle): Boolean;
   external 'CloseHandle@kernel32.dll stdcall';
 
-var SoundWasRunning, SetupFinished: Boolean;
+var
+  SoundWasRunning, SetupFinished: Boolean;
+  InitialInputLanguage: Integer;
+
+function InitializeSetup: Boolean;
+var
+  Foreground: HWND;
+  ProcessId, ThreadId: LongWord;
+begin
+  InitialInputLanguage := 0;
+  Foreground := GetForegroundWindow;
+  if Foreground <> 0 then begin
+    ProcessId := 0;
+    ThreadId := GetWindowThreadProcessId(Foreground, ProcessId);
+    if ThreadId <> 0 then
+      InitialInputLanguage := GetKeyboardLayout(ThreadId) and $FFFF;
+  end;
+  Result := True;
+end;
 
 function SoundServiceFile: String;
 begin
@@ -193,11 +215,11 @@ begin
     SetupFinished := True;
     if not Exec(Manager, '--after-install', '', SW_HIDE, ewWaitUntilTerminated, Code) or (Code <> 0) then
       if not WizardSilent then
-        MsgBox('點心已安裝。未能完成舊版程式列表整理，可以喺管理器完成步驟 02 後再核對。', mbInformation, MB_OK);
+        MsgBox('點心已安裝。未能完成舊版程式列表整理，可以喺管理器核對操作結果。', mbInformation, MB_OK);
     if not WizardSilent then OfferNvdaAddon(Manager);
   end;
   if (Step = ssDone) and not WizardSilent then
-    Exec(Manager, '--first-launch', '', SW_SHOWNORMAL, ewNoWait, Code);
+    Exec(Manager, '--first-launch --input-language ' + IntToStr(InitialInputLanguage), '', SW_SHOWNORMAL, ewNoWait, Code);
 end;
 
 function RemoveEngineRequested: Boolean;

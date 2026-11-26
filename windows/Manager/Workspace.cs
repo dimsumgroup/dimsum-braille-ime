@@ -18,6 +18,7 @@ sealed class Preferences
     public bool? SingleCandidateSound { get; set; }
     public bool ShiftSwitch { get; set; } = true;
     public string? SetupVersion { get; set; }
+    public bool SetupPending { get; set; }
     public string? InputLanguageTag { get; set; }
     public bool Initialized { get; set; }
     public string ReportingMode { get; set; } = "standard";
@@ -48,7 +49,7 @@ sealed class Workspace
     public string Rime { get; }
     public string DataDirectory => data;
     public bool SoundEnabled => Settings.SingleCandidateSound ?? true;
-    public bool SetupComplete => Settings.SetupVersion == AppVersion;
+    public bool SetupComplete => Settings.SetupVersion == AppVersion && !Settings.SetupPending;
     static string AppVersion => typeof(Workspace).Assembly.GetName().Version!.ToString(3);
     string Journal => Path.Combine(data, "deployment");
     string Pending => Path.Combine(data, "pending.dict.yaml");
@@ -327,17 +328,52 @@ sealed class Workspace
             Process.Start(new ProcessStartInfo(Environment.ProcessPath!, "--sound") { UseShellExecute = false })?.Dispose();
     }
 
-    public async Task<string> CompleteSetupAsync(InputLanguageChoice language, bool makeDefault, bool legacyMigration = false)
+    public void MarkSetupPending()
     {
-        await DeployAsync(applyPending: true, reporting: true, legacyMigration: legacyMigration);
+        if (Settings.SetupPending) return;
+        Settings.SetupPending = true;
+        Save();
+    }
+
+    bool SetupDeploymentUsable()
+    {
+        if (!Settings.Initialized || Settings.AppliedDictionary is null || File.Exists(Pending) || Directory.Exists(Journal)) return false;
+        try
+        {
+            if (ReportingNeedsDeployment) return false;
+            VerifyTable(File.ReadAllBytes(Path.Combine(Rime, Dictionary)), File.ReadAllBytes(Path.Combine(Rime, UserDictionary)));
+            return true;
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException) { return false; }
+    }
+
+    public async Task<string> CompleteSetupAsync(InputLanguageChoice language, bool makeDefault, bool legacyMigration = false,
+        Action<string>? progress = null, bool forceDeploy = false)
+    {
+        if (forceDeploy || legacyMigration || !SetupDeploymentUsable())
+        {
+            progress?.Invoke("正在部署點心字庫同設定。");
+            await DeployAsync(applyPending: true, reporting: true, legacyMigration: legacyMigration);
+        }
+        progress?.Invoke($"正在將點心加入到「{language.Label}」。");
+        string result = await ApplyInputLanguageAsync(language, makeDefault);
+        WindowsSetup.StartAvailableEngine();
+        await WindowsSetup.HideInstallationEntriesAsync();
+        return result;
+    }
+
+    public async Task<string> ApplyInputLanguageAsync(InputLanguageChoice language, bool makeDefault)
+    {
         await WindowsSetup.EnableOnlyDimsumLanguageAsync(language, makeDefault);
         Settings.InputLanguageTag = language.Tag;
         Settings.SetupVersion = AppVersion;
+        Settings.SetupPending = false;
         Save();
-        WindowsSetup.StartAvailableEngine();
-        await WindowsSetup.HideInstallationEntriesAsync();
-        return $"已部署點心，並加入到「{language.Label}」。";
+        return LanguageAppliedMessage(language);
     }
+
+    internal static string LanguageAppliedMessage(InputLanguageChoice language) =>
+        $"點心已加入到「{language.Label}」。如需更改，請喺「點心輸入法語言」揀另一個語言，再按「套用輸入法語言」。";
 
     public async Task<(WindowsSetup.EngineOutcome Engine, bool RestartNvda)> RemoveAsync(bool removeEngine)
     {
@@ -386,6 +422,7 @@ sealed class Workspace
         WindowsSetup.RemoveUserProfiles(profiles);
         Settings.Initialized = false;
         Settings.SetupVersion = null;
+        Settings.SetupPending = false;
         Settings.AppliedDictionary = null;
         Save();
         ConfigureStartup(retireLegacy: true);
@@ -398,8 +435,8 @@ sealed class Workspace
         bool legacyMigration = false, bool settingsOnly = false)
     {
         if (!legacyMigration && new LegacyUpgrade(this).NeedsUpgrade())
-            throw new IOException("請先按步驟 02 完成舊版遷移，再部署點心。");
-        string deployer = FindDeployer() ?? throw new IOException("搵唔到輸入引擎部署程式。請先完成步驟 01。");
+            throw new IOException("請先按「繼續設定點心」完成舊版遷移，再部署點心。");
+        string deployer = FindDeployer() ?? throw new IOException("搵唔到輸入引擎部署程式。請先按「繼續設定點心」。");
         if (LegacyUpgrade.ConverterRunning(MachineLegacyUpgrade.KnownFolders()))
             throw new IOException("舊版詞庫更新仍在執行。請完成後再部署。");
         Directory.CreateDirectory(Rime);

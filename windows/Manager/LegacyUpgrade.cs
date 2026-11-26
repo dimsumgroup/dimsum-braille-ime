@@ -91,6 +91,13 @@ sealed class LegacyUpgrade(Workspace workspace)
                 state = Advance(state, Stage.Deployed);
             }
 
+            else if (!WindowsSetup.SameLanguage(workspace.Settings.InputLanguageTag, language.Tag) || workspace.Settings.SetupPending)
+            {
+                stage = "加入 Windows 輸入法";
+                progress("正在加入點心到 Windows 輸入法。");
+                await workspace.ApplyInputLanguageAsync(language, makeDefault);
+            }
+
             stage = "移除舊版自動更新元件";
             progress("正在移除舊版自動更新元件。");
             if (MachineLegacyUpgrade.NeedsMachineCleanup(id))
@@ -118,7 +125,7 @@ sealed class LegacyUpgrade(Workspace workspace)
             throw new IOException($"舊版遷移停喺「{stage}」。{Environment.NewLine}{error.Message}{Environment.NewLine}" +
                 recovery +
                 $"用家備份：{backup}{Environment.NewLine}引擎備份：{MachineLegacyUpgrade.EngineBackup(id)}{Environment.NewLine}" +
-                "可以按步驟 02 繼續。", error);
+                "可以按「繼續設定點心」重試。", error);
         }
     }
 

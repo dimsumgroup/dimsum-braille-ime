@@ -35,7 +35,7 @@ static class Program
                     case "--hide-machine-entries":
                         WindowsSetup.HideMachineEntries();
                         break;
-                    case "--install-engine":
+                    case "--install-engine" when args.Length == 1:
                         WindowsSetup.InstallBundledEngineAsync().GetAwaiter().GetResult();
                         break;
                     case "--prepare-legacy-engine" when args.Length == 2:
@@ -114,7 +114,10 @@ static class Program
             return;
         }
         ApplicationConfiguration.Initialize();
-        Application.Run(new ManagerForm(workspace, args.Contains("--first-launch")));
+        int input = Array.IndexOf(args, "--input-language");
+        ushort installerLanguage = input >= 0 && input + 1 < args.Length && ushort.TryParse(args[input + 1], out ushort captured)
+            ? captured : (ushort)0;
+        Application.Run(new ManagerForm(workspace, args.Contains("--first-launch"), installerLanguage));
     }
 
     public static void Open(string target) => Process.Start(new ProcessStartInfo(target) { UseShellExecute = true });
