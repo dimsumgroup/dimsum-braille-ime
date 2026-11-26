@@ -15,12 +15,12 @@ enum DataUpdate { CannotCheck, Current, Available, Downloaded }
 
 sealed class Preferences
 {
-    public bool AutoCopyPronunciations { get; set; }
     public bool? SingleCandidateSound { get; set; }
     public bool ShiftSwitch { get; set; } = true;
     public string? SetupVersion { get; set; }
     public bool Initialized { get; set; }
-    public string ReportingMode { get; set; } = "tone";
+    public string ReportingMode { get; set; } = "standard";
+    public bool UseDimsumReviewDescription { get; set; } = true;
     public bool PronounceCandidates { get; set; } = true;
     public string LookupGesture { get; set; } = "";
     public string? AppliedDictionary { get; set; }
@@ -284,10 +284,10 @@ sealed class Workspace
             Path.Combine(data, "pronunciations", revision) : null;
     }
 
-    public (bool Copied, string Scope) CopyToNvda()
+    public void ExportPronunciations(string destination, bool overwrite)
     {
         string source = ActivePronunciations() ?? Path.Combine(assets, "pronunciations");
-        return NvdaDictionaries.CopyToProfile(data, source);
+        NvdaDictionaries.Export(destination, NvdaDictionaries.ReadBundle(source), overwrite);
     }
 
     public void ConfigureStartup(bool retireLegacy = false) =>

@@ -7,6 +7,8 @@ import time
 from uuid import uuid4
 
 import api
+import braille
+import globalCommands
 import config
 import globalPluginHandler
 import inputCore
@@ -15,6 +17,8 @@ from NVDAObjects.behaviors import CandidateItem
 from NVDAObjects.inputComposition import InputComposition
 import speech
 from speech import extensions
+from scriptHandler import getLastScriptRepeatCount, script
+import textInfos
 import ui
 import wx
 
@@ -23,35 +27,29 @@ BASE = Path(os.environ["LOCALAPPDATA"]) / "DimsumInput"
 ASSETS = Path(__file__).resolve().parent.parent
 FILES = ("characterDescriptions.dic", "symbols.dic", "cldr.dic")
 DICTIONARY_DATA = runpy.run_path(str(ASSETS / "dictionaryData.py"))
-CHARACTERS = DICTIONARY_DATA["CHARACTERS"]
-SYMBOL_DICTIONARIES = DICTIONARY_DATA["SYMBOL_DICTIONARIES"]
-CONFIG_SECTION = "dimsumPronunciations"
 SCHEMAS = {"dimsum_cb", "dimsum_cb_std", "dimsum_full"}
 DIRECT_MODES = {"standard", "compact"}
 # Native candidate speech normally follows the Rime update immediately.
 NATIVE_SPEECH_WINDOW_NS = 500_000_000
 
 
-def load_pronunciations(directory, enabled=(CHARACTERS, *SYMBOL_DICTIONARIES)):
+def load_pronunciations(directory):
     pronunciations = {}
-    if CHARACTERS in enabled:
-        for line in (directory / FILES[0]).read_text(encoding="utf-8-sig").splitlines():
-            if not line or line.startswith("#"):
-                continue
-            fields = line.split("\t")
-            key = fields[0]
-            if not DICTIONARY_DATA["is_described_character"](key) or key in pronunciations:
-                continue
-            groups = (group for field in fields[1:] for group in field.split(" "))
-            groups = tuple(group.strip() for group in groups if group.strip() not in {"", "-"})
-            if groups:
-                pronunciations[key] = groups
-    if any(name in enabled for name in SYMBOL_DICTIONARIES):
-        for name, rows in DICTIONARY_DATA["split_symbols"](directory).items():
-            if name in enabled:
-                for key, (replacement, _) in rows.items():
-                    if len(key) == 1 and replacement.strip() not in {"", "-"}:
-                        pronunciations.setdefault(key, (replacement.strip(),))
+    for line in (directory / FILES[0]).read_text(encoding="utf-8-sig").splitlines():
+        if not line or line.startswith("#"):
+            continue
+        fields = line.split("\t")
+        key = fields[0]
+        if not DICTIONARY_DATA["is_described_character"](key) or key in pronunciations:
+            continue
+        groups = (part.strip() for field in fields[1:] for part in field.split(" "))
+        groups = tuple(group for group in groups if group not in {"", "-"})
+        if groups:
+            pronunciations[key] = groups
+    for name in FILES[1:]:
+        for key, replacement in DICTIONARY_DATA["read_symbol_rows"](directory / name):
+            if len(key) == 1 and replacement.strip() not in {"", "-"}:
+                pronunciations.setdefault(key, (replacement.strip(),))
     return pronunciations
 
 
@@ -118,6 +116,7 @@ def record_nvda_profile():
 
         profile = {
             "Language": languageHandler.getLanguage(),
+            "DictionaryLanguage": speech.getCurrentLanguage(),
             "ConfigDirectory": str(Path(WritePaths.configDir).resolve()),
         }
         BASE.mkdir(parents=True, exist_ok=True)
@@ -130,55 +129,6 @@ def record_nvda_profile():
         return None
 
 
-def copied_pronunciations(language=None):
-    try:
-        import languageHandler
-        from NVDAState import WritePaths
-
-        explicit = language is not None
-        language = language if explicit else languageHandler.getLanguage()
-        if language not in DICTIONARY_DATA["LOCALES"]:
-            return None
-        root = Path(WritePaths.configDir) / "DimsumPronunciations"
-        for locale in (language,) if explicit or language == "zh" else (language, "zh"):
-            directory = root / locale
-            pointer = directory / "active.txt"
-            revision = pointer.read_text(encoding="utf-8").strip() if pointer.is_file() else ""
-            if re.fullmatch(r"[0-9a-f]{32}", revision):
-                return directory / revision
-    except (ImportError, AttributeError, OSError, TypeError, ValueError):
-        pass
-    return None
-
-
-def enabled_pronunciations():
-    speech_dictionaries = config.conf["speech"].get("symbolDictionaries", ())
-    characters = config.conf[CONFIG_SECTION].get("useCharacterDescriptions", True)
-    enabled = [CHARACTERS] if characters else []
-    enabled.extend(name for name in SYMBOL_DICTIONARIES if name in speech_dictionaries)
-    return tuple(enabled)
-
-
-def initialize_symbol_defaults(prevConf=None):
-    import characterProcessing
-
-    section = config.conf[CONFIG_SECTION]
-    profiles = getattr(config.conf, "profiles", ())
-    profile_settings = profiles[-1].get(CONFIG_SECTION, {}) if profiles else section
-    initialized = profile_settings.get("symbolsInitialized", False)
-    if initialized is True or str(initialized).lower() == "true":
-        return
-    speech_settings = config.conf["speech"]
-    if "symbolDictionaries" not in speech_settings:
-        return
-    selected = list(speech_settings["symbolDictionaries"])
-    merged = list(dict.fromkeys((*selected, *SYMBOL_DICTIONARIES)))
-    if merged != selected:
-        speech_settings["symbolDictionaries"] = merged
-        characterProcessing.clearSpeechSymbols()
-    section["symbolsInitialized"] = True
-
-
 def write_atomic(path, contents):
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + "." + uuid4().hex + ".tmp")
@@ -189,30 +139,15 @@ def write_atomic(path, contents):
         temporary.unlink(missing_ok=True)
 
 
-def update_native_dictionaries():
+def remove_legacy_native_symbols():
     import characterProcessing
     from logHandler import log
     from NVDAState import WritePaths
 
-    definitions = getattr(characterProcessing, "listAvailableSymbolDictionaryDefinitions", lambda: ())()
-    if not set(SYMBOL_DICTIONARIES).issubset(definition.name for definition in definitions):
-        return
-
     profile = Path(WritePaths.configDir)
-    generated = {}
     changed = False
     for locale in DICTIONARY_DATA["LOCALES"]:
         try:
-            source = copied_pronunciations(locale)
-            if source is not None:
-                if source not in generated:
-                    generated[source] = DICTIONARY_DATA["native_symbol_files"](source)
-                for name, text in generated[source].items():
-                    target = ASSETS / "locale" / locale / f"symbols-{name}.dic"
-                    contents = text.encode("utf-8")
-                    if not target.is_file() or target.read_bytes() != contents:
-                        write_atomic(target, contents)
-                        changed = True
             user_symbols = profile / f"symbols-{locale}.dic"
             if not user_symbols.is_file() or user_symbols.is_symlink():
                 continue
@@ -223,31 +158,13 @@ def update_native_dictionaries():
                 write_atomic(backup / f"{locale}-{uuid4().hex}.dic", original)
                 write_atomic(user_symbols, cleaned)
                 changed = True
-        except (OSError, UnicodeError):
-            log.warning("Could not prepare a Dimsum symbol dictionary for %s", locale, exc_info=True)
+        except OSError:
+            log.warning("Could not clean the old Dimsum symbol block for %s", locale, exc_info=True)
     if changed:
-        for definition in definitions:
-            if definition.name in {"user", *SYMBOL_DICTIONARIES}:
+        for definition in getattr(characterProcessing, "listAvailableSymbolDictionaryDefinitions", lambda: ())():
+            if definition.name == "user":
                 definition.symbols.invalidateAllData()
         characterProcessing.clearSpeechSymbols()
-
-
-def register_pronunciation_settings():
-    from gui import guiHelper, settingsDialogs
-
-    class DimsumPronunciationPanel(settingsDialogs.SettingsPanel):
-        title = "點心單字配詞"
-
-        def makeSettings(self, settingsSizer):
-            helper = guiHelper.BoxSizerHelper(self, sizer=settingsSizer)
-            self.useCharacters = helper.addItem(wx.CheckBox(self, label="使用點心單字配詞"))
-            self.useCharacters.SetValue(config.conf[CONFIG_SECTION]["useCharacterDescriptions"])
-
-        def onSave(self):
-            config.conf[CONFIG_SECTION]["useCharacterDescriptions"] = self.useCharacters.IsChecked()
-
-    settingsDialogs.NVDASettingsDialog.categoryClasses.append(DimsumPronunciationPanel)
-    return settingsDialogs.NVDASettingsDialog.categoryClasses, DimsumPronunciationPanel
 
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
@@ -265,14 +182,8 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         self.last_report = None
         self.latest_stamp = time.time_ns()
         self.delayed = None
-        config.conf.spec[CONFIG_SECTION] = {
-            "useCharacterDescriptions": "boolean(default=True)",
-            "symbolsInitialized": "boolean(default=False)",
-        }
-        initialize_symbol_defaults()
-        config.post_configProfileSwitch.register(initialize_symbol_defaults)
-        self.settings_categories, self.settings_panel = register_pronunciation_settings()
-        update_native_dictionaries()
+        remove_legacy_native_symbols()
+        self.refresh_settings()
         extensions.filter_speechSequence.register(self.filter_native_speech)
         extensions.pre_speech.register(self.capture)
         self.timer = wx.PyTimer(self.poll)
@@ -281,8 +192,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
     def terminate(self):
         self.timer.Stop()
-        config.post_configProfileSwitch.unregister(initialize_symbol_defaults)
-        self.settings_categories.remove(self.settings_panel)
         if self.delayed:
             self.delayed.Stop()
         extensions.filter_speechSequence.unregister(self.filter_native_speech)
@@ -330,6 +239,8 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         self.settings_stamp = stamp
         self.clearGestureBindings()
         shortcut = self.preferences.get("LookupGesture", "")
+        if self.preferences.get("UseDimsumReviewDescription", True) or shortcut:
+            self.bindGestures({"kb:numpad2": "reviewCharacter", "kb(laptop):NVDA+.": "reviewCharacter"})
         if shortcut:
             try:
                 for identifier in KeyboardInputGesture.fromName(shortcut.lower()).identifiers:
@@ -343,33 +254,60 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         revision = pointer.read_text(encoding="utf-8").strip() if pointer.is_file() else ""
         if not re.fullmatch("[0-9a-f]{40}(?:-[0-9a-f]{32})?", revision):
             revision = ""
-        directory = root / revision if revision else copied_pronunciations() or ASSETS
-        enabled = enabled_pronunciations()
-        current = (directory, enabled)
-        if current == self.pronunciation_revision:
+        directory = root / revision if revision else ASSETS
+        if directory == self.pronunciation_revision:
             return
         try:
-            self.pronunciations = load_pronunciations(directory, enabled)
+            self.pronunciations = load_pronunciations(directory)
         except (OSError, UnicodeError):
-            if self.pronunciations and self.pronunciation_revision and self.pronunciation_revision[1] == enabled:
-                return
-            self.pronunciations = load_pronunciations(ASSETS, enabled)
-        self.pronunciation_revision = current
+            self.pronunciations = load_pronunciations(ASSETS)
+        self.pronunciation_revision = directory
 
     def script_lookup(self, gesture):
-        if not enabled_pronunciations():
-            self.say("目前未啟用點心配詞。", lookup_reply=True)
-            return
         original = self.last_speech.strip()
         if not original:
             self.say("暫時未取得 NVDA 最近嘅報讀。", lookup_reply=True)
             return
         try:
             self.refresh_pronunciations()
+            if not any(character in self.pronunciations for character in original):
+                self.say("呢段文字喺點心配詞表入面搵唔到配詞。", lookup_reply=True)
+                return
             text = describe(original, self.pronunciations, all_groups=len(original) == 1)
-            self.say(text or "呢段報讀冇可查詢嘅文字。", lookup_reply=True)
+            self.say(text, lookup_reply=True)
         except (OSError, UnicodeError):
-            self.say("無法載入點心配詞。", lookup_reply=True)
+            self.say("未能讀取點心配詞表。", lookup_reply=True)
+
+    @script(description="讀出檢閱游標所在字，連按兩下查點心配詞", speakOnDemand=True)
+    def script_reviewCharacter(self, gesture):
+        # Use NVDA's repeat counter and call the native script directly so its
+        # single- and triple-press paths see the same count as this wrapper.
+        native = globalCommands.commands.script_review_currentCharacter
+        repeat = getLastScriptRepeatCount()
+        if repeat == 0:
+            native(gesture)
+            return
+        text = None
+        if repeat == 1 and self.preferences.get("UseDimsumReviewDescription", True):
+            try:
+                info = api.getReviewPosition().copy()
+                info.expand(textInfos.UNIT_CHARACTER)
+                self.refresh_pronunciations()
+                if any(character in self.pronunciations for character in info.text):
+                    text = describe(info.text, self.pronunciations, all_groups=True)
+            except (OSError, UnicodeError, RuntimeError, NotImplementedError):
+                pass
+        # Keep the first press's text for lookup when the next press explains
+        # that character or speaks its code point, including native replies.
+        self.own_speech = True
+        try:
+            if text is None:
+                native(gesture)
+            else:
+                braille.handler.handleReviewMove(shouldAutoTether=True)
+                ui.reviewMessage(text)
+        finally:
+            self.own_speech = False
 
     def read_report(self):
         found = []
@@ -434,8 +372,8 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
     def filter_native_speech(self, value):
         if self.speaking_directly or self.own_speech:
             return value
-        mode = self.preferences.get("ReportingMode")
-        if mode not in DIRECT_MODES or speech.getState().speechMode != speech.SpeechMode.talk:
+        mode = self.preferences.get("ReportingMode", "standard")
+        if (mode not in DIRECT_MODES and mode != "tone") or speech.getState().speechMode != speech.SpeechMode.talk:
             return value
         snapshot = self.read_report()
         if snapshot is None:
@@ -444,6 +382,8 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         if not 0 <= time.time_ns() - stamp <= NATIVE_SPEECH_WINDOW_NS:
             return value
         _, _, event, selected, _, items = report
+        if mode == "tone" and event != "browse":
+            return value
         focus = api.getFocusObject()
         handle = getattr(focus, "windowHandle", None)
         if handle is None or event == "clear" or not native_candidate_speech(value, focus, items, selected):
@@ -458,7 +398,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
     def poll(self):
         try:
             self.refresh_settings()
-            mode = self.preferences.get("ReportingMode", "off")
+            mode = self.preferences.get("ReportingMode", "standard")
             if mode == "off":
                 self.latest_stamp = time.time_ns()
                 return
@@ -471,11 +411,11 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             _, _, event, selected, _, items = latest
             focus = api.getFocusObject()
             handle = getattr(focus, "windowHandle", None)
-            if mode == "tone":
+            if mode == "tone" and event != "browse":
                 if items and event == "tone":
                     self.delayed = wx.CallLater(120, self.supplement, items, selected, handle, self.latest_stamp)
                 return
-            if mode in DIRECT_MODES:
+            if mode in DIRECT_MODES or (mode == "tone" and event == "browse"):
                 if self.direct_delivery and self.direct_delivery[0][2] == latest[0]:
                     return
                 text = self.direct_candidate_text(latest, mode, handle)

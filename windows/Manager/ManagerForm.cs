@@ -4,10 +4,13 @@ namespace Dimsum;
 
 sealed class ManagerForm : Form
 {
+    const string ReviewDescription = "用 NVDA 原有快捷鍵連按兩下，讀出檢閱游標所在字嘅點心配詞。關閉後會用返 NVDA 原有解釋。";
+    const string LookupLabel = "查最近報讀配詞快捷鍵（可留空）";
+    const string LookupDescription = "有設定快捷鍵，就可以查 NVDA 最近讀過嘅字詞或句子。呢個快捷鍵同上面嘅開關各自生效。即係話，就算上面關閉咗，呢度你設定咗快捷鍵，你就可以好快咁對比兩套字表嘅解釋。";
     readonly Workspace workspace;
     readonly TableLayoutPanel form = new() { Dock = DockStyle.Fill, AutoScroll = true, ColumnCount = 1, Padding = new Padding(14) };
     readonly TextBox status = new() { Multiline = true, ReadOnly = true, Dock = DockStyle.Fill, ScrollBars = ScrollBars.Vertical, Height = 170, AccessibleName = "操作結果/版本" };
-    readonly TextBox gesture = new() { MaxLength = 55, AccessibleName = "查配詞快捷鍵（可留空）", Width = 270 };
+    readonly TextBox gesture = new() { MaxLength = 55, AccessibleName = LookupLabel, AccessibleDescription = LookupDescription, Width = 270 };
     Dictionary<string, string>? dataIndex;
     int dataCheck;
     string operationStatus = "";
@@ -79,21 +82,9 @@ sealed class ManagerForm : Form
         AddButton("更新點心報讀配詞(&P)", async () =>
         {
             await workspace.DownloadAsync(true);
-            if (workspace.Settings.AutoCopyPronunciations)
-            {
-                var copy = workspace.CopyToNvda();
-                return copy.Copied ? $"已複製新配詞到 NVDA 用家設定（{copy.Scope}）。重啟 NVDA 後生效。" :
-                    $"NVDA 用家設定（{copy.Scope}）已有同一份配詞。";
-            }
             return "點心配詞已更新。NVDA 附加元件會讀取新版本。";
         }, recheckData: true);
-        AddButton("立即複製配詞到 NVDA(&Y)", () =>
-        {
-            if (!Confirm("會更新 NVDA 用家設定入面嘅點心專用配詞。繼續嗎？")) return Task.FromResult("");
-            var copy = workspace.CopyToNvda();
-            return Task.FromResult(copy.Copied ? $"已複製點心配詞到 NVDA 用家設定（{copy.Scope}）。重啟 NVDA 後生效。" :
-                $"NVDA 用家設定（{copy.Scope}）已有同一份配詞。");
-        });
+        AddButton("另存配詞表供 NVDA 獨立使用(&Y)", () => Task.FromResult(ExportPronunciations()));
         AddButton("還原 NVDA 原有配詞檔", async () =>
         {
             if (!Confirm("會用舊版點心嘅備份，還原辨認到曾被覆寫嘅 NVDA 安裝配詞檔。繼續嗎？")) return "";
@@ -101,8 +92,6 @@ sealed class ManagerForm : Form
             return "";
         });
 
-        AddPreference("配詞更新後自動複製到 NVDA(&F)", workspace.Settings.AutoCopyPronunciations,
-            value => workspace.Settings.AutoCopyPronunciations = value);
         var shift = new CheckBox { AutoSize = true, Text = "單按 Shift 切換中英文", Checked = workspace.Settings.ShiftSwitch };
         var sound = new CheckBox { AutoSize = true, Text = "只有一個候選時播放提示音", Checked = workspace.SoundEnabled };
         Add(shift);
@@ -133,9 +122,15 @@ sealed class ManagerForm : Form
         Add(modes);
         var pronunciations = new CheckBox { AutoSize = true, Text = "候選用配詞報讀(&W)", Checked = workspace.Settings.PronounceCandidates };
         Add(pronunciations);
-        Add(new Label { Text = "最近報讀查配詞快捷鍵（可留空）", AutoSize = true });
+        Add(new Label { Text = "NVDA 查配詞", AutoSize = true });
+        var review = new CheckBox { Text = "使用點心字詞解釋", AccessibleDescription = ReviewDescription,
+            AutoSize = true, Checked = workspace.Settings.UseDimsumReviewDescription };
+        Add(review);
+        AddExplanation(ReviewDescription);
+        Add(new Label { Text = LookupLabel, AutoSize = true });
         gesture.Text = workspace.Settings.LookupGesture;
         Add(gesture);
+        AddExplanation(LookupDescription);
         AddButton("按下查配詞快捷鍵(&K)", () =>
         {
             using var capture = new ShortcutCapture();
@@ -155,12 +150,14 @@ sealed class ManagerForm : Form
                 @"\A(?:(?:control|alt|shift|windows)\+){1,3}(?:[a-z0-9]|f(?:[1-9]|1[0-2]))\z",
                 System.Text.RegularExpressions.RegexOptions.IgnoreCase))
                 throw new IOException("快捷鍵請用 Control、Alt、Shift 或 Windows 加英文字母、數字或 F1 至 F12。");
+            workspace.Settings.UseDimsumReviewDescription = review.Checked;
+            workspace.Settings.LookupGesture = shortcut;
+            workspace.Save();
             string mode = choices[modes.SelectedIndex];
-            if (mode != "off" && (workspace.Settings.ReportingMode == "off" || workspace.ReportingNeedsDeployment))
+            if (workspace.Settings.Initialized && mode != "off" && workspace.ReportingNeedsDeployment)
                 await workspace.DeployAsync(reporting: true);
             workspace.Settings.ReportingMode = mode;
             workspace.Settings.PronounceCandidates = pronunciations.Checked;
-            workspace.Settings.LookupGesture = shortcut;
             workspace.Save();
             return "已儲存報讀設定。";
         });
@@ -185,6 +182,13 @@ sealed class ManagerForm : Form
                 {
                     if (migration.NeedsUpgrade())
                         await RunOperationAsync(async () => await migration.RunAsync(this, targetLanguage, RefreshStatus) ?? "");
+                    else if (workspace.SetupComplete && workspace.Settings.Initialized &&
+                             workspace.Settings.ReportingMode != "off" && workspace.ReportingNeedsDeployment)
+                        await RunOperationAsync(async () =>
+                        {
+                            await workspace.DeployAsync(reporting: true);
+                            return "已更新點心候選報讀。";
+                        });
                 }
                 catch (Exception error) { RefreshStatus(error.Message); }
             };
@@ -203,21 +207,48 @@ sealed class ManagerForm : Form
         return Task.FromResult("");
     }
 
-    void AddPreference(string label, bool initial, Action<bool> apply)
+    string ExportPronunciations()
     {
-        var option = new CheckBox { AutoSize = true, Text = label, Checked = initial };
-        option.CheckedChanged += (_, _) =>
+        using var dialog = new FolderBrowserDialog
         {
+            Description = "選擇存放三份點心配詞檔嘅資料夾",
+            UseDescriptionForTitle = true,
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+        };
+        if (dialog.ShowDialog(this) != DialogResult.OK) return "";
+        string destination = dialog.SelectedPath;
+        try
+        {
+            NvdaDictionaries.CheckExportDestination(destination);
+            bool overwrite = NvdaDictionaries.Names.Any(name => File.Exists(Path.Combine(destination, name)));
+            if (overwrite && !Confirm("呢個資料夾已有同名配詞檔。要取代嗎？")) return "";
+            bool backup = Confirm("要一併備份 NVDA 現時使用嘅配詞檔嗎？備份會放喺你揀嘅位置入面嘅「NVDA舊配詞表備份」資料夾。");
+            workspace.ExportPronunciations(destination, overwrite);
+            string saved = $"已將三份點心配詞檔另存到「{destination}」。";
+            if (!backup) return saved;
             try
             {
-                apply(option.Checked);
-                workspace.Save();
-                RefreshStatus("");
+                if (NvdaDictionaries.BackupCurrent(workspace.DataDirectory, destination) is not { } result)
+                    return saved + Environment.NewLine + "未能確認 NVDA 現時使用嘅配詞檔位置。";
+                if (result.Missing.Length > 0)
+                    return saved + Environment.NewLine + $"NVDA 備份未齊，以下檔案未能備份：{string.Join("、", result.Missing)}。";
+                return saved + Environment.NewLine + $"已將 NVDA 現用配詞檔備份到「{result.Location}」。";
             }
-            catch (Exception error) { RefreshStatus(error.Message); }
-        };
-        Add(option);
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+            {
+                return saved + Environment.NewLine + $"未能備份 NVDA 現用配詞檔。{error.Message}";
+            }
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or System.Text.DecoderFallbackException)
+        {
+            return $"未能另存點心配詞檔。{error.Message}";
+        }
     }
+
+    void AddExplanation(string description) => Add(new Label
+    {
+        Text = description, AutoSize = true, Dock = DockStyle.Fill, TabStop = false
+    });
 
     void Add(Control control)
     {

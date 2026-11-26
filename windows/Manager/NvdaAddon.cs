@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO.Compression;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace Dimsum;
@@ -7,6 +8,7 @@ namespace Dimsum;
 static class NvdaAddon
 {
     const string Name = "dimsumCandidates";
+    const string Plugin = "globalPlugins/dimsumCandidates.py";
     static string Bundle => Path.Combine(AppContext.BaseDirectory, "assets", Name + ".nvda-addon");
 
     public static void Install()
@@ -48,11 +50,20 @@ static class NvdaAddon
             throw new IOException("內附 NVDA 附加元件缺少版本資料。"));
         var bundled = ReadManifestVersion(manifest.ReadToEnd()) ??
             throw new IOException("內附 NVDA 附加元件嘅版本資料無效。");
-        return NeedsPackage(profile, bundled);
+        using var plugin = archive.GetEntry(Plugin)?.Open() ?? throw new IOException("內附 NVDA 附加元件缺少報讀程式。");
+        return NeedsPackage(profile, bundled, SHA256.HashData(plugin));
     }
 
-    internal static bool NeedsPackage(string profile, Version bundled) => !AddonFolders(profile)
-        .Select(ReadOwnedVersion).Any(version => version is not null && version >= bundled);
+    internal static bool NeedsPackage(string profile, Version bundled, byte[] bundledPluginHash) => !AddonFolders(profile)
+        .Any(folder =>
+        {
+            var version = ReadOwnedVersion(folder);
+            if (version != bundled) return version is not null && version > bundled;
+            string path = Path.Combine(folder, Plugin);
+            if (!File.Exists(path) || !OrdinaryPath(path)) return false;
+            using var plugin = File.OpenRead(path);
+            return SHA256.HashData(plugin).AsSpan().SequenceEqual(bundledPluginHash);
+        });
 
     public static bool Remove(string data)
     {

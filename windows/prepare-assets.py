@@ -4,7 +4,6 @@ import hashlib
 from pathlib import Path
 import os
 import re
-import runpy
 from shutil import copy2
 import struct
 import subprocess
@@ -99,8 +98,6 @@ def main():
         encoding="utf-8",
     )
     reporting = HERE / "reporting"
-    dictionary_data = runpy.run_path(str(reporting / "dictionaryData.py"))
-    native_dictionaries = dictionary_data["native_symbol_files"](source / "NVDA dic")
     copy2(reporting / "rime/lua/dimsum_windows_reporter.lua", rime / "lua")
     addon = assets / "dimsumCandidates.nvda-addon"
     with ZipFile(addon, "w", compression=ZIP_DEFLATED) as archive:
@@ -113,9 +110,6 @@ def main():
         archive.write(HERE / "LICENSE", "LICENSE")
         for filename in PRONUNCIATIONS:
             archive.write(source / "NVDA dic" / filename, filename)
-        for locale in dictionary_data["LOCALES"]:
-            for name, contents in native_dictionaries.items():
-                archive.writestr(f"locale/{locale}/symbols-{name}.dic", contents.encode("utf-8"))
     print(hashlib.sha256(engine.read_bytes()).hexdigest())
 
 

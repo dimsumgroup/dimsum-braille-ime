@@ -2,17 +2,23 @@
 import importlib.util
 from pathlib import Path
 from tempfile import TemporaryDirectory
-import shutil
 import sys
 import types
 
 ROOT = Path(__file__).resolve().parents[1]
-for module in ("api", "config", "inputCore", "keyboardHandler", "globalPluginHandler", "speech", "ui", "winsound", "wx"):
+for module in ("api", "config", "inputCore", "keyboardHandler", "globalPluginHandler", "speech", "ui", "winsound", "wx", "braille", "globalCommands", "scriptHandler", "textInfos"):
     sys.modules[module] = types.ModuleType(module)
 for module in ("NVDAObjects", "NVDAObjects.behaviors", "NVDAObjects.inputComposition"):
     sys.modules[module] = types.ModuleType(module)
 sys.modules["globalPluginHandler"].GlobalPlugin = object
-sys.modules["keyboardHandler"].KeyboardInputGesture = object
+sys.modules["keyboardHandler"].KeyboardInputGesture = types.SimpleNamespace(
+    fromName=lambda key: types.SimpleNamespace(identifiers=[f"kb:{key}"])
+)
+sys.modules["inputCore"].normalizeGestureIdentifier = lambda key: key
+sys.modules["scriptHandler"].script = lambda **kwargs: lambda method: method
+sys.modules["textInfos"].UNIT_CHARACTER = "character"
+presses = 0
+sys.modules["scriptHandler"].getLastScriptRepeatCount = lambda: presses
 sys.modules["speech"].extensions = None
 sys.modules["speech"].SpeechMode = types.SimpleNamespace(talk="talk")
 sys.modules["speech"].getState = lambda: types.SimpleNamespace(speechMode="talk")
@@ -41,46 +47,17 @@ reporter = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(reporter)
 pronunciations = reporter.load_pronunciations(Path(sys.argv[1]) / "NVDA dic")
 source = Path(sys.argv[1]) / "NVDA dic"
-split = reporter.DICTIONARY_DATA["split_symbols"](source)
-punctuation, emoji = reporter.DICTIONARY_DATA["PUNCTUATION"], reporter.DICTIONARY_DATA["EMOJI"]
-assert "、" in split[punctuation] and "、" not in split[emoji]
-assert "😀" in split[emoji] and "😀" not in split[punctuation]
-assert set(split[punctuation]).isdisjoint(split[emoji])
-for enabled, includes, excludes in (
-    ((reporter.CHARACTERS,), "過", "、😀"),
-    ((punctuation,), "、", "過😀"),
-    ((emoji,), "😀", "過、"),
-):
-    selected = reporter.load_pronunciations(source, enabled)
-    assert includes in selected and all(character not in selected for character in excludes)
-assert not reporter.load_pronunciations(source, ())
-
+assert "、" in pronunciations and "😀" in pronunciations
 character_processing = types.ModuleType("characterProcessing")
 invalidations = []
 character_processing.clearSpeechSymbols = lambda: invalidations.append("speech")
 sys.modules["characterProcessing"] = character_processing
-cfg = {
-    "speech": {"symbolDictionaries": ["cldr", "personal"]},
-    reporter.CONFIG_SECTION: {"useCharacterDescriptions": True},
-}
-sys.modules["config"].conf = cfg
-reporter.initialize_symbol_defaults()
-assert set(cfg["speech"]["symbolDictionaries"]) == {"cldr", "personal", punctuation, emoji}
-assert reporter.enabled_pronunciations() == (reporter.CHARACTERS, emoji, punctuation)
-cfg["speech"]["symbolDictionaries"].remove(punctuation)
-reporter.initialize_symbol_defaults()
-assert reporter.enabled_pronunciations() == (reporter.CHARACTERS, emoji)
-cfg[reporter.CONFIG_SECTION]["useCharacterDescriptions"] = False
-assert reporter.enabled_pronunciations() == (emoji,)
 
 with TemporaryDirectory() as temporary:
     profile = Path(temporary)
     state = types.ModuleType("NVDAState")
     state.WritePaths = types.SimpleNamespace(configDir=str(profile))
     sys.modules["NVDAState"] = state
-    locale_module = types.ModuleType("languageHandler")
-    locale_module.getLanguage = lambda: "zh_TW"
-    sys.modules["languageHandler"] = locale_module
     logging = types.ModuleType("logHandler")
     logging.log = types.SimpleNamespace(warning=lambda *args, **kwargs: None)
     sys.modules["logHandler"] = logging
@@ -88,28 +65,20 @@ with TemporaryDirectory() as temporary:
         types.SimpleNamespace(name=name, symbols=types.SimpleNamespace(
             invalidateAllData=lambda name=name: invalidations.append(name)
         ))
-        for name in ("user", emoji, punctuation, "cldr")
+        for name in ("user", "cldr")
     ]
-    reporter.ASSETS = profile / "addons" / "dimsumCandidates"
-    copied = profile / "DimsumPronunciations" / "zh_TW"
-    revision = "a" * 32
-    (copied / revision).mkdir(parents=True)
-    (copied / "active.txt").write_text(revision)
-    for filename in reporter.FILES:
-        shutil.copyfile(source / filename, copied / revision / filename)
     symbols_file = profile / "symbols-zh_TW.dic"
     personal = b"symbols:\r\n# personal entry\r\nX\tmy choice\r\n"
     merged = personal + b"# Dimsum Group: managed symbols begin\r\nY\told Dimsum\r\n# Dimsum Group: managed symbols end\r\n"
     symbols_file.write_bytes(merged)
     (profile / "nvda.ini").write_bytes(b"[general]\r\nlanguage = zh_TW\r\n")
-    reporter.update_native_dictionaries()
-    assert (reporter.ASSETS / "locale" / "zh_TW" / f"symbols-{emoji}.dic").is_file()
+    reporter.remove_legacy_native_symbols()
     assert (profile / "nvda.ini").read_bytes() == b"[general]\r\nlanguage = zh_TW\r\n"
     assert symbols_file.read_bytes() == personal
-    backups = copied.parent / "symbol-migration-backups"
+    backups = profile / "DimsumPronunciations" / "symbol-migration-backups"
     assert [path.read_bytes() for path in backups.iterdir()] == [merged]
     assert "user" in invalidations and "cldr" not in invalidations
-    reporter.update_native_dictionaries()
+    reporter.remove_legacy_native_symbols()
     assert len(list(backups.iterdir())) == 1
 
 reporter.ASSETS = ROOT / "reporting"
@@ -198,4 +167,87 @@ assert plugin.filter_native_speech(native_page) == native_page
 for mode in ("off", "tone"):
     assert direct_plugin(mode).filter_native_speech(native_page) == native_page
 
-print("NVDA report parsing, pronunciations, mode routing, and tone supplementation passed")
+browse = (("dimsum", 3), "dimsum_cb", "browse", 2, False, [("1", "過"), ("2", "日本")])
+for mode in ("standard", "compact", "tone"):
+    plugin = direct_plugin(mode, browse)
+    plugin.preferences["PronounceCandidates"] = True
+    plugin.pronunciations = pronunciations
+    plugin.refresh_pronunciations = lambda: None
+    composition.compositionString = "raw  [ 1. 過  *2. 日本  ]"
+    spoken.clear()
+    full = reporter.describe("日本", pronunciations, all_groups=True)
+    assert full != "日子，本來"
+    assert plugin.filter_native_speech(["2. 日本"]) == [full]
+    plugin.poll()
+    assert not spoken, "Native speech replacement should not repeat through the timer."
+    plugin = direct_plugin(mode, browse)
+    plugin.preferences["PronounceCandidates"] = True
+    plugin.pronunciations = pronunciations
+    plugin.refresh_pronunciations = lambda: None
+    plugin.poll()
+    assert spoken == [(full, "next")], "Navigation must speak even without a native speech event."
+
+plugin = direct_plugin("off")
+assert plugin.filter_native_speech(native_page) == native_page
+spoken.clear()
+plugin.poll()
+assert not spoken
+
+review = types.SimpleNamespace(text="過", expand=lambda unit: None)
+sys.modules["api"].getReviewPosition = lambda: types.SimpleNamespace(copy=lambda: review)
+sys.modules["braille"].handler = types.SimpleNamespace(handleReviewMove=lambda **kwargs: None)
+sys.modules["globalCommands"].commands = types.SimpleNamespace(
+    script_review_currentCharacter=lambda gesture: (
+        spoken.append(presses), plugin.capture(["原有解釋"] if presses else ["過"])
+    )
+)
+sys.modules["ui"].reviewMessage = spoken.append
+plugin.pronunciations = pronunciations
+plugin.refresh_pronunciations = lambda: None
+plugin.recent_candidate_speech = []
+plugin.say = lambda text, **kwargs: spoken.append(text)
+full = reporter.describe("過", pronunciations, all_groups=True)
+for presses in range(3):
+    plugin.script_reviewCharacter(None)
+assert spoken == [0, full, 2]
+assert plugin.last_speech == "過"
+presses = 1
+review.text = "𰻞"
+plugin.script_reviewCharacter(None)
+assert spoken[-1] == 1, "Use the native description when Dimsum has no entry."
+review.text = "過"
+plugin.preferences["UseDimsumReviewDescription"] = False
+plugin.script_reviewCharacter(None)
+assert spoken[-1] == 1
+assert plugin.last_speech == "過", "Keep the original character across a native double press."
+plugin.script_lookup(None)
+assert spoken[-1] == full, "Custom lookup is independent of both switches."
+plugin.last_speech = "日本"
+plugin.script_lookup(None)
+assert spoken[-1] == "日子，本來"
+plugin.last_speech = "𰻞"
+plugin.script_lookup(None)
+assert spoken[-1] == "呢段文字喺點心配詞表入面搵唔到配詞。"
+
+with TemporaryDirectory() as temporary:
+    reporter.BASE = Path(temporary)
+    config_path = reporter.BASE / "settings.json"
+    plugin.settings_stamp = None
+    bindings = {}
+    plugin.clearGestureBindings = bindings.clear
+    plugin.bindGestures = bindings.update
+    plugin.bindGesture = bindings.__setitem__
+    config_path.write_text('{"ReportingMode":"off", "UseDimsumReviewDescription":false, "LookupGesture":"Control+Alt+D"}')
+    reporter.GlobalPlugin.refresh_settings(plugin)
+    assert bindings == {
+        "kb:numpad2": "reviewCharacter", "kb(laptop):NVDA+.": "reviewCharacter", "kb:control+alt+d": "lookup"
+    }
+    config_path.write_text('{"UseDimsumReviewDescription":false}')
+    plugin.settings_stamp = None
+    reporter.GlobalPlugin.refresh_settings(plugin)
+    assert bindings == {}, "With both features off, the native shortcuts are left entirely to NVDA."
+    config_path.unlink()
+    reporter.GlobalPlugin.refresh_settings(plugin)
+    assert bindings == {"kb:numpad2": "reviewCharacter", "kb(laptop):NVDA+.": "reviewCharacter"}
+
+print("NVDA reporting, pronunciation migration, review gestures and independent lookup passed")

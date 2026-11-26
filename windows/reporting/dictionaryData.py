@@ -1,4 +1,4 @@
-"""Prepare independent NVDA dictionaries from the Dimsum sources."""
+"""Read descriptions and symbols from the Dimsum data."""
 
 from functools import lru_cache
 from pathlib import Path
@@ -7,12 +7,6 @@ import unicodedata
 
 
 LOCALES = ("zh", "zh_CN", "zh_HK", "zh_TW")
-CHARACTERS = "characterDescriptions"
-PUNCTUATION = "dimsumPunctuation"
-EMOJI = "dimsumEmoji"
-# NVDA gives later built-in definitions priority. Prefer Dimsum punctuation
-# over CLDR for entries that describe the same non-emoji symbol.
-SYMBOL_DICTIONARIES = (EMOJI, PUNCTUATION)
 ESCAPES = {"0": "\0", "t": "\t", "n": "\n", "r": "\r", "f": "\f", "v": "\v"}
 
 
@@ -54,23 +48,7 @@ def read_symbol_rows(path):
             decoded = identifier
             if identifier.startswith("\\") and len(identifier) > 1:
                 decoded = ESCAPES.get(identifier[1], identifier[1]) + identifier[2:]
-            yield decoded, fields.split("\t", 1)[0], line
-
-
-def split_symbols(directory):
-    dictionaries = {PUNCTUATION: {}, EMOJI: {}}
-    for name in ("symbols.dic", "cldr.dic"):
-        for identifier, replacement, row in read_symbol_rows(directory / name):
-            key = EMOJI if is_emoji(identifier) else PUNCTUATION
-            dictionaries[key].setdefault(identifier, (replacement, row))
-    return dictionaries
-
-
-def native_symbol_files(directory):
-    return {
-        name: "symbols:\n" + "".join(row + "\n" for _, row in rows.values())
-        for name, rows in split_symbols(directory).items()
-    }
+            yield decoded, fields.split("\t", 1)[0]
 
 
 def remove_legacy_symbol_block(contents):

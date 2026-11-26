@@ -77,7 +77,30 @@ context.update_notifier.emit(context)
 assert(published[9] == "不久" and published[11] == "不過")
 segment.selected_index = 2
 context.update_notifier.emit(context)
-assert(published[9] == "日本" and published[7] == "0", "Last page with one of several candidates")
+assert(published[5] == "browse" and published[9] == "日本" and published[7] == "0",
+    "An adjacent candidate on the last page should be browsed without the singleton sound")
+segment.selected_index = 1
+candidates = {"不便", "不過", "日本"}
+context.update_notifier.emit(context)
+assert(published[5] == "browse" and published[6] == "2", "Adjacent movement still works when the page is rebuilt")
+context.has_menu = function() return #candidates > 0 end
+local key = {repr = function() return "Down" end}
+env.engine.process_key = function(_, event)
+    assert(reporter.func(event, env) == 2, "The nested key event uses normal Rime processors")
+    segment.selected_index = 2
+    return true
+end
+assert(reporter.func(key, env) == 1 and published[5] == "browse" and published[9] == "日本",
+    "Report the native selection even if Rime sends no update notification")
+env.engine.process_key = function(_, event)
+    assert(reporter.func(event, env) == 2)
+    segment.selected_index = 1
+    context.update_notifier.emit(context)
+    return true
+end
+revision = tonumber(published[3])
+assert(reporter.func(key, env) == 1 and tonumber(published[3]) == revision + 1,
+    "A notified move and the navigation fallback must report once")
 candidates = {"你"}
 segment.start, segment.selected_index = 3, 0
 context.select_notifier.emit(context)

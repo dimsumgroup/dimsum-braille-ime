@@ -8,7 +8,7 @@ namespace Dimsum;
 
 sealed record NvdaSession(int Id, string? Directory, DateTime? StartedUtc)
 {
-    internal sealed record Profile(string Language, string ConfigDirectory);
+    internal sealed record Profile(string Language, string ConfigDirectory, string? DictionaryLanguage = null);
 
     public static NvdaSession? Find()
     {

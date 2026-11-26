@@ -104,9 +104,7 @@ local function publish(context, env)
         and same_selected_candidate(previous, current) then
         event = "tone"
     elseif same_input and previous.start == current.start and previous.selected > 0 and current.selected > 0
-        and ((same_candidates and not same_selection)
-             or (previous.page ~= current.page
-                 and math.abs(previous.page + previous.selected - current.page - current.selected) == 1)) then
+        and math.abs(previous.page + previous.selected - current.page - current.selected) == 1 then
         event = "browse"
     elseif same_candidates and same_selection and previous.raw ~= "" and current.raw ~= previous.raw then
         event = "same"
@@ -162,8 +160,22 @@ function reporter.fini(env)
     end
 end
 
-function reporter.func()
-    return 2 -- kNoop
+local navigation_keys = {Up = true, Down = true, KP_Up = true, KP_Down = true}
+
+function reporter.func(key, env)
+    if env.navigating or not env.flag or not navigation_keys[key:repr()] then return 2 end
+    local context = env.engine.context
+    if not context:has_menu() or not enabled(env.flag) then return 2 end
+
+    -- Some Rime selectors change the highlight without an update notifier.
+    -- Let the normal key chain handle the arrow (including arrows sent by
+    -- G/H bindings), then publish the actual highlight and deduplicate it.
+    env.navigating = true
+    local ok, handled = pcall(env.engine.process_key, env.engine, key)
+    env.navigating = false
+    if not ok or not handled then return 2 end
+    publish(context, env)
+    return 1 -- kAccepted
 end
 
 return reporter

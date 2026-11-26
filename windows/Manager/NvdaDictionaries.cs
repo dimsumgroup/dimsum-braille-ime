@@ -1,4 +1,5 @@
 using Microsoft.Win32;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -42,27 +43,6 @@ static class NvdaDictionaries
         return Path.Combine(Environment.GetFolderPath(location), "nvda");
     }
 
-    static (string Profile, string? Locale) SelectDestination(NvdaSession? running, string data, string resources)
-    {
-        var active = running?.ReadProfile(data);
-        string? profile = active?.ConfigDirectory;
-        if (profile is null && running?.Directory is { } directory && !IsSameDirectory(FindInstallation(), directory))
-            profile = Path.Combine(directory, "userConfig");
-        profile ??= InstalledConfigDirectory() ?? throw new IOException("未能確認 NVDA 用家設定資料夾。");
-        string? language = active?.Language;
-        if (language is null)
-        {
-            try
-            {
-                string path = Path.Combine(profile, "nvda.ini");
-                if (File.Exists(path)) language = ReadConfiguredLanguage(File.ReadLines(path));
-            }
-            catch (IOException) { }
-            catch (UnauthorizedAccessException) { }
-        }
-        return (profile, ResolveLocale(resources, language));
-    }
-
     internal static string? ReadConfiguredLanguage(IEnumerable<string> lines)
     {
         bool general = false;
@@ -82,56 +62,115 @@ static class NvdaDictionaries
         return null;
     }
 
-    internal static string? ResolveLocale(string install, string? language)
+    internal const string BackupFolder = "NVDA舊配詞表備份";
+
+    public static void CheckExportDestination(string destination)
     {
-        string? requested = language?.Trim().Replace('-', '_');
-        return Locales.FirstOrDefault(locale => locale.Equals(requested, StringComparison.OrdinalIgnoreCase) &&
-            Directory.Exists(Path.Combine(install, "locale", locale)));
+        string path = Path.TrimEndingDirectorySeparator(Path.GetFullPath(destination));
+        foreach (string? nvda in new[] { NvdaSession.Find()?.Directory, FindInstallation() })
+        {
+            if (nvda is null) continue;
+            string relative = Path.GetRelativePath(nvda, path);
+            if (!Path.IsPathRooted(relative) && relative != ".." && !relative.StartsWith(".." + Path.DirectorySeparatorChar))
+                throw new IOException("請揀 NVDA 安裝目錄以外嘅資料夾。");
+        }
     }
 
-    static readonly UTF8Encoding Utf8 = new(false, true);
-
-    public static (bool Copied, string Scope) CopyToProfile(string data, string source)
+    internal static void Export(string destination, byte[][] contents, bool overwrite)
     {
-        var running = NvdaSession.Find();
-        string resources = running?.Directory ?? FindInstallation() ?? throw new IOException("未搵到 NVDA。");
-        var destination = SelectDestination(running, data, resources);
-        bool copied = ApplyToProfile(destination.Profile, resources, ReadBundle(source), destination.Locale);
-        return (copied, destination.Locale is null ? "已存在嘅中文語言" : destination.Locale);
-    }
-
-    internal static bool ApplyToProfile(string profile, string resources, byte[][] contents, string? locale)
-    {
-        var languages = Targets(resources, locale).Select(target => target.BackupName.Split('.')[0]).Distinct().ToArray();
-        using var mutex = new Mutex(false, @"Local\DimsumNvdaProfileDictionaries");
-        Acquire(mutex);
+        string stage = Path.Combine(destination, ".dimsum-export-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(stage);
+        var replaced = new List<(string Target, string? Original)>();
         try
         {
-            bool changed = false;
-            foreach (string language in languages)
+            for (int index = 0; index < Names.Length; index++)
+                File.WriteAllBytes(Path.Combine(stage, Names[index]), contents[index]);
+            foreach (string name in Names)
             {
-                string directory = Path.Combine(profile, "DimsumPronunciations", language);
-                string active = Path.Combine(directory, "active.txt");
-                RejectRedirects(active);
-                string? previous = File.Exists(active) ? File.ReadAllText(active).Trim() : null;
-                bool same = Guid.TryParseExact(previous, "N", out _) &&
-                    Names.Select((name, index) => (Name: name, Index: index)).All(file =>
-                    {
-                        string path = Path.Combine(directory, previous!, file.Name);
-                        RejectRedirects(path);
-                        return File.Exists(path) && File.ReadAllBytes(path).AsSpan().SequenceEqual(contents[file.Index]);
-                    });
-                if (same) continue;
-                string revision = Guid.NewGuid().ToString("N");
-                string target = Path.Combine(directory, revision);
-                for (int index = 0; index < Names.Length; index++)
-                    Workspace.WriteAtomic(Path.Combine(target, Names[index]), contents[index]);
-                Workspace.WriteAtomic(active, Utf8.GetBytes(revision));
-                changed = true;
+                string prepared = Path.Combine(stage, name);
+                string target = Path.Combine(destination, name);
+                if (File.Exists(target) && overwrite)
+                {
+                    string original = prepared + ".original";
+                    File.Replace(prepared, target, original, ignoreMetadataErrors: true);
+                    replaced.Add((target, original));
+                }
+                else
+                {
+                    File.Move(prepared, target);
+                    replaced.Add((target, null));
+                }
             }
-            return changed;
         }
-        finally { mutex.ReleaseMutex(); }
+        catch
+        {
+            foreach (var file in Enumerable.Reverse(replaced))
+            {
+                try
+                {
+                    if (file.Original is null) File.Delete(file.Target);
+                    else File.Move(file.Original, file.Target, overwrite: true);
+                }
+                catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+                {
+                    throw new IOException($"未能復原原有檔案。復原資料夾喺「{stage}」。{error.Message}", error);
+                }
+            }
+            Directory.Delete(stage, recursive: true);
+            throw;
+        }
+        Directory.Delete(stage, recursive: true);
+    }
+
+    public static (string Location, string[] Missing)? BackupCurrent(string data, string destination)
+    {
+        var running = NvdaSession.Find();
+        string? installed = FindInstallation();
+        string? resources = running is null ? installed : running.Directory;
+        if (resources is null) return null;
+        var active = running?.ReadProfile(data);
+        string? profile = active?.ConfigDirectory ?? (IsSameDirectory(installed, resources)
+            ? InstalledConfigDirectory() : Path.Combine(resources, "userConfig"));
+        string? language = active?.DictionaryLanguage ?? active?.Language;
+        if (language is null && profile is not null)
+        {
+            try
+            {
+                string path = Path.Combine(profile, "nvda.ini");
+                if (File.Exists(path)) language = ReadConfiguredLanguage(File.ReadLines(path)) ?? "Windows";
+            }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException) { }
+        }
+        if (language?.Equals("Windows", StringComparison.OrdinalIgnoreCase) == true)
+            language = CultureInfo.CurrentUICulture.Name;
+        language = language?.Trim().Replace('-', '_');
+        if (language is null || !Regex.IsMatch(language, @"\A[a-zA-Z]{2,8}(?:_[a-zA-Z0-9]{2,8})*\z")) return null;
+        return BackupDictionaries(resources, language, destination);
+    }
+
+    internal static (string Location, string[] Missing) BackupDictionaries(string resources, string language, string destination)
+    {
+        string backup = Path.Combine(destination, BackupFolder);
+        if (Directory.Exists(backup))
+            backup = Path.Combine(backup, DateTime.UtcNow.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture) + "-" + Guid.NewGuid().ToString("N"));
+        string[] languages = new[] { language, language.Split('_')[0], "en" }.Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        var missing = new List<string>();
+        foreach (string name in Names)
+        {
+            string? locale = languages.FirstOrDefault(locale => File.Exists(Path.Combine(resources, "locale", locale, name)));
+            if (locale is not null)
+            {
+                try
+                {
+                    string source = Path.Combine(resources, "locale", locale, name);
+                    Workspace.WriteAtomic(Path.Combine(backup, locale, name), File.ReadAllBytes(source));
+                    continue;
+                }
+                catch (Exception error) when (error is IOException or UnauthorizedAccessException) { }
+            }
+            missing.Add($"{name}（{locale ?? language}）");
+        }
+        return (backup, [.. missing]);
     }
 
     public static (int Restored, int Missing) RestoreInstalled()
