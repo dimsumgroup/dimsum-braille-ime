@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
-using System.Text.Json;
 using Microsoft.Win32;
 
 namespace Dimsum;
@@ -106,6 +105,41 @@ static partial class WindowsSetup
         return false;
     }
 
+    const string LanguageListStart = "DIMSUM-LANGUAGES-1";
+    const string LanguageListEnd = "DIMSUM-END";
+
+    internal static UserInputLanguage[] ParseUserInputLanguages(string output)
+    {
+        using var reader = new StringReader(output);
+        while (reader.ReadLine() is { } line)
+        {
+            if (line.Trim().TrimStart('\uFEFF') != LanguageListStart) continue;
+            var languages = new List<UserInputLanguage>();
+            string? tag = null;
+            var tips = new List<string>();
+            while (reader.ReadLine() is { } record)
+            {
+                if (record == LanguageListEnd)
+                {
+                    if (tag is not null) languages.Add(new(tag, tips.ToArray()));
+                    return languages.ToArray();
+                }
+                if (record.StartsWith("L:", StringComparison.Ordinal) && record.Length > 2)
+                {
+                    if (tag is not null) languages.Add(new(tag, tips.ToArray()));
+                    tag = record[2..];
+                    tips.Clear();
+                }
+                else if (tag is not null && record.StartsWith("T:", StringComparison.Ordinal) && record.Length > 2)
+                    tips.Add(record[2..]);
+                else
+                    break;
+            }
+            break;
+        }
+        throw new IOException("未能辨認 Windows 輸入語言。PowerShell 傳回嘅語言清單格式不完整。");
+    }
+
     public static async Task<UserInputLanguage[]> GetUserInputLanguagesAsync()
     {
         string powershell = Path.Combine(Environment.SystemDirectory, "WindowsPowerShell", "v1.0", "powershell.exe");
@@ -117,13 +151,20 @@ static partial class WindowsSetup
         start.ArgumentList.Add("-NoProfile");
         start.ArgumentList.Add("-NonInteractive");
         start.ArgumentList.Add("-Command");
-        start.ArgumentList.Add("""
-            $ErrorActionPreference = 'Stop'
-            [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
-            ConvertTo-Json -Compress -InputObject @(Get-WinUserLanguageList | ForEach-Object {
-                [PSCustomObject]@{Tag=$_.LanguageTag; Tips=@($_.InputMethodTips)}
-            })
-            """);
+        // Windows PowerShell can wrap collections in different JSON objects.
+        // Emit each language and each key as a separate plain-text record.
+        start.ArgumentList.Add($$"""
+            $ErrorActionPreference = 'Stop';
+            $languages = Get-WinUserLanguageList;
+            [Console]::WriteLine('{{LanguageListStart}}');
+            foreach ($language in $languages) {
+                [Console]::WriteLine('L:' + [string]$language.LanguageTag);
+                foreach ($tip in $language.InputMethodTips) {
+                    [Console]::WriteLine('T:' + [string]$tip);
+                }
+            };
+            [Console]::WriteLine('{{LanguageListEnd}}');
+            """.ReplaceLineEndings(" "));
         using var process = Process.Start(start) ?? throw new IOException("未能讀取 Windows 輸入語言。");
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(12));
         try
@@ -134,21 +175,20 @@ static partial class WindowsSetup
             string data = await read;
             string error = await errors;
             if (process.ExitCode != 0) throw new IOException($"未能讀取 Windows 輸入語言。{error.Trim()}");
-            return JsonSerializer.Deserialize<UserInputLanguage[]>(data) ?? [];
+            return ParseUserInputLanguages(data);
         }
         catch (OperationCanceledException)
         {
             if (!process.HasExited) process.Kill();
             throw new IOException("讀取 Windows 輸入語言逾時。請再試。");
         }
-        catch (JsonException error) { throw new IOException("未能辨認 Windows 輸入語言。", error); }
     }
 
     public static async Task EnableOnlyDimsumLanguageAsync(InputLanguageChoice choice, bool makeDefault)
     {
+        var previous = await GetUserInputLanguagesAsync();
         if (!IsOurProfile(choice.Id))
             await RunAdminAsync("--finish-setup", choice.Id.ToString(CultureInfo.InvariantCulture));
-        var previous = await GetUserInputLanguagesAsync();
         if (!IsDimsumEnabled(previous, choice))
         {
             if (!EnableProfileForUser(choice.Id, makeDefault: false))

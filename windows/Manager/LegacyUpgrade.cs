@@ -15,7 +15,7 @@ sealed class LegacyUpgrade(Workspace workspace)
     static readonly string[] EngineValues = ["RimeUserDir", "Hant", "Language", "ToggleMode"];
     internal static readonly string[] OldFiles = ["cb_converter.exe", "cb_converter.ps1"];
     enum Stage { Accepted, DataSaved, EngineReady, Deployed, Complete }
-    sealed record Checkpoint(Guid Id, Stage Stage);
+    sealed record Checkpoint(Guid Id, Stage Stage, bool DictionaryDeployed = false);
     string StateFile => Path.Combine(workspace.DataDirectory, "legacy-upgrade.json");
     string BackupFolder => Path.Combine(workspace.DataDirectory, "舊版遷移備份");
     Checkpoint? ReadState() => File.Exists(StateFile) ? JsonSerializer.Deserialize<Checkpoint>(File.ReadAllBytes(StateFile)) : null;
@@ -54,7 +54,7 @@ sealed class LegacyUpgrade(Workspace workspace)
             // A previous version could leave a migration checkpoint after its
             // engine uninstaller removed the binaries.
             if (state.Stage >= Stage.EngineReady && Workspace.FindDeployer() is null)
-                state = Advance(state, Stage.DataSaved);
+                state = Advance(state with { DictionaryDeployed = false }, Stage.DataSaved);
             if (state.Stage < Stage.DataSaved)
             {
                 progress("正在備份用家資料。");
@@ -83,14 +83,23 @@ sealed class LegacyUpgrade(Workspace workspace)
 
             if (state.Stage < Stage.Deployed)
             {
-                stage = "部署點心同加入輸入法";
-                progress("正在部署點心並加入輸入法。");
+                stage = "部署點心字庫同設定";
                 RestoreEngineSettings(backup);
                 WindowsSetup.StartAvailableEngine();
-                await workspace.CompleteSetupAsync(language, makeDefault, legacyMigration: true);
+                string engineCheckpoint = Path.Combine(MachineLegacyUpgrade.EngineBackup(id), "engine-package-installed");
+                bool verified = state.DictionaryDeployed ? workspace.SetupDeploymentUsable() :
+                    File.Exists(engineCheckpoint) && workspace.SetupDeploymentUsable(File.GetLastWriteTimeUtc(engineCheckpoint));
+                if (!verified)
+                {
+                    progress("正在部署點心字庫同設定。");
+                    await workspace.DeployAsync(applyPending: true, reporting: true, legacyMigration: true);
+                }
+                if (!state.DictionaryDeployed) state = Advance(state with { DictionaryDeployed = true }, state.Stage);
+                stage = "加入 Windows 輸入法";
+                progress($"正在將點心加入到「{language.Label}」。");
+                await workspace.FinishSetupAsync(language, makeDefault);
                 state = Advance(state, Stage.Deployed);
             }
-
             else if (!WindowsSetup.SameLanguage(workspace.Settings.InputLanguageTag, language.Tag) || workspace.Settings.SetupPending)
             {
                 stage = "加入 Windows 輸入法";

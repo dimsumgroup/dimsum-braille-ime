@@ -335,27 +335,33 @@ sealed class Workspace
         Save();
     }
 
-    bool SetupDeploymentUsable()
+    internal bool SetupDeploymentUsable(DateTime? deployedAfterUtc = null)
     {
         if (!Settings.Initialized || Settings.AppliedDictionary is null || File.Exists(Pending) || Directory.Exists(Journal)) return false;
         try
         {
-            if (ReportingNeedsDeployment) return false;
+            if (ReportingNeedsDeployment || (deployedAfterUtc is DateTime since &&
+                File.GetLastWriteTimeUtc(Path.Combine(Rime, "build", "dimsum_cb.table.bin")) < since)) return false;
             VerifyTable(File.ReadAllBytes(Path.Combine(Rime, Dictionary)), File.ReadAllBytes(Path.Combine(Rime, UserDictionary)));
             return true;
         }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException) { return false; }
     }
 
-    public async Task<string> CompleteSetupAsync(InputLanguageChoice language, bool makeDefault, bool legacyMigration = false,
+    public async Task<string> CompleteSetupAsync(InputLanguageChoice language, bool makeDefault,
         Action<string>? progress = null, bool forceDeploy = false)
     {
-        if (forceDeploy || legacyMigration || !SetupDeploymentUsable())
+        if (forceDeploy || !SetupDeploymentUsable())
         {
             progress?.Invoke("正在部署點心字庫同設定。");
-            await DeployAsync(applyPending: true, reporting: true, legacyMigration: legacyMigration);
+            await DeployAsync(applyPending: true, reporting: true);
         }
         progress?.Invoke($"正在將點心加入到「{language.Label}」。");
+        return await FinishSetupAsync(language, makeDefault);
+    }
+
+    internal async Task<string> FinishSetupAsync(InputLanguageChoice language, bool makeDefault)
+    {
         string result = await ApplyInputLanguageAsync(language, makeDefault);
         WindowsSetup.StartAvailableEngine();
         await WindowsSetup.HideInstallationEntriesAsync();

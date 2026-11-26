@@ -15,8 +15,8 @@
 - `settings.json` 同下載資料放喺 `%LOCALAPPDATA%\DimsumInput`。Rime 用家目錄預設 `%APPDATA%\Rime`，亦會讀已設定嘅 `RimeUserDir`。維持用家自訂詞庫、學習、NVDA 語言同已清空嘅快捷鍵。
 - 候選自動報讀逐字讀第一組配詞，逐個瀏覽讀高亮候選每個字嘅全部配詞。補讀模式保留一般 NVDA 候選報讀及補聲調。
 - `UseDimsumReviewDescription` 只控制 NVDA 檢閱當前字元指令第二下。`LookupGesture` 獨立查最近報讀，保留原句畀用家比較。由管理器集中設定。點心可另存三份配詞及備份 NVDA 安裝字典，附加元件直接讀管理器已下載或內附資料。
-- 舊版遷移備份已安裝 NVDA 嘅現存中文配詞檔，目的地係當次遷移備份下嘅 `NVDA舊配詞表備份/`，安裝目錄只用作讀取來源。
+- 舊版遷移備份已安裝 NVDA 嘅現存中文配詞檔，目的地係當次遷移備份下嘅 `NVDA舊配詞表備份/`，安裝目錄只用作讀取來源。遷移會分開記錄字庫部署同 Windows 輸入法登記，重試時核對已部署字庫再繼續。
 - 精簡引擎使用固定版本 Weasel 0.17.4.0 原廠二進位檔。`prepare-assets.py` 驗證原始安裝檔 SHA-256；`installer/engine.nsi` 定義重封裝。完整來源位置見 `engine-notices.txt`。
 - 調整介面要驗證 NVDA 鍵盤操作、可聚焦欄位同讀出嚟嘅名稱。安裝程式擷取開始時嘅 Windows 輸入語言，按「完成」後由管理器依序檢查引擎、部署同加入語言。未完成操作用「繼續設定點心」，「修復點心」會重跑部署，已完成後換語言用「套用輸入法語言」。設定即時套用。查配詞快捷鍵嘅編輯、錄製同清除共用 `LookupGesture`，手動輸入喺離開欄位或按 Enter 時驗證。
-- `Manager/InputLanguages.cs` 先核對揀定語言有點心，再移除其他點心項目。台灣 Weasel 須核對內附引擎嘅安裝標記。普通重新部署只管 Rime 資料。
+- `Manager/InputLanguages.cs` 先核對揀定語言有點心，再移除其他點心項目。台灣 Weasel 須核對內附引擎嘅安裝標記。普通重新部署只管 Rime 資料。Windows PowerShell 語言清單採用逐行記錄，先驗證開頭同結尾，再用於語言登記。
 - `tests/reporting.py ..` 由呢個目錄用 Python 執行，`tests/reporting.lua` 用 Lua 執行。Windows 實機重點包括更新提示、快捷鍵錄製同清除、換語言、遷移、單候選提示，以及 NVDA 開關各模式嘅行為。
