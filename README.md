@@ -31,11 +31,11 @@ NVDA / JAWS 螢幕閱讀器支援
 
 ### Windows 安裝步驟
 
-1. [下載 Windows 版 v1.3.1 安裝程式](https://github.com/dimsumgroup/dimsum-braille-ime/releases/download/v1.3.1/Dimsum_Setup_v1.3.1.exe)。
-2. 執行安裝程式，按畫面指示完成安裝。如果 NVDA 正在執行而尚未安裝點心附加組件，安裝程式會邀請安裝。
+1. [下載 Windows 版 v1.3.2 安裝程式](https://github.com/dimsumgroup/dimsum-braille-ime/releases/download/v1.3.2/Dimsum_Setup_v1.3.2.exe)。
+2. 執行安裝程式，按畫面指示完成安裝。如果 NVDA 正在執行，而點心附加組件尚未安裝或版本較舊，安裝程式會邀請安裝或更新。
 3. 安裝完成後，按 **Windows 鍵＋空白鍵**，在「繁體中文（香港）」下選擇「點心粵語點字輸入法」。
 
-[Windows 版發行頁](https://github.com/dimsumgroup/dimsum-braille-ime/releases/tag/v1.3.1)
+[Windows 版發行頁](https://github.com/dimsumgroup/dimsum-braille-ime/releases/tag/v1.3.2)
 
 ---
 
@@ -43,13 +43,12 @@ NVDA / JAWS 螢幕閱讀器支援
 
 ### Windows 版
 
-#### v1.3.1（2026-11-27）
+#### v1.3.2（2026-11-28）
 
-- 因應多位使用者希望有更大彈性調整進階設定，我們重整了 Windows 版架構。使用舊版的朋友請務必升級。
-- NVDA 使用者請務必安裝點心 NVDA 附加組件。安裝點心時，如果 NVDA 正在執行而尚未安裝附加組件，安裝程式會提示。也可以稍後在管理器安裝。附加組件負責候選報讀，可減少 Windows 更新對候選報讀的影響。
-- 即使毋須調整設定，也可以開啟「Dimsum Manager - 點心粵語點字輸入法管理器」，更新輸入法字庫和報讀配詞表。
-- 點心的配詞解釋和 NVDA 原有解釋各自處理。「在 NVDA 開啟點心配詞解釋」預設關閉。開啟後，在 NVDA 桌面配置連按兩下數字鍵盤 2，或在手提電腦配置連按兩下 NVDA 鍵加句號，就會讀出點心的配詞解釋。
-- 管理器提供「另存配詞表供 NVDA 獨立使用」。選擇資料夾後可一次另存三份配詞檔，再按需要自行複製到指定位置。
+- 修正用上、下方向鍵瀏覽候選，以及用 Page Up、Page Down 翻頁時讀出未上屏字碼的問題。開啟配詞報讀後，逐個瀏覽會讀出選字編號和高亮候選的全部配詞，翻頁會讀出新一頁的選字編號和每字的第一組配詞。選字編號仍由報讀設定控制。
+- 改善快速打字時偶爾漏讀或讀出上一組候選的情況。
+- 安裝程式會比對正在使用的 NVDA 附加組件版本。如尚未安裝或已有較舊版本，會邀請安裝或更新至內附的 1.3.2。請依 NVDA 指示完成更新並重新啟動 NVDA。
+- 安裝位置會在按下「安裝」前以唯讀方式顯示。
 
 ### Mac 版
 
