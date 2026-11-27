@@ -6,7 +6,7 @@ import sys
 import types
 
 ROOT = Path(__file__).resolve().parents[1]
-for module in ("api", "inputCore", "keyboardHandler", "globalPluginHandler", "speech", "ui", "winsound", "wx", "braille", "globalCommands", "scriptHandler", "textInfos"):
+for module in ("api", "config", "speech.commands", "inputCore", "keyboardHandler", "globalPluginHandler", "speech", "ui", "winsound", "wx", "braille", "globalCommands", "scriptHandler", "textInfos"):
     sys.modules[module] = types.ModuleType(module)
 for module in ("NVDAObjects", "NVDAObjects.behaviors", "NVDAObjects.inputComposition"):
     sys.modules[module] = types.ModuleType(module)
@@ -20,6 +20,13 @@ sys.modules["textInfos"].UNIT_CHARACTER = "character"
 presses = 0
 sys.modules["scriptHandler"].getLastScriptRepeatCount = lambda: presses
 sys.modules["speech"].extensions = None
+sys.modules["config"].conf = {"featureFlag": {"cancelExpiredFocusSpeech": 2}}
+
+class CancellableSpeechCommand:
+    def is_current(self):
+        return self._checkIfValid()
+
+sys.modules["speech.commands"]._CancellableSpeechCommand = CancellableSpeechCommand
 sys.modules["speech"].SpeechMode = types.SimpleNamespace(talk="talk")
 sys.modules["speech"].getState = lambda: types.SimpleNamespace(speechMode="talk")
 sys.modules["speech"].Spri = types.SimpleNamespace(NEXT="next")
@@ -97,6 +104,10 @@ ordinary_page = (("dimsum", 1), "dimsum_cb", "page", 1, False, [("1", "分"), ("
 later_same = (("dimsum", 2), *ordinary_page[1:2], "same", *ordinary_page[3:])
 
 
+def report_time():
+    return reporter.time.time_ns() - 2 * reporter.CANDIDATE_SETTLE_NS
+
+
 def direct_plugin(omit_numbers=False, report=ordinary_page):
     plugin = reporter.GlobalPlugin.__new__(reporter.GlobalPlugin)
     plugin.preferences = {"OmitCandidateNumbers": omit_numbers, "PronounceCandidates": False}
@@ -106,7 +117,7 @@ def direct_plugin(omit_numbers=False, report=ordinary_page):
     plugin.latest_stamp = 0
     plugin.last_report = None
     plugin.refresh_settings = lambda: None
-    plugin.read_report = lambda: (reporter.time.time_ns(), report)
+    plugin.read_report = lambda: (report_time(), report)
     return plugin
 
 
@@ -144,7 +155,7 @@ assert len(spoken) == 1
 spoken.clear()
 plugin = direct_plugin(omit_numbers=True)
 plugin.poll()
-plugin.read_report = lambda: (reporter.time.time_ns(), later_same)
+plugin.read_report = lambda: (report_time(), later_same)
 plugin.poll()
 assert spoken == [("分，芬", "next")] * 2, "A fresh input event should speak even when it yields the same candidates."
 
@@ -199,6 +210,32 @@ sys.modules["ui"].message = original_message
 plugin.poll()
 plugin.poll()
 assert spoken == [("1 過，2 日本", "next")], "A transient failure should leave the latest page pending."
+
+spoken.clear()
+plugin = direct_plugin(report=ordinary_page)
+plugin.read_report = lambda: (reporter.time.time_ns(), ordinary_page)
+plugin.poll()
+assert not spoken and plugin.last_report is None, "A fresh typing update waits briefly."
+plugin.read_report = lambda: (report_time(), next_page)
+plugin.poll()
+assert spoken == [("1 過，2 日本", "next")], "A burst should only announce the latest candidates."
+
+queues = []
+sys.modules["config"].conf["featureFlag"]["cancelExpiredFocusSpeech"] = 1
+sys.modules["speech"].speak = lambda sequence, priority: queues.append((sequence, priority))
+sys.modules["braille"].handler = types.SimpleNamespace(message=lambda text: None)
+plugin = direct_plugin()
+plugin.poll()
+command, first = queues[0][0]
+assert command.is_current() and first == "1 分，2 芬"
+plugin.read_report = lambda: (reporter.time.time_ns(), next_page)
+plugin.poll()
+assert not command.is_current() and len(queues) == 1, "The older queued candidate expires even before the new one is ready."
+plugin.read_report = lambda: (report_time(), next_page)
+plugin.poll()
+command, latest = queues[-1][0]
+assert command.is_current() and latest == "1 過，2 日本"
+sys.modules["config"].conf["featureFlag"]["cancelExpiredFocusSpeech"] = 2
 
 with TemporaryDirectory() as temporary:
     reporter.BASE = Path(temporary)

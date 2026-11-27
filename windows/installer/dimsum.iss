@@ -1,4 +1,4 @@
-﻿#define AppVer "1.3.2"
+﻿#define AppVer "1.3.3"
 #define ShortcutName "Dimsum Manager - 點心粵語點字輸入法管理器"
 #define ManagerName "點心粵語點字輸入法管理器"
 

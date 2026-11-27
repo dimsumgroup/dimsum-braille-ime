@@ -8,6 +8,7 @@ from uuid import uuid4
 
 import api
 import braille
+import config
 import globalCommands
 import globalPluginHandler
 import inputCore
@@ -21,6 +22,11 @@ import textInfos
 import ui
 import wx
 
+try:
+    from speech.commands import _CancellableSpeechCommand
+except ImportError:
+    _CancellableSpeechCommand = None
+
 
 BASE = Path(os.environ["LOCALAPPDATA"]) / "DimsumInput"
 ASSETS = Path(__file__).resolve().parent.parent
@@ -30,6 +36,7 @@ SCHEMAS = {"dimsum_cb", "dimsum_cb_std", "dimsum_full"}
 # Native candidate speech normally follows the Rime update immediately.
 NATIVE_SPEECH_WINDOW_NS = 500_000_000
 REPORT_SLOTS = 3
+CANDIDATE_SETTLE_NS = 80_000_000
 
 
 def load_pronunciations(directory):
@@ -170,6 +177,28 @@ def remove_legacy_native_symbols():
         characterProcessing.clearSpeechSymbols()
 
 
+if _CancellableSpeechCommand is not None:
+    class CandidateSpeech(_CancellableSpeechCommand):
+        def __init__(self, is_current):
+            super().__init__()
+            self._is_current = is_current
+
+        def _checkIfValid(self):
+            return self._is_current()
+
+        def _getDevInfo(self):
+            return "Dimsum input candidate"
+
+
+def can_cancel_candidate_speech():
+    if _CancellableSpeechCommand is None:
+        return False
+    try:
+        return config.conf["featureFlag"]["cancelExpiredFocusSpeech"] != 2
+    except KeyError:
+        return False
+
+
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
     def __init__(self):
         super().__init__()
@@ -177,6 +206,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         self.own_speech = False
         self.speaking_directly = False
         self.delivered_window = None
+        self.observed_report = None
         self.pronunciation_revision = None
         self.pronunciations = {}
         self.preferences = {}
@@ -188,7 +218,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         extensions.filter_speechSequence.register(self.filter_native_speech)
         extensions.pre_speech.register(self.capture)
         self.timer = wx.PyTimer(self.poll)
-        self.timer.Start(75)
+        self.timer.Start(40)
         self.profile_marker = record_nvda_profile()
 
     def terminate(self):
@@ -363,6 +393,21 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         # the key. Leave candidate delivery to the timer at NEXT priority.
         return []
 
+    def speak_candidate(self, text, report_id, window):
+        self.speaking_directly = True
+        try:
+            if can_cancel_candidate_speech() and speech.getState().speechMode == speech.SpeechMode.talk:
+                # NVDA checks this command before starting the queued utterance.
+                # It only invalidates our candidate speech, leaving other speech alone.
+                command = CandidateSpeech(lambda: self.observed_report == report_id and
+                    getattr(api.getFocusObject(), "windowHandle", None) == window)
+                speech.speak([command, text], priority=speech.Spri.NEXT)
+                braille.handler.message(text)
+            else:
+                ui.message(text, speechPriority=speech.Spri.NEXT)
+        finally:
+            self.speaking_directly = False
+
     def poll(self):
         try:
             self.refresh_settings()
@@ -374,16 +419,17 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             if snapshot is None:
                 return
             stamp, report = snapshot
+            self.observed_report = report[0]
             if self.last_report == report[0]:
+                return
+            # Wait for a short gap before adding a typing update to the speech queue.
+            # One-by-one candidate browsing remains immediate.
+            if report[2] in {"page", "tone", "same"} and time.time_ns() - stamp < CANDIDATE_SETTLE_NS:
                 return
             text = self.direct_candidate_text(report)
             handle = getattr(api.getFocusObject(), "windowHandle", None)
             if text:
-                self.speaking_directly = True
-                try:
-                    ui.message(text, speechPriority=speech.Spri.NEXT)
-                finally:
-                    self.speaking_directly = False
+                self.speak_candidate(text, report[0], handle)
             self.latest_stamp = stamp
             self.last_report = report[0]
             self.delivered_window = handle
