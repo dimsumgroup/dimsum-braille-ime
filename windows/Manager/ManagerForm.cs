@@ -85,7 +85,10 @@ sealed class ManagerForm : Form
             return Task.FromResult("");
         });
         continueSetup = AddButton(support, "繼續設定點心", () => SetupAsync(repair: false));
-        AddButton(support, "修復點心", () => SetupAsync(repair: true));
+        const string repairHint = "如果打唔到字，或者輸入法出現錯誤，請按呢個按鈕。";
+        var repair = AddButton(support, "輸入法設定修復", () => SetupAsync(repair: true));
+        repair.AccessibleDescription = repairHint;
+        AddLabel(support, repairHint);
         AddLabel(support, "點心輸入法語言（只顯示呢部電腦已驗證嘅語言）");
         Add(support, inputLanguage);
         applyLanguage = AddButton(support, "套用輸入法語言", ApplyLanguageAsync);
