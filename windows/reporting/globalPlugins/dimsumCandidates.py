@@ -437,6 +437,13 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             return []
         if not 0 <= time.time_ns() - stamp <= NATIVE_SPEECH_WINDOW_NS:
             return value
+        if preedit is None and self.delivered_window == handle:
+            # Some edit controls report the preedit as a document line before
+            # NVDA exposes an InputComposition object. Require an exact match.
+            parts = [part.strip() for part in value if isinstance(part, str)]
+            if parts and any(report[0][0].endswith(preedit_signature(joiner.join(parts)))
+                             for joiner in ("", " ")):
+                return []
         if not native_candidate_speech(value, focus, items, selected):
             return value
         # A native utterance can be canceled while NVDA is still processing

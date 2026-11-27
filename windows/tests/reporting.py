@@ -289,6 +289,11 @@ plugin = direct_plugin(report=new_page)
 sys.modules["api"].getFocusObject = lambda: types.SimpleNamespace(windowHandle=42)
 assert plugin.filter_native_speech(["f$"]) == ["f$"]
 assert plugin.route_candidate_navigation(KeyboardInputGesture("downArrow")) is True
+plugin.delivered_window = 42
+assert plugin.filter_native_speech(["f", "$"]) == [], "Suppress an exact raw-code echo in the known editor during the composition."
+assert plugin.filter_native_speech(["f"]) == ["f"], "Do not suppress part of an unrelated document line."
+plugin.read_report = lambda: (reporter.time.time_ns() - reporter.NATIVE_SPEECH_WINDOW_NS - 1, new_page)
+assert plugin.filter_native_speech(["f$"]) == ["f$"]
 
 spoken.clear()
 next_page = (("dimsum", 3), "dimsum_cb", "page", 1, False, [("1", "過"), ("2", "日本")])
