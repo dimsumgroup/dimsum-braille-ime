@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.IO.Compression;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace Dimsum;
@@ -6,6 +8,9 @@ namespace Dimsum;
 static class NvdaAddon
 {
     const string Name = "dimsumCandidates";
+    const string PluginFile = "globalPlugins/dimsumCandidates.py";
+    static readonly Lazy<(Version Version, byte[] PluginHash)> Bundled = new(ReadBundle);
+    public static Version BundledVersion => Bundled.Value.Version;
     static string Bundle => Path.Combine(AppContext.BaseDirectory, "assets", Name + ".nvda-addon");
 
     public static void Install()
@@ -39,7 +44,37 @@ static class NvdaAddon
                 ? NvdaDictionaries.InstalledConfigDirectory()
                 : Path.Combine(directory, "userConfig");
         }
-        return profile is not null && !AddonFolders(profile).Any(folder => ReadOwnedVersion(folder) is not null);
+        if (profile is null) return false;
+        _ = BundledVersion;
+        return !AddonFolders(profile).Any(IsCurrentOrNewer);
+    }
+
+    static (Version Version, byte[] PluginHash) ReadBundle()
+    {
+        using var addon = ZipFile.OpenRead(Bundle);
+        using var manifestFile = addon.GetEntry("manifest.ini")?.Open()
+            ?? throw new IOException("內附 NVDA 附加組件缺少版本資料。");
+        using var manifest = new StreamReader(manifestFile);
+        var version = ReadManifestVersion(manifest.ReadToEnd());
+        if (version is null || version != typeof(NvdaAddon).Assembly.GetName().Version)
+            throw new IOException("內附 NVDA 附加組件版本同管理器唔一致。");
+        using var plugin = addon.GetEntry(PluginFile)?.Open()
+            ?? throw new IOException("內附 NVDA 附加組件缺少報讀模組。");
+        return (version, SHA256.HashData(plugin));
+    }
+
+    static bool IsCurrentOrNewer(string folder)
+    {
+        var installed = ReadOwnedVersion(folder);
+        if (installed is null || installed < BundledVersion) return false;
+        if (installed > BundledVersion) return true;
+
+        // A previous test installer used the same public version number.
+        // Confirm the installed or pending plugin has the updated code.
+        string plugin = Path.Combine(folder, PluginFile);
+        if (!File.Exists(plugin) || !OrdinaryPath(plugin)) return false;
+        using var file = File.OpenRead(plugin);
+        return SHA256.HashData(file).AsSpan().SequenceEqual(Bundled.Value.PluginHash);
     }
 
     public static bool Remove(string data)

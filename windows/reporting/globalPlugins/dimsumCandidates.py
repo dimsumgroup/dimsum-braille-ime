@@ -8,6 +8,7 @@ from uuid import uuid4
 
 import api
 import braille
+import config
 import globalCommands
 import globalPluginHandler
 import inputCore
@@ -21,6 +22,11 @@ import textInfos
 import ui
 import wx
 
+try:
+    from speech.commands import _CancellableSpeechCommand
+except ImportError:
+    _CancellableSpeechCommand = None
+
 
 BASE = Path(os.environ["LOCALAPPDATA"]) / "DimsumInput"
 ASSETS = Path(__file__).resolve().parent.parent
@@ -29,6 +35,8 @@ DICTIONARY_DATA = runpy.run_path(str(ASSETS / "dictionaryData.py"))
 SCHEMAS = {"dimsum_cb", "dimsum_cb_std", "dimsum_full"}
 # Native candidate speech normally follows the Rime update immediately.
 NATIVE_SPEECH_WINDOW_NS = 500_000_000
+REPORT_SLOTS = 3
+CANDIDATE_SETTLE_NS = 80_000_000
 
 
 def load_pronunciations(directory):
@@ -75,6 +83,66 @@ def omit_candidate_numbers(preferences):
     return preferences.get("OmitCandidateNumbers", preferences.get("ReportingMode") == "compact")
 
 
+def preedit_signature(text):
+    data = text.strip(" \t\r\n").encode("utf-8")
+    checksum = 5381
+    for byte in data:
+        checksum = (checksum * 33 + byte) & 0xffffffff
+    return f"/p{len(data)}:{checksum:08x}"
+
+
+def matching_inline_preedit(focus, report):
+    composition = focus
+    for _ in range(3):
+        if isinstance(composition, InputComposition):
+            break
+        composition = getattr(composition, "parent", None)
+    if not isinstance(composition, InputComposition) or composition.isReading:
+        return None
+
+    text = composition.compositionString.strip()
+    if not text:
+        return None
+    report_id, _, _, _, _, items = report
+    prefix, separator, preview = text.rpartition("  [")
+    if not separator or not preview.endswith("]"):
+        prefix, preview = text, ""
+    if report_id[0].endswith(preedit_signature(prefix)):
+        return prefix, preview
+
+    # The actual candidate list can still identify an unsigned or changing
+    # inline preview, including the one-item last page.
+    if not preview or not items:
+        return None
+    remainder = preview[:-1]
+    for _, word in items:
+        if not word:
+            return None
+        _, found, remainder = remainder.partition(word)
+        if not found:
+            return None
+    return prefix, preview
+
+
+def inline_preedit_speech(sequence, preedit):
+    strings = [part for part in sequence if isinstance(part, str)]
+    text = "".join("".join(strings).split())
+    if not text:
+        return False
+    prefix, preview = preedit
+    raw = "".join(prefix.split())
+    candidates = "".join(preview.split())
+    if text in raw or (candidates and (text in candidates or text == raw + "[" + candidates)):
+        return True
+    if not raw or not candidates or not text.startswith(raw):
+        return False
+    # NVDA can emit the code and a flattened candidate list together,
+    # dropping Weasel's brackets or changing label punctuation.
+    spoken_candidates = re.sub(r"[\[\].*，,]", "", text[len(raw):])
+    preview_text = re.sub(r"[\[\].*，,]", "", candidates)
+    return bool(spoken_candidates) and spoken_candidates == preview_text
+
+
 def native_candidate_speech(sequence, focus, items, selected):
     text = " ".join(part.strip() for part in sequence if isinstance(part, str)).rstrip(" ,，")
     if not text or not 0 < selected <= len(items):
@@ -84,30 +152,12 @@ def native_candidate_speech(sequence, focus, items, selected):
     if len(names) > 1 and text == ", ".join(names):
         return True
     word = words[selected - 1]
+    name = names[selected - 1]
     if isinstance(focus, CandidateItem):
-        name = names[selected - 1]
-        if getattr(focus, "basicText", None) == word and (
+        return getattr(focus, "basicText", None) == word and (
             text in {word, name} or text.startswith((name + ", ", name + "，"))
-        ):
-            return True
-
-    composition = focus if isinstance(focus, InputComposition) else getattr(focus, "parent", None)
-    if not isinstance(composition, InputComposition) or composition.isReading:
-        return False
-    preedit = composition.compositionString.strip()
-    if preedit == word:
-        return text == word
-
-    # Weasel's preview_all style appends a bracketed candidate page to the preedit.
-    _, opening, preview = preedit.rpartition("  [")
-    if not opening or not preview.endswith("]") or len(words) < 2:
-        return False
-    remainder = preview[:-1]
-    for word in words:
-        _, found, remainder = remainder.partition(word)
-        if not found:
-            return False
-    return text in preview or text == preedit
+        )
+    return isinstance(focus, InputComposition) and not focus.isReading and focus.compositionString.strip() == text == word
 
 
 def record_nvda_profile():
@@ -169,13 +219,36 @@ def remove_legacy_native_symbols():
         characterProcessing.clearSpeechSymbols()
 
 
+if _CancellableSpeechCommand is not None:
+    class CandidateSpeech(_CancellableSpeechCommand):
+        def __init__(self, is_current):
+            super().__init__()
+            self._is_current = is_current
+
+        def _checkIfValid(self):
+            return self._is_current()
+
+        def _getDevInfo(self):
+            return "Dimsum input candidate"
+
+
+def can_cancel_candidate_speech():
+    if _CancellableSpeechCommand is None:
+        return False
+    try:
+        return config.conf["featureFlag"]["cancelExpiredFocusSpeech"] != 2
+    except KeyError:
+        return False
+
+
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
     def __init__(self):
         super().__init__()
         self.last_speech = ""
         self.own_speech = False
         self.speaking_directly = False
-        self.direct_delivery = None
+        self.delivered_window = None
+        self.observed_report = None
         self.pronunciation_revision = None
         self.pronunciations = {}
         self.preferences = {}
@@ -186,14 +259,19 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         self.refresh_settings()
         extensions.filter_speechSequence.register(self.filter_native_speech)
         extensions.pre_speech.register(self.capture)
+        self.gesture_decider = getattr(inputCore, "decide_executeGesture", None)
+        if self.gesture_decider is not None:
+            self.gesture_decider.register(self.route_candidate_navigation)
         self.timer = wx.PyTimer(self.poll)
-        self.timer.Start(75)
+        self.timer.Start(40)
         self.profile_marker = record_nvda_profile()
 
     def terminate(self):
         self.timer.Stop()
         extensions.filter_speechSequence.unregister(self.filter_native_speech)
         extensions.pre_speech.unregister(self.capture)
+        if self.gesture_decider is not None:
+            self.gesture_decider.unregister(self.route_candidate_navigation)
         self.last_speech = ""
         if self.profile_marker is not None:
             try:
@@ -226,9 +304,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         if stamp == self.settings_stamp:
             return
         preferences = json.loads(settings.read_text(encoding="utf-8")) if stamp else {}
-        if (omit_candidate_numbers(preferences) != omit_candidate_numbers(self.preferences)
-                or preferences.get("PronounceCandidates", True) != self.preferences.get("PronounceCandidates", True)):
-            self.direct_delivery = None
         self.preferences = preferences
         self.settings_stamp = stamp
         self.clearGestureBindings()
@@ -305,7 +380,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
     def read_report(self):
         found = []
-        for slot in (1, 2):
+        for slot in range(1, REPORT_SLOTS + 1):
             file = BASE / f"candidate-report-{slot}"
             try:
                 with file.open("rb") as stream:
@@ -313,36 +388,18 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                     if stat.st_size > 65536 or stat.st_mtime_ns < self.latest_stamp:
                         continue
                     report = parse_report(stream.read(65537))
-                    if report:
+                    if report and not (stat.st_mtime_ns == self.latest_stamp and self.last_report
+                                       and report[0][1] < self.last_report[1]):
                         found.append((stat.st_mtime_ns, report))
             except (OSError, UnicodeError, ValueError):
                 continue
         return max(found, key=lambda entry: (entry[0], entry[1][0][1]), default=None)
 
-    def latest_report(self):
-        snapshot = self.read_report()
-        if snapshot is None:
-            return None
-        stamp, latest = snapshot
-        if self.last_report == latest[0]:
-            return None
-        self.latest_stamp = stamp
-        self.last_report = latest[0]
-        return latest
-
-    def direct_candidate_text(self, report, window):
-        revision, schema, event, selected, _, items = report
+    def direct_candidate_text(self, report):
+        _, schema, event, selected, _, items = report
         if event == "clear" or not items:
-            self.direct_delivery = None
             return None
-        omit_numbers = omit_candidate_numbers(self.preferences)
-        key = (window, revision)
-        page = (window, revision[0], schema, selected, items)
-        if self.direct_delivery:
-            last_key, last_page = self.direct_delivery
-            if key == last_key or (event == "same" and page == last_page):
-                return None
-
+        speak_numbers = not omit_candidate_numbers(self.preferences) and schema != "dimsum_full"
         use_descriptions = self.preferences.get("PronounceCandidates", True)
         if use_descriptions:
             try:
@@ -350,19 +407,18 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             except (OSError, UnicodeError):
                 pass
         if event == "browse" and 0 < selected <= len(items):
-            word = items[selected - 1][1]
-            text = describe(word, self.pronunciations, all_groups=True) if use_descriptions else word
+            label, word = items[selected - 1]
+            text = (describe(word, self.pronunciations, all_groups=True) or word) if use_descriptions else word
+            if speak_numbers:
+                text = f"{label} {text}"
         else:
             spoken = []
             for label, candidate in items:
-                word = describe(candidate, self.pronunciations) if use_descriptions else candidate
-                spoken.append(f"{label} {word}" if not omit_numbers and schema != "dimsum_full" else word)
+                word = (describe(candidate, self.pronunciations) or candidate) if use_descriptions else candidate
+                spoken.append(f"{label} {word}" if speak_numbers else word)
             text = "，".join(spoken)
 
-        if not text:
-            return None
-        self.direct_delivery = (key, page)
-        return text
+        return text or None
 
     def filter_native_speech(self, value):
         if self.speaking_directly or self.own_speech:
@@ -373,34 +429,95 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         if snapshot is None:
             return value
         stamp, report = snapshot
-        if not 0 <= time.time_ns() - stamp <= NATIVE_SPEECH_WINDOW_NS:
-            return value
         _, _, event, selected, _, items = report
         focus = api.getFocusObject()
         handle = getattr(focus, "windowHandle", None)
-        if handle is None or event == "clear" or not native_candidate_speech(value, focus, items, selected):
+        if handle is None or event == "clear" or (self.last_report == report[0] and self.delivered_window != handle):
             return value
-        if self.direct_delivery:
-            last_key, _ = self.direct_delivery
-            if last_key[1] == report[0] and last_key[0] != handle:
-                return value
-        text = self.direct_candidate_text(report, handle)
-        return [text] if text else []
+        preedit = matching_inline_preedit(focus, report)
+        if preedit is not None and inline_preedit_speech(value, preedit):
+            return []
+        if not 0 <= time.time_ns() - stamp <= NATIVE_SPEECH_WINDOW_NS:
+            return value
+        if preedit is None and self.delivered_window == handle:
+            # Some edit controls report the preedit as a document line before
+            # NVDA exposes an InputComposition object. Require an exact match.
+            parts = [part.strip() for part in value if isinstance(part, str)]
+            if parts and any(report[0][0].endswith(preedit_signature(joiner.join(parts)))
+                             for joiner in ("", " ")):
+                return []
+        if not native_candidate_speech(value, focus, items, selected):
+            return value
+        # A native utterance can be canceled while NVDA is still processing
+        # the key. Leave candidate delivery to the timer at NEXT priority.
+        return []
+
+    def route_candidate_navigation(self, gesture):
+        if (not isinstance(gesture, KeyboardInputGesture)
+                or gesture.mainKeyName.lower() not in {"uparrow", "downarrow", "pageup", "pagedown"}
+                or gesture.modifierNames or inputCore.manager.isInputHelpActive):
+            return True
+        snapshot = self.read_report()
+        if snapshot is None:
+            return True
+        _, report = snapshot
+        report_id, _, event, selected, _, items = report
+        focus = api.getFocusObject()
+        window = getattr(focus, "windowHandle", None)
+        if (event == "clear" or window is None or not 0 < selected <= len(items)
+                or (self.last_report == report_id and self.delivered_window not in (None, window))
+                or (matching_inline_preedit(focus, report) is None
+                    and not native_candidate_speech([items[selected - 1][1]], focus, items, selected))):
+            return True
+
+        # Send candidate navigation to Rime instead of running a document script.
+        # Send outside the keyboard hook so the injected key can reach the IME.
+        def send_if_focused():
+            if getattr(api.getFocusObject(), "windowHandle", None) == window:
+                gesture.send()
+
+        wx.CallAfter(send_if_focused)
+        return False
+
+    def speak_candidate(self, text, report_id, window):
+        self.speaking_directly = True
+        try:
+            if can_cancel_candidate_speech() and speech.getState().speechMode == speech.SpeechMode.talk:
+                # NVDA checks this command before starting the queued utterance.
+                # It only invalidates our candidate speech, leaving other speech alone.
+                command = CandidateSpeech(lambda: self.observed_report == report_id and
+                    getattr(api.getFocusObject(), "windowHandle", None) == window)
+                speech.speak([command, text], priority=speech.Spri.NEXT)
+                braille.handler.message(text)
+            else:
+                ui.message(text, speechPriority=speech.Spri.NEXT)
+        finally:
+            self.speaking_directly = False
 
     def poll(self):
         try:
             self.refresh_settings()
-            latest = self.latest_report()
-            if latest is None or (self.direct_delivery and self.direct_delivery[0][1] == latest[0]):
-                return
-            focus = api.getFocusObject()
-            handle = getattr(focus, "windowHandle", None)
-            text = self.direct_candidate_text(latest, handle)
-            if text:
-                self.speaking_directly = True
-                try:
-                    ui.message(text, speechPriority=speech.Spri.NEXT)
-                finally:
-                    self.speaking_directly = False
         except (OSError, UnicodeError, ValueError):
+            pass  # Keep the last usable settings if a refresh fails.
+
+        try:
+            snapshot = self.read_report()
+            if snapshot is None:
+                return
+            stamp, report = snapshot
+            self.observed_report = report[0]
+            if self.last_report == report[0]:
+                return
+            # Wait for a short gap before adding a typing update to the speech queue.
+            # One-by-one candidate browsing remains immediate.
+            if report[2] in {"page", "tone", "same"} and time.time_ns() - stamp < CANDIDATE_SETTLE_NS:
+                return
+            text = self.direct_candidate_text(report)
+            handle = getattr(api.getFocusObject(), "windowHandle", None)
+            if text:
+                self.speak_candidate(text, report[0], handle)
+            self.latest_stamp = stamp
+            self.last_report = report[0]
+            self.delivered_window = handle
+        except (OSError, RuntimeError, UnicodeError, ValueError):
             return

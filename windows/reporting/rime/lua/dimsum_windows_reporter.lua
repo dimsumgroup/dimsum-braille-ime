@@ -1,5 +1,6 @@
 -- Derived from the Dimsum macOS candidate reporter. Never writes raw key codes.
 local reporter = {}
+local report_slots = 3
 local revision = 0
 local active_slot
 local active_engine
@@ -72,7 +73,43 @@ local function page_snapshot(context, env)
     }
 end
 
-local function publish(context, env)
+local function write_snapshot(path, payload)
+    -- Never replace the last complete report. If a reader has another slot
+    -- open without delete sharing, publish through the remaining slot.
+    for offset = 1, report_slots do
+        local slot = ((active_slot or 0) + offset - 1) % report_slots + 1
+        if slot ~= active_slot then
+            local target = path .. tostring(slot)
+            local temporary = target .. ".tmp"
+            local file = io.open(temporary, "wb")
+            if file then
+                local written = file:write(payload)
+                if file:close() and written then
+                    os.remove(target)
+                    if os.rename(temporary, target) then
+                        for previous = 1, report_slots do
+                            if previous ~= slot then os.remove(path .. tostring(previous)) end
+                        end
+                        return slot
+                    end
+                end
+                os.remove(temporary)
+            end
+        end
+    end
+end
+
+local function preedit_signature(context)
+    -- Match Windows' inline composition without transmitting the input itself.
+    local text = context:get_preedit().text:match("^%s*(.-)%s*$")
+    local hash = 5381
+    for index = 1, #text do
+        hash = (hash * 33 + text:byte(index)) % 4294967296
+    end
+    return string.format("/p%d:%08x", #text, hash)
+end
+
+local function publish(context, env, navigation)
     if not env.path then return end
     local report = enabled(env.flag)
     local sound = enabled(env.sound_flag)
@@ -103,31 +140,24 @@ local function publish(context, env)
         and current.raw:sub(#previous.raw + 1):match(env.tone_pattern)
         and same_selected_candidate(previous, current) then
         event = "tone"
-    elseif same_input and previous.start == current.start and previous.selected > 0 and current.selected > 0
+    elseif navigation ~= "page" and same_input and previous.start == current.start and previous.selected > 0 and current.selected > 0
         and math.abs(previous.page + previous.selected - current.page - current.selected) == 1 then
         event = "browse"
-    elseif same_candidates and same_selection and previous.raw ~= "" and current.raw ~= previous.raw then
+    elseif navigation ~= "page" and same_candidates and same_selection and previous.raw ~= "" and current.raw ~= previous.raw then
         event = "same"
     end
 
     revision = revision + 1
+    -- Older add-ons treat this field as an opaque token.
+    local token = env.session
+    if #current.fields > 0 then token = token .. preedit_signature(context) end
     local fields = {
-        "dimsum-win-1", env.session, tostring(revision), env.engine.schema.schema_id,
+        "dimsum-win-1", token, tostring(revision), env.engine.schema.schema_id,
         event, tostring(current.selected), current.singleton and "1" or "0"
     }
     for _, value in ipairs(current.fields) do fields[#fields + 1] = value end
-    -- Windows rename will fail when the destination exists. Keep the active
-    -- slot until the next complete report has been published in the other slot.
-    local slot = active_slot == 1 and 2 or 1
-    local target = env.path .. tostring(slot)
-    local temporary = target .. ".tmp"
-    local file = io.open(temporary, "wb")
-    if not file then return end
-    local written = file:write(table.concat(fields, "\0"))
-    if not file:close() or not written then return end
-    os.remove(target)
-    if os.rename(temporary, target) then
-        if active_slot then os.remove(env.path .. tostring(active_slot)) end
+    local slot = write_snapshot(env.path, table.concat(fields, "\0"))
+    if slot then
         active_slot = slot
         active_engine = env.session
         env.previous = current
@@ -144,15 +174,18 @@ function reporter.init(env)
     env.sound_flag = local_data .. "\\DimsumInput\\singleton-sound-enabled"
     env.sound_event = local_data .. "\\DimsumInput\\singleton-sound-event"
     local context = env.engine.context
-    env.update = context.update_notifier:connect(function(ctx) publish(ctx, env) end)
-    env.selection = context.select_notifier:connect(function(ctx) publish(ctx, env) end)
+    local function on_change(ctx)
+        if not env.navigating then publish(ctx, env) end
+    end
+    env.update = context.update_notifier:connect(on_change)
+    env.selection = context.select_notifier:connect(on_change)
 end
 
 function reporter.fini(env)
     if env.update then env.update:disconnect() end
     if env.selection then env.selection:disconnect() end
     if env.path and active_engine == env.session then
-        for slot = 1, 2 do
+        for slot = 1, report_slots do
             os.remove(env.path .. tostring(slot))
             os.remove(env.path .. tostring(slot) .. ".tmp")
         end
@@ -160,21 +193,26 @@ function reporter.fini(env)
     end
 end
 
-local navigation_keys = {Up = true, Down = true, KP_Up = true, KP_Down = true}
+local navigation_keys = {
+    Up = "browse", Down = "browse", KP_Up = "browse", KP_Down = "browse",
+    Prior = "page", Next = "page", Page_Up = "page", Page_Down = "page",
+    KP_Prior = "page", KP_Next = "page", KP_Page_Up = "page", KP_Page_Down = "page"
+}
 
 function reporter.func(key, env)
-    if env.navigating or not env.flag or not navigation_keys[key:repr()] then return 2 end
+    if env.navigating or not env.flag then return 2 end
+    local navigation = navigation_keys[key:repr()]
+    if not navigation then return 2 end
     local context = env.engine.context
     if not context:has_menu() or not enabled(env.flag) then return 2 end
 
-    -- Some Rime selectors change the highlight without an update notifier.
-    -- Let the normal key chain handle the arrow (including arrows sent by
-    -- G/H bindings), then publish the actual highlight and deduplicate it.
+    -- Let the normal key chain change the highlight or page, including
+    -- arrows sent by G/H bindings. Publish once with the actual result.
     env.navigating = true
     local ok, handled = pcall(env.engine.process_key, env.engine, key)
     env.navigating = false
     if not ok or not handled then return 2 end
-    publish(context, env)
+    publish(context, env, navigation)
     return 1 -- kAccepted
 end
 
