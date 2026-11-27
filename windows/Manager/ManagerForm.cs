@@ -90,9 +90,9 @@ sealed class ManagerForm : Form
         applyLanguage = AddButton(support, "套用輸入法語言", ApplyLanguageAsync);
         inputLanguage.SelectedIndexChanged += (_, _) => RefreshLanguageControls();
         AddButton(support, "檢查程式更新", CheckProgramAsync);
-        AddButton(support, "查看操作記錄及版本", () =>
+        AddButton(support, "查看" + OperationLog.Title, () =>
         {
-            ShowHistory();
+            CopyDialog.Show(this, OperationLog.Title, log.Report(defaultIme.Checked), report: true);
             return Task.FromResult("");
         });
         AddButton(support, "另存問題回報", ExportReportAsync);
@@ -447,24 +447,10 @@ sealed class ManagerForm : Form
             }
         }
         string result = string.Join(Environment.NewLine, results);
-        if (errorOccurred) MessageBox.Show(this, result, Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        if (errorOccurred) CopyDialog.Show(this, "更新結果", result);
         try { await RefreshDataUpdatesAsync(Workspace.CheckDataIndexAsync()); }
         catch (Exception error) { log.Record(ErrorText("檢查詞庫更新", error)); }
         return result;
-    }
-
-    void ShowHistory()
-    {
-        using var dialog = new Form { Text = "操作記錄及版本", Size = new Size(655, 475), StartPosition = FormStartPosition.CenterParent, ShowInTaskbar = false };
-        var close = new Button { Text = "關閉", AutoSize = true, Dock = DockStyle.Bottom, DialogResult = DialogResult.OK };
-        var history = new TextBox { AccessibleName = dialog.Text, Text = log.Report(defaultIme.Checked), Dock = DockStyle.Fill,
-            Multiline = true, ReadOnly = true, ScrollBars = ScrollBars.Vertical };
-        dialog.Controls.Add(history);
-        dialog.Controls.Add(close);
-        dialog.CancelButton = close;
-        dialog.ActiveControl = history;
-        history.Select(0, 0);
-        dialog.ShowDialog(this);
     }
 
     Task<string> ExportReportAsync()
@@ -507,7 +493,7 @@ sealed class ManagerForm : Form
             string message = ErrorText("操作", error);
             log.Record(message);
             SetStatus(message);
-            MessageBox.Show(this, message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            CopyDialog.Show(this, "操作未完成", message);
         }
         finally
         {

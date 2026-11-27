@@ -80,7 +80,8 @@ static class Program
             {
                 Environment.ExitCode = 1;
                 if (args[0] is not ("--complete-install" or "--legacy-notice"))
-                    MessageBox.Show(error.Message, Title);
+                    CopyDialog.Show(null, "操作未完成",
+                        $"錯誤碼 0x{error.HResult:X8}。{Environment.NewLine}{error.Message}");
             }
             return;
         }

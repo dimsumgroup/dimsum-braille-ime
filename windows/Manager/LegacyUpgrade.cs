@@ -56,6 +56,7 @@ sealed class LegacyUpgrade(Workspace workspace)
         string id = state.Id.ToString("N");
         string backup = MigrationRecord(id);
         string stage = "停用舊版自動更新";
+        string languageResult = Workspace.LanguageAppliedMessage(language);
         try
         {
             // A previous version could leave a migration checkpoint after its
@@ -99,14 +100,14 @@ sealed class LegacyUpgrade(Workspace workspace)
                 if (!state.DictionaryDeployed) state = Advance(state with { DictionaryDeployed = true }, state.Stage);
                 stage = "加入 Windows 輸入法";
                 progress($"正在將點心加入到「{language.Label}」。");
-                await workspace.FinishSetupAsync(language, makeDefault);
+                languageResult = await workspace.FinishSetupAsync(language, makeDefault);
                 state = Advance(state, Stage.Deployed);
             }
             else if (!WindowsSetup.SameLanguage(workspace.Settings.InputLanguageTag, language.Tag) || workspace.Settings.SetupPending)
             {
                 stage = "加入 Windows 輸入法";
                 progress("正在加入點心到 Windows 輸入法。");
-                await workspace.ApplyInputLanguageAsync(language, makeDefault);
+                languageResult = await workspace.ApplyInputLanguageAsync(language, makeDefault);
             }
 
             stage = "移除舊版自動更新元件";
@@ -116,7 +117,7 @@ sealed class LegacyUpgrade(Workspace workspace)
             ClearOldUserEntries();
             Advance(state, Stage.Complete);
             workspace.ConfigureStartup(retireLegacy: true);
-            return "已升級點心，並移除舊版自動更新元件。已保留學習記錄、自訂詞庫同設定。";
+            return languageResult + Environment.NewLine + "已升級點心，並移除舊版自動更新元件。已保留學習記錄、自訂詞庫同設定。";
         }
         catch (Exception error)
         {

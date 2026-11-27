@@ -16,11 +16,11 @@ static class SetupCoordinator
             }
             catch (IOException) { }
             var result = await new LegacyUpgrade(workspace).RunAsync(owner, language, progress, makeDefault: makeDefault, confirmed: confirmed);
-            if (result is not null) return Workspace.LanguageAppliedMessage(language) + Environment.NewLine + result;
+            if (result is not null) return result;
 
             if (Workspace.FindDeployer() is null)
             {
-                progress("正在安裝 輸入引擎。");
+                progress("正在安裝輸入引擎。");
                 await WindowsSetup.InstallEngineAsync();
             }
             return await workspace.CompleteSetupAsync(language, makeDefault: makeDefault, progress: progress, forceDeploy: repair);

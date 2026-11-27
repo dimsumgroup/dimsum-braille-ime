@@ -7,6 +7,7 @@ namespace Dimsum;
 
 sealed class OperationLog(Workspace workspace)
 {
+    public const string Title = "操作記錄及版本";
     string Pathname => Path.Combine(workspace.DataDirectory, "operations.log");
     static readonly Encoding Utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
 
@@ -34,7 +35,7 @@ sealed class OperationLog(Workspace workspace)
         string? deployer = Workspace.FindDeployer();
         var nvda = NvdaSession.Find()?.Directory ?? NvdaDictionaries.FindInstallation();
         return $"""
-            點心問題回報
+            {Title}
             管理器 {typeof(Workspace).Assembly.GetName().Version!.ToString(3)}
             Windows {RuntimeInformation.OSDescription} · {RuntimeInformation.OSArchitecture}
             Rime 引擎 {VersionOf(deployer)}

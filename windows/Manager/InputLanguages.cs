@@ -168,42 +168,88 @@ static partial class WindowsSetup
         }
     }
 
-    public static async Task<string[]> EnableOnlyDimsumLanguageAsync(InputLanguageChoice choice, bool makeDefault)
+    public static async Task<(string[] Verified, string? Notice)> EnableOnlyDimsumLanguageAsync(InputLanguageChoice choice, bool makeDefault)
     {
         var previous = await GetUserInputLanguagesAsync();
         if (!IsOurProfile(choice.Id))
             await RunAdminAsync("--finish-setup", choice.Id.ToString(CultureInfo.InvariantCulture));
-        string[] verified = LanguageChoices(previous).Where(language => IsDimsumEnabled(previous, language) && EnabledInTsf(language.Id))
+        string[] verified = LanguageChoices(previous).Where(language => ProfileAvailable(previous, language))
             .Select(language => language.Tag).ToArray();
-        if (!IsDimsumEnabled(previous, choice) || !EnabledInTsf(choice.Id))
-        {
-            string tip = DimsumTip(choice.Id);
-            InstallLayoutOrTip(tip, 0);
-            var current = await GetUserInputLanguagesAsync();
-            if (!IsDimsumEnabled(current, choice))
-                current = await AddToLanguageListAsync(choice);
-            for (int attempt = 0; attempt < 2 && (!IsDimsumEnabled(current, choice) || !EnabledInTsf(choice.Id)); attempt++)
-            {
-                await Task.Delay(300);
-                current = await GetUserInputLanguagesAsync();
-            }
-            if (!IsDimsumEnabled(current, choice) || !EnabledInTsf(choice.Id))
-            {
-                if (!previous.SelectMany(Tips).Contains(tip, IgnoreCase)) InstallLayoutOrTip(tip, RemoveLayout);
-                throw new IOException($"Windows 未能確認點心已加到「{choice.Label}」。請先喺 Windows 設定加入「{choice.Label}」，再按「繼續設定點心」。");
-            }
-            previous = current;
-        }
-        if (makeDefault) await SetDimsumDefaultAsync(choice);
-        var old = OtherDimsumTips(previous, choice, UserProfiles(legacyOnly: true).ToArray(), BundledTaiwanTip());
+        var current = await EnsureLanguageEnabledAsync(previous, choice);
+        if (!ProfileAvailable(current, choice))
+            throw new IOException($"Windows 未能確認點心已加到「{choice.Label}」。請先喺 Windows 設定加入「{choice.Label}」，再按「繼續設定點心」。");
+
+        var old = OtherDimsumTips(current, choice, UserProfiles(legacyOnly: true).ToArray(), BundledTaiwanTip());
+        string? notice = null;
         if (old.Length > 0)
         {
-            RemoveUserProfiles(old);
-            var current = await GetUserInputLanguagesAsync();
-            if (!IsDimsumEnabled(current, choice) || !EnabledInTsf(choice.Id) || current.SelectMany(Tips).Intersect(old, IgnoreCase).Any())
-                throw new IOException("已加入點心，但 Windows 仍然顯示其他點心輸入法項目。請再套用輸入法語言。");
+            // Some Windows profiles stay in the language list after native removal.
+            // Update the user's language list directly, with native removal as a fallback.
+            try { await RemoveFromLanguageListAsync(old); }
+            catch (Exception error) when (error is IOException or System.ComponentModel.Win32Exception) { }
+            current = await GetUserInputLanguagesAsync();
+            var remaining = current.SelectMany(Tips).Intersect(old, IgnoreCase).ToArray();
+            if (remaining.Length > 0)
+            {
+                RemoveUserProfiles(remaining);
+                current = await GetUserInputLanguagesAsync();
+            }
+            current = await EnsureLanguageEnabledAsync(current, choice);
+            if (!ProfileAvailable(current, choice))
+                throw new IOException($"整理舊輸入法項目後，Windows 未能重新啟用「{choice.Label}」下嘅點心。請按「繼續設定點心」重試。");
+            if (current.SelectMany(Tips).Intersect(old, IgnoreCase).Any())
+                notice = "新版點心已啟用。Windows 仍然顯示舊輸入法項目，可以登出再登入後按 Windows 鍵加空格核對。";
         }
-        return verified;
+        if (makeDefault) await SetDimsumDefaultAsync(choice);
+        return (verified, notice);
+    }
+
+    static bool ProfileAvailable(UserInputLanguage[] configured, InputLanguageChoice choice) =>
+        IsDimsumEnabled(configured, choice) && EnabledInTsf(choice.Id);
+
+    static async Task<UserInputLanguage[]> EnsureLanguageEnabledAsync(UserInputLanguage[] configured, InputLanguageChoice choice)
+    {
+        if (ProfileAvailable(configured, choice)) return configured;
+        InstallLayoutOrTip(DimsumTip(choice.Id), 0);
+        var current = await GetUserInputLanguagesAsync();
+        if (!IsDimsumEnabled(current, choice))
+            current = await AddToLanguageListAsync(choice);
+        for (int attempt = 0; attempt < 2 && !ProfileAvailable(current, choice); attempt++)
+        {
+            await Task.Delay(300);
+            current = await GetUserInputLanguagesAsync();
+        }
+        return current;
+    }
+
+    static Task<string> RemoveFromLanguageListAsync(string[] old)
+    {
+        string oldTips = string.Join(",", old.Select(tip => $"'{tip}'"));
+        return RunLanguageQueryAsync($$"""
+            $ErrorActionPreference = 'Stop';
+            $list = Get-WinUserLanguageList;
+            $old = @({{oldTips}});
+            $changed = $false;
+            foreach ($language in $list) {
+                $removed = $false;
+                foreach ($tip in @($language.InputMethodTips)) {
+                    if ($tip -in $old) {
+                        [void]$language.InputMethodTips.Remove($tip);
+                        $removed = $true;
+                    }
+                };
+                if ($removed) {
+                    $changed = $true;
+                    if ($language.InputMethodTips.Count -eq 0) {
+                        $defaults = (New-WinUserLanguageList $language.LanguageTag)[0].InputMethodTips;
+                        foreach ($tip in $defaults) {
+                            if ($tip -notin $old) { $language.InputMethodTips.Add($tip) }
+                        }
+                    }
+                }
+            };
+            if ($changed) { Set-WinUserLanguageList -LanguageList $list -Force };
+            """.ReplaceLineEndings(" "));
     }
 
     static async Task<UserInputLanguage[]> AddToLanguageListAsync(InputLanguageChoice choice)

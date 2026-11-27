@@ -388,7 +388,7 @@ sealed class Workspace
 
     public async Task<string> ApplyInputLanguageAsync(InputLanguageChoice language, bool makeDefault)
     {
-        var verified = await WindowsSetup.EnableOnlyDimsumLanguageAsync(language, makeDefault);
+        var (verified, notice) = await WindowsSetup.EnableOnlyDimsumLanguageAsync(language, makeDefault);
         Settings.VerifiedInputLanguages = Settings.VerifiedInputLanguages.Concat(verified).Append(language.Tag)
             .Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         Settings.InputLanguageTag = language.Tag;
@@ -396,7 +396,8 @@ sealed class Workspace
         Settings.SetupPending = false;
         Settings.PendingInputLanguageTag = null;
         Save();
-        return LanguageAppliedMessage(language);
+        string applied = LanguageAppliedMessage(language);
+        return notice is null ? applied : applied + Environment.NewLine + notice;
     }
 
     internal static string LanguageAppliedMessage(InputLanguageChoice language) =>
