@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using System.Text.Json;
 using System.Xml.Linq;
 using Microsoft.Win32;
 
@@ -29,7 +28,7 @@ static class MachineLegacyUpgrade
     public static async Task PrepareEngineAsync(string id)
     {
         string backup = EngineBackup(id);
-        string step = "建立引擎備份位置";
+        string step = "建立引擎遷移記錄";
         try
         {
             VerifyOrdinaryPath(backup);
@@ -38,33 +37,8 @@ static class MachineLegacyUpgrade
             step = "檢查並停用舊版更新排程";
             PauseOldUpdater(id);
 
-            string ready = Path.Combine(backup, "engine-backup-complete");
             string installed = Path.Combine(backup, "engine-package-installed");
-            bool updateEngine = !File.Exists(installed) || Workspace.FindDeployer() is null;
-            if (updateEngine)
-            {
-                step = "等候舊輸入引擎退出";
-                await WindowsSetup.StopEngineAsync();
-            }
-
-            if (!File.Exists(ready))
-            {
-                step = "備份舊輸入引擎同登記";
-                string? deployer = Workspace.FindDeployer();
-                if (deployer is not null)
-                {
-                    string oldEngine = Path.GetDirectoryName(deployer)!;
-                    CopyTree(oldEngine, Path.Combine(backup, "engine"));
-                    var reg = WindowsSetup.FindEntries(RegistryHive.LocalMachine).Where(entry => entry.IsEngine)
-                        .Select(entry => (entry.View, entry.Key));
-                    foreach (var entry in reg)
-                        SaveRegistration(backup, RegistryHive.LocalMachine, entry.View, entry.Key);
-                    File.WriteAllText(Path.Combine(backup, "original-engine-path.txt"), oldEngine);
-                }
-                Workspace.WriteAtomic(ready, []);
-            }
-
-            if (updateEngine)
+            if (!File.Exists(installed) || Workspace.FindDeployer() is null)
             {
                 step = "執行內附引擎安裝器並核對版本";
                 await WindowsSetup.StopEngineAsync();
@@ -85,7 +59,6 @@ static class MachineLegacyUpgrade
             WindowsSetup.FindEntries(RegistryHive.LocalMachine).Any(entry => !entry.IsEngine) ||
             WindowsSetup.FindEntries(RegistryHive.CurrentUser).Any(entry => !entry.IsEngine &&
                 folders.Contains(Path.GetDirectoryName(entry.Executable), StringComparer.OrdinalIgnoreCase)) ||
-            File.Exists(Path.Combine(EngineBackup(id), TaskName + ".xml")) ||
             HasOwnedTask();
     }
 
@@ -95,10 +68,8 @@ static class MachineLegacyUpgrade
         VerifyOrdinaryPath(backup);
         Directory.CreateDirectory(backup);
         var folders = KnownFolders();
-        UseOwnedTask(folders, (_, task, xml) =>
+        UseOwnedTask(folders, (_, task, _) =>
         {
-            string snapshot = Path.Combine(backup, TaskName + ".xml");
-            if (!File.Exists(snapshot)) File.WriteAllText(snapshot, xml);
             task.Enabled = false;
             if ((int)task.GetInstances(0).Count != 0)
                 throw new IOException("舊版自動更新排程仍在執行。請等佢完成後再試。");
@@ -127,7 +98,6 @@ static class MachineLegacyUpgrade
 
     public static void RetireOldInstallation(string id)
     {
-        string backup = EngineBackup(id);
         PauseOldUpdater(id);
         var folders = KnownFolders();
         UseOwnedTask(folders, (taskFolder, _, _) => taskFolder.DeleteTask(TaskName, 0));
@@ -137,18 +107,12 @@ static class MachineLegacyUpgrade
         foreach (string folder in folders)
         {
             VerifyOrdinaryPath(folder);
-            string archive = Path.Combine(backup, "old-program",
-                folder.Contains("(x86)", StringComparison.OrdinalIgnoreCase) ? "x86" : "native");
             var uninstallFiles = entries.SelectMany(entry => LegacyUninstallFiles(entry.Executable, folder));
             foreach (string file in LegacyUpgrade.OldFiles.Select(name => Path.Combine(folder, name))
                 .Concat(uninstallFiles).Distinct(StringComparer.OrdinalIgnoreCase))
             {
                 if (!File.Exists(file)) continue;
                 VerifyOrdinaryPath(file);
-                string destination = Path.Combine(archive, Path.GetFileName(file));
-                VerifyOrdinaryPath(destination);
-                Directory.CreateDirectory(archive);
-                if (!File.Exists(destination)) File.Copy(file, destination);
                 File.Delete(file);
             }
             if (Directory.Exists(folder) && !Directory.EnumerateFileSystemEntries(folder).Any())
@@ -157,7 +121,6 @@ static class MachineLegacyUpgrade
         // The unelevated manager handles the original user's HKCU record.
         foreach (var entry in entries.Where(entry => entry.Hive == RegistryHive.LocalMachine))
         {
-            SaveRegistration(backup, entry.Hive, entry.View, entry.Key);
             DeleteOldEntry(entry);
         }
     }
@@ -170,17 +133,6 @@ static class MachineLegacyUpgrade
         yield return executable;
         yield return Path.ChangeExtension(executable, ".dat");
         yield return Path.ChangeExtension(executable, ".msg");
-    }
-
-    internal static void SaveRegistration(string backup, RegistryHive hive, RegistryView view, string name)
-    {
-        using var root = RegistryKey.OpenBaseKey(hive, view);
-        using var entry = root.OpenSubKey($@"{UninstallKey}\{name}");
-        if (entry is null) return;
-        string record = Path.Combine(backup, $"{view}-{name}.json");
-        if (!File.Exists(record))
-            Workspace.WriteAtomic(record, JsonSerializer.SerializeToUtf8Bytes(entry.GetValueNames().ToDictionary(
-                key => key, key => entry.GetValue(key, null, RegistryValueOptions.DoNotExpandEnvironmentNames))));
     }
 
     internal static void DeleteOldEntry(WindowsSetup.InstallEntry entry)

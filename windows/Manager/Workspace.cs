@@ -19,13 +19,30 @@ sealed class Preferences
     public bool ShiftSwitch { get; set; } = true;
     public string? SetupVersion { get; set; }
     public bool SetupPending { get; set; }
+    public string? PendingInputLanguageTag { get; set; }
     public string? InputLanguageTag { get; set; }
     public bool Initialized { get; set; }
-    public string ReportingMode { get; set; } = "standard";
-    public bool UseDimsumReviewDescription { get; set; } = true;
+    public bool OmitCandidateNumbers { get; set; }
+    // Retain a compatible value for a Dimsum NVDA add-on already installed.
+    public string ReportingMode => OmitCandidateNumbers ? "compact" : "standard";
+    public bool UseDimsumReviewDescription { get; set; }
+    public string? PreviousDefaultInputTip { get; set; }
+    public List<string> VerifiedInputLanguages { get; set; } = [];
     public bool PronounceCandidates { get; set; } = true;
     public string LookupGesture { get; set; } = "";
     public string? AppliedDictionary { get; set; }
+
+    internal static Preferences Read(byte[] content)
+    {
+        using var json = JsonDocument.Parse(content);
+        var settings = json.RootElement.Deserialize<Preferences>() ?? new();
+        if (json.RootElement.ValueKind == JsonValueKind.Object &&
+            !json.RootElement.TryGetProperty(nameof(OmitCandidateNumbers), out _) &&
+            json.RootElement.TryGetProperty(nameof(ReportingMode), out var mode) && mode.ValueKind == JsonValueKind.String)
+            settings.OmitCandidateNumbers = mode.ValueEquals("compact");
+        return settings;
+    }
+
 }
 
 sealed class Workspace
@@ -71,13 +88,13 @@ sealed class Workspace
         Rime = Path.GetFullPath(key?.GetValue("RimeUserDir") is string path && Path.IsPathFullyQualified(path) ?
             path : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rime"));
         Settings = File.Exists(SettingsPath) ?
-            JsonSerializer.Deserialize<Preferences>(File.ReadAllBytes(SettingsPath)) ?? new() : new();
+            Preferences.Read(File.ReadAllBytes(SettingsPath)) : new();
     }
 
     public void Save()
     {
         string reporting = Path.Combine(data, "candidate-reporting-enabled");
-        bool reportCandidates = Settings.Initialized && Settings.ReportingMode != "off";
+        bool reportCandidates = Settings.Initialized;
         (string Path, bool Enabled)[] flags =
         [
             (Path.Combine(data, SingletonSound.Service), Settings.Initialized),
@@ -126,8 +143,8 @@ sealed class Workspace
 
     public string Status()
     {
-        string stage = File.Exists(Pending) ? "有字庫等待部署。" : "暫無待部署字庫。";
-        string dictionaries = Settings.AppliedDictionary is { } applied ? $"Rime 已部署字庫{Environment.NewLine}{applied}" : "Rime 尚未由管理器驗證部署。";
+        string stage = File.Exists(Pending) ? "有字庫等待處理。" : "暫無待處理字庫。";
+        string dictionaries = Settings.AppliedDictionary is { } applied ? $"已處理嘅輸入法字庫{Environment.NewLine}{applied}" : "管理器尚未核對已處理嘅輸入法字庫。";
         string version;
         try
         {
@@ -328,10 +345,11 @@ sealed class Workspace
             Process.Start(new ProcessStartInfo(Environment.ProcessPath!, "--sound") { UseShellExecute = false })?.Dispose();
     }
 
-    public void MarkSetupPending()
+    public void MarkSetupPending(InputLanguageChoice language)
     {
-        if (Settings.SetupPending) return;
+        if (Settings.SetupPending && Settings.PendingInputLanguageTag == language.Tag) return;
         Settings.SetupPending = true;
+        Settings.PendingInputLanguageTag = language.Tag;
         Save();
     }
 
@@ -353,7 +371,7 @@ sealed class Workspace
     {
         if (forceDeploy || !SetupDeploymentUsable())
         {
-            progress?.Invoke("正在部署點心字庫同設定。");
+            progress?.Invoke("正在處理點心字庫同設定。");
             await DeployAsync(applyPending: true, reporting: true);
         }
         progress?.Invoke($"正在將點心加入到「{language.Label}」。");
@@ -370,28 +388,31 @@ sealed class Workspace
 
     public async Task<string> ApplyInputLanguageAsync(InputLanguageChoice language, bool makeDefault)
     {
-        await WindowsSetup.EnableOnlyDimsumLanguageAsync(language, makeDefault);
+        var verified = await WindowsSetup.EnableOnlyDimsumLanguageAsync(language, makeDefault);
+        Settings.VerifiedInputLanguages = Settings.VerifiedInputLanguages.Concat(verified).Append(language.Tag)
+            .Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         Settings.InputLanguageTag = language.Tag;
         Settings.SetupVersion = AppVersion;
         Settings.SetupPending = false;
+        Settings.PendingInputLanguageTag = null;
         Save();
         return LanguageAppliedMessage(language);
     }
 
     internal static string LanguageAppliedMessage(InputLanguageChoice language) =>
-        $"點心已加入到「{language.Label}」。如需更改，請喺「點心輸入法語言」揀另一個語言，再按「套用輸入法語言」。";
+        $"點心已加入到「{language.Label}」。";
 
-    public async Task<(WindowsSetup.EngineOutcome Engine, bool RestartNvda)> RemoveAsync(bool removeEngine)
+    public async Task<(WindowsSetup.EngineOutcome Engine, bool RestartNvda)> RemoveAsync()
     {
         string? deployer = FindDeployer();
         string? engine = Path.GetDirectoryName(deployer);
-        if (removeEngine && engine is not null)
+        if (engine is not null)
         {
             string relative = Path.GetRelativePath(engine, Rime);
             if (!Path.IsPathRooted(relative) && relative != ".." && !relative.StartsWith(@"..\", StringComparison.Ordinal))
                 throw new IOException("用家資料位於輸入引擎資料夾內。請先將用家資料移到其他位置，再移除引擎。");
         }
-        bool interrupted = ArchiveInterruptedDeployment(Journal, Rime, Path.Combine(data, "未完成部署備份"));
+        ArchiveInterruptedDeployment(Journal, Rime, Path.Combine(data, "未完成部署備份"));
         const string filename = "default.custom.yaml";
         string path = Path.Combine(Rime, filename);
         string? original = File.Exists(path) ? File.ReadAllText(path) : null;
@@ -401,34 +422,17 @@ sealed class Workspace
         var legacy = new LegacyUpgrade(this);
         string? backupId = await legacy.BeginRemovalAsync();
         bool machineCleanup = backupId is not null && MachineLegacyUpgrade.NeedsMachineCleanup(backupId);
-        var outcome = WindowsSetup.EngineOutcome.Removed;
-        if (removeEngine)
-            outcome = await WindowsSetup.RemoveEngineAsync(machineCleanup ? backupId : null);
-        else if (machineCleanup)
-            await WindowsSetup.RunAdminAsync("--retire-legacy-on-removal", backupId!);
+        if (await WindowsSetup.GetDefaultTipAsync() is { } currentDefault && WindowsSetup.IsDimsumProfileTip(currentDefault))
+            await WindowsSetup.RestoreDefaultInputAsync(Settings.PreviousDefaultInputTip);
+        var outcome = await WindowsSetup.RemoveEngineAsync(machineCleanup ? backupId : null);
 
-        if (remaining != original || (interrupted && !removeEngine && deployer is not null))
-        {
-            StartJournal([filename]);
-            try
-            {
-                if (remaining != original) WriteAtomic(path, Utf8.GetBytes(remaining!));
-                if (!removeEngine && deployer is not null) await RunDeployerAsync(deployer);
-            }
-            catch
-            {
-                RestoreDeploymentSources();
-                if (!removeEngine && deployer is not null) await RunDeployerAsync(deployer);
-                CloseJournal();
-                throw;
-            }
-            CloseJournal();
-        }
-
+        if (remaining != original) WriteAtomic(path, Utf8.GetBytes(remaining!));
         WindowsSetup.RemoveUserProfiles(profiles);
         Settings.Initialized = false;
         Settings.SetupVersion = null;
+        Settings.PreviousDefaultInputTip = null;
         Settings.SetupPending = false;
+        Settings.PendingInputLanguageTag = null;
         Settings.AppliedDictionary = null;
         Save();
         ConfigureStartup(retireLegacy: true);
@@ -441,10 +445,10 @@ sealed class Workspace
         bool legacyMigration = false, bool settingsOnly = false)
     {
         if (!legacyMigration && new LegacyUpgrade(this).NeedsUpgrade())
-            throw new IOException("請先按「繼續設定點心」完成舊版遷移，再部署點心。");
-        string deployer = FindDeployer() ?? throw new IOException("搵唔到輸入引擎部署程式。請先按「繼續設定點心」。");
+            throw new IOException("請先按「繼續設定點心」完成舊版遷移，再處理點心。");
+        string deployer = FindDeployer() ?? throw new IOException("搵唔到輸入引擎處理程式。請先按「繼續設定點心」。");
         if (LegacyUpgrade.ConverterRunning(MachineLegacyUpgrade.KnownFolders()))
-            throw new IOException("舊版詞庫更新仍在執行。請完成後再部署。");
+            throw new IOException("舊版詞庫更新仍在執行。請完成後再處理。");
         Directory.CreateDirectory(Rime);
         if (legacyMigration)
             ArchiveInterruptedDeployment(Journal, Rime, Path.Combine(data, "未完成部署備份"));
@@ -528,7 +532,7 @@ sealed class Workspace
                 {
                     string built = Path.Combine(Rime, "build", schema + ".schema.yaml");
                     if (!File.Exists(built) || !File.ReadAllText(built).Contains("lua_processor@*dimsum_windows_reporter", StringComparison.Ordinal))
-                        throw new IOException($"未確認報讀設定已部署（{schema}）。請確認方案已加入輸入方案選單。");
+                        throw new IOException($"未確認報讀設定已處理（{schema}）。請確認方案已加入輸入方案選單。");
                 }
             }
             Settings.AppliedDictionary = $"{version} · SHA-256 {Hash(primary)[..12]}";
@@ -544,7 +548,7 @@ sealed class Workspace
             {
                 throw new IOException($"{error.Message}{Environment.NewLine}恢復仍待完成。{rollback.Message}", error);
             }
-            throw new IOException($"{error.Message}{Environment.NewLine}已復原部署前嘅來源檔案。", error);
+            throw new IOException($"{error.Message}{Environment.NewLine}已復原處理前嘅來源檔案。", error);
         }
         CloseJournal();
         if (applyPending) File.Delete(Pending);
@@ -621,14 +625,14 @@ sealed class Workspace
         var yaml = new YamlStream();
         yaml.Load(new StringReader(text));
         if (yaml.Documents.Count != 1 || yaml.Documents[0].RootNode is not YamlMappingNode root)
-            throw new IOException("Rime 自訂設定需要一份 YAML 對照表。");
+            throw new IOException("輸入法自訂設定需要一份 YAML 對照表。");
         if (!root.Children.TryGetValue(new YamlScalarNode("patch"), out var patch))
         {
             int end = Regex.Match(text, @"(?m)^\.\.\.[ \t]*(?:#.*)?\r?$") is { Success: true } marker
                 ? marker.Index : text.Length;
             if (root.Style == YamlDotNet.Core.Events.MappingStyle.Flow)
             {
-                if (root.Children.Count != 0) throw new IOException("Rime 自訂設定需要用分行格式。");
+                if (root.Children.Count != 0) throw new IOException("輸入法自訂設定需要用分行格式。");
                 int start = checked((int)root.Start.Index);
                 int close = text.IndexOf('}', start);
                 return (text.Remove(start, close - start + 1).Insert(start, "patch:"), new());
@@ -642,7 +646,7 @@ sealed class Workspace
             string headerOnly = Regex.Replace(text, @"(?m)^patch:[ \t]*(?:\{[ \t]*\}|null|~)(?=[ \t]*(?:#|\r?$))", "patch:");
             return (headerOnly, new());
         }
-        throw new IOException("Rime 自訂設定嘅 patch 格式無效。");
+        throw new IOException("輸入法自訂設定嘅 patch 格式無效。");
     }
 
     internal static string IncludeDimsumSchemas(string text)
@@ -802,7 +806,7 @@ sealed class Workspace
         }
         catch (Exception error)
         {
-            throw new IOException($"未能保全未完成部署嘅資料。{Environment.NewLine}{error.Message}{Environment.NewLine}備份位置：{backup}", error);
+            throw new IOException($"未能保全未完成處理嘅資料。{Environment.NewLine}{error.Message}{Environment.NewLine}備份位置：{backup}", error);
         }
     }
 
@@ -811,12 +815,12 @@ sealed class Workspace
         string marker = Path.Combine(journal, "restore.json");
         if (!File.Exists(marker)) return new();
         var files = JsonSerializer.Deserialize<Dictionary<string, bool>>(File.ReadAllBytes(marker)) ??
-            throw new IOException("未能讀取部署備份記錄。");
+            throw new IOException("未能讀取處理備份記錄。");
         foreach (string name in files.Keys)
         {
             if (Path.IsPathRooted(name) || name.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
                 .Any(part => part is "" or "." or ".." || part.Contains(':')))
-                throw new IOException("部署備份記錄含有無效路徑。");
+                throw new IOException("處理備份記錄含有無效路徑。");
         }
         return files;
     }
@@ -954,9 +958,9 @@ sealed class Workspace
         {
             UseShellExecute = false,
             WorkingDirectory = Path.GetDirectoryName(executable)!
-        }) ?? throw new IOException("未能啟動輸入引擎部署。");
+        }) ?? throw new IOException("未能啟動輸入引擎處理。");
         await process.WaitForExitAsync();
-        if (process.ExitCode != 0) throw new IOException($"輸入引擎部署傳回錯誤 {process.ExitCode}。");
+        if (process.ExitCode != 0) throw new IOException($"輸入引擎處理傳回錯誤 {process.ExitCode}。");
     }
 
     public static string? FindDeployer()

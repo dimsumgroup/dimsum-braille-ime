@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
@@ -37,7 +38,7 @@ static partial class WindowsSetup
         return new(culture.Name, (ushort)id, culture.Name switch
         {
             "en-HK" => "英文（香港）",
-            "zh-HK" => "中文（香港）",
+            "zh-HK" => "繁體中文（香港）",
             "zh-TW" => "中文（台灣）",
             _ => culture.DisplayName
         });
@@ -48,30 +49,6 @@ static partial class WindowsSetup
         .Concat(["en-HK", "en-US", "zh-HK", "zh-TW"])
         .Select(LanguageChoice).OfType<InputLanguageChoice>().DistinctBy(choice => choice.Tag, IgnoreCase).ToArray();
 
-    internal static InputLanguageChoice? DetectSetupLanguage(ushort current, IReadOnlyList<UserInputLanguage> configured)
-    {
-        if (current == 0) return null;
-        string layoutPrefix = $"{current:X4}:";
-        var layouts = configured.Where(language => Tips(language).Any(tip => tip.StartsWith(layoutPrefix, StringComparison.OrdinalIgnoreCase)))
-            .Select(language => LanguageChoice(language.Tag)).OfType<InputLanguageChoice>().DistinctBy(choice => choice.Id).ToArray();
-        if (layouts.Length > 0) return layouts.Length == 1 ? layouts[0] : null;
-
-        var choices = configured.Select(language => LanguageChoice(language.Tag)).OfType<InputLanguageChoice>()
-            .DistinctBy(choice => choice.Id).ToArray();
-        var exact = choices.FirstOrDefault(choice => choice.Id == current);
-        if (exact is not null) return exact;
-        // A regional language can share a keyboard layout with another locale.
-        // Use it only when it is the sole configured choice in that language.
-        var shared = choices.Where(choice => (choice.Id & 0x03ff) == (current & 0x03ff)).ToArray();
-        return shared.Length == 1 ? shared[0] : null;
-    }
-
-    internal static string? ExistingDimsumLanguage(IEnumerable<UserInputLanguage> configured)
-    {
-        var active = configured.Where(language => Tips(language).Any(IsDimsumTip)).Select(language => language.Tag).ToArray();
-        return active.Length == 1 ? active[0] : null;
-    }
-
     internal static bool IsDimsumEnabled(IEnumerable<UserInputLanguage> configured, InputLanguageChoice choice) =>
         configured.Any(language => SameLanguage(language.Tag, choice.Tag) && Tips(language).Contains(DimsumTip(choice.Id), IgnoreCase));
 
@@ -80,14 +57,14 @@ static partial class WindowsSetup
     static string? NormalizeLanguage(string? tag) => tag?.Replace("-Hans-", "-", StringComparison.OrdinalIgnoreCase)
         .Replace("-Hant-", "-", StringComparison.OrdinalIgnoreCase);
 
-    static bool IsDimsumTip(string tip) => tip.Length >= 5 && ushort.TryParse(tip.AsSpan(0, 4), NumberStyles.HexNumber,
+    internal static bool IsDimsumProfileTip(string tip) => tip.Length >= 5 && ushort.TryParse(tip.AsSpan(0, 4), NumberStyles.HexNumber,
         CultureInfo.InvariantCulture, out ushort language) && IgnoreCase.Equals(tip, DimsumTip(language));
 
     static IEnumerable<string> Tips(UserInputLanguage language) => language.Tips ?? [];
 
     internal static string[] OtherDimsumTips(IEnumerable<UserInputLanguage> configured, InputLanguageChoice keep,
         IEnumerable<string> legacy, bool ownsTaiwan) => configured.SelectMany(Tips).Distinct(IgnoreCase)
-        .Where(tip => !IgnoreCase.Equals(tip, DimsumTip(keep.Id)) && (IsDimsumTip(tip) || legacy.Contains(tip, IgnoreCase) ||
+        .Where(tip => !IgnoreCase.Equals(tip, DimsumTip(keep.Id)) && (IsDimsumProfileTip(tip) || legacy.Contains(tip, IgnoreCase) ||
             (ownsTaiwan && IgnoreCase.Equals(tip, TaiwanEngineTip)))).ToArray();
 
     internal static bool OwnsTaiwanTip(int? explicitOwnership, int? oldOwner) => explicitOwnership is int known
@@ -140,20 +117,13 @@ static partial class WindowsSetup
         throw new IOException("未能辨認 Windows 輸入語言。PowerShell 傳回嘅語言清單格式不完整。");
     }
 
-    public static async Task<UserInputLanguage[]> GetUserInputLanguagesAsync()
+    public static async Task<UserInputLanguage[]> GetUserInputLanguagesAsync() => ParseUserInputLanguages(await ReadLanguageRecordsAsync());
+
+    static Task<string> ReadLanguageRecordsAsync()
     {
-        string powershell = Path.Combine(Environment.SystemDirectory, "WindowsPowerShell", "v1.0", "powershell.exe");
-        var start = new ProcessStartInfo(powershell)
-        {
-            CreateNoWindow = true, UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true,
-            StandardOutputEncoding = Encoding.UTF8
-        };
-        start.ArgumentList.Add("-NoProfile");
-        start.ArgumentList.Add("-NonInteractive");
-        start.ArgumentList.Add("-Command");
         // Windows PowerShell can wrap collections in different JSON objects.
         // Emit each language and each key as a separate plain-text record.
-        start.ArgumentList.Add($$"""
+        return RunLanguageQueryAsync($$"""
             $ErrorActionPreference = 'Stop';
             $languages = Get-WinUserLanguageList;
             [Console]::WriteLine('{{LanguageListStart}}');
@@ -165,6 +135,20 @@ static partial class WindowsSetup
             };
             [Console]::WriteLine('{{LanguageListEnd}}');
             """.ReplaceLineEndings(" "));
+    }
+
+    static async Task<string> RunLanguageQueryAsync(string command)
+    {
+        string powershell = Path.Combine(Environment.SystemDirectory, "WindowsPowerShell", "v1.0", "powershell.exe");
+        var start = new ProcessStartInfo(powershell)
+        {
+            CreateNoWindow = true, UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true,
+            StandardOutputEncoding = Encoding.UTF8
+        };
+        start.ArgumentList.Add("-NoProfile");
+        start.ArgumentList.Add("-NonInteractive");
+        start.ArgumentList.Add("-Command");
+        start.ArgumentList.Add(command);
         using var process = Process.Start(start) ?? throw new IOException("未能讀取 Windows 輸入語言。");
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(12));
         try
@@ -175,7 +159,7 @@ static partial class WindowsSetup
             string data = await read;
             string error = await errors;
             if (process.ExitCode != 0) throw new IOException($"未能讀取 Windows 輸入語言。{error.Trim()}");
-            return ParseUserInputLanguages(data);
+            return data;
         }
         catch (OperationCanceledException)
         {
@@ -184,33 +168,112 @@ static partial class WindowsSetup
         }
     }
 
-    public static async Task EnableOnlyDimsumLanguageAsync(InputLanguageChoice choice, bool makeDefault)
+    public static async Task<string[]> EnableOnlyDimsumLanguageAsync(InputLanguageChoice choice, bool makeDefault)
     {
         var previous = await GetUserInputLanguagesAsync();
         if (!IsOurProfile(choice.Id))
             await RunAdminAsync("--finish-setup", choice.Id.ToString(CultureInfo.InvariantCulture));
-        if (!IsDimsumEnabled(previous, choice))
+        string[] verified = LanguageChoices(previous).Where(language => IsDimsumEnabled(previous, language) && EnabledInTsf(language.Id))
+            .Select(language => language.Tag).ToArray();
+        if (!IsDimsumEnabled(previous, choice) || !EnabledInTsf(choice.Id))
         {
-            if (!EnableProfileForUser(choice.Id, makeDefault: false))
-                throw new IOException($"Windows 未能將點心加到「{choice.Label}」。請揀另一個輸入語言再試。");
+            string tip = DimsumTip(choice.Id);
+            InstallLayoutOrTip(tip, 0);
             var current = await GetUserInputLanguagesAsync();
             if (!IsDimsumEnabled(current, choice))
+                current = await AddToLanguageListAsync(choice);
+            for (int attempt = 0; attempt < 2 && (!IsDimsumEnabled(current, choice) || !EnabledInTsf(choice.Id)); attempt++)
             {
-                string tip = DimsumTip(choice.Id);
+                await Task.Delay(300);
+                current = await GetUserInputLanguagesAsync();
+            }
+            if (!IsDimsumEnabled(current, choice) || !EnabledInTsf(choice.Id))
+            {
                 if (!previous.SelectMany(Tips).Contains(tip, IgnoreCase)) InstallLayoutOrTip(tip, RemoveLayout);
-                throw new IOException($"Windows 未能確認點心已加到「{choice.Label}」。請揀另一個輸入語言再試。");
+                throw new IOException($"Windows 未能確認點心已加到「{choice.Label}」。請先喺 Windows 設定加入「{choice.Label}」，再按「繼續設定點心」。");
             }
             previous = current;
         }
-        if (makeDefault && !SetDefaultLayoutOrTip(DimsumTip(choice.Id), 0))
-            throw new IOException("已加入點心。Windows 未能將點心設為預設輸入法。");
+        if (makeDefault) await SetDimsumDefaultAsync(choice);
         var old = OtherDimsumTips(previous, choice, UserProfiles(legacyOnly: true).ToArray(), BundledTaiwanTip());
         if (old.Length > 0)
         {
             RemoveUserProfiles(old);
             var current = await GetUserInputLanguagesAsync();
-            if (!IsDimsumEnabled(current, choice) || current.SelectMany(Tips).Intersect(old, IgnoreCase).Any())
+            if (!IsDimsumEnabled(current, choice) || !EnabledInTsf(choice.Id) || current.SelectMany(Tips).Intersect(old, IgnoreCase).Any())
                 throw new IOException("已加入點心，但 Windows 仍然顯示其他點心輸入法項目。請再套用輸入法語言。");
         }
+        return verified;
+    }
+
+    static async Task<UserInputLanguage[]> AddToLanguageListAsync(InputLanguageChoice choice)
+    {
+        string match = choice.Tag.StartsWith("zh-", StringComparison.OrdinalIgnoreCase)
+            ? choice.Tag[..3] + "*-" + choice.Tag[3..] : choice.Tag;
+        await RunLanguageQueryAsync($$"""
+            $ErrorActionPreference = 'Stop';
+            $list = Get-WinUserLanguageList;
+            $language = $list | Where-Object { $_.LanguageTag -eq '{{choice.Tag}}' -or $_.LanguageTag -like '{{match}}' } | Select-Object -First 1;
+            if ($null -eq $language) {
+                $language = (New-WinUserLanguageList '{{choice.Tag}}')[0];
+                $language.InputMethodTips.Clear();
+                $list.Add($language);
+            };
+            if (-not $language.InputMethodTips.Contains('{{DimsumTip(choice.Id)}}')) {
+                $language.InputMethodTips.Add('{{DimsumTip(choice.Id)}}');
+                Set-WinUserLanguageList -LanguageList $list -Force;
+            };
+            """.ReplaceLineEndings(" "));
+        return await GetUserInputLanguagesAsync();
+    }
+
+    internal static bool EnabledInTsf(ushort language)
+    {
+        var type = Type.GetTypeFromCLSID(new Guid("33C53A50-F456-4884-B049-85FD643ECFED"), throwOnError: true)!;
+        var profiles = (IInputProcessorProfiles)Activator.CreateInstance(type)!;
+        try
+        {
+            return profiles.GetProfile(InputProcessorProfile, language, Service, Profile, 0, out var value) >= 0 && (value.Flags & 2) != 0;
+        }
+        finally { Marshal.FinalReleaseComObject(profiles); }
+    }
+
+    static bool ValidTip(string? tip) => !string.IsNullOrEmpty(tip) &&
+        System.Text.RegularExpressions.Regex.IsMatch(tip, @"\A[0-9a-fA-F]{4}:(?:[0-9a-fA-F]{8}|(?:\{[0-9a-fA-F-]{36}\}){2})\z");
+
+    public static async Task<string?> GetDefaultTipAsync()
+    {
+        string output = await RunLanguageQueryAsync("$ErrorActionPreference = 'Stop'; $tip = Get-WinDefaultInputMethodOverride; " +
+            "if ($tip -is [string]) { $value = $tip } else { $value = $tip.InputMethodTip }; " +
+            "[Console]::WriteLine('DIMSUM-DEFAULT:' + [string]$value);");
+        string? match = output.Split('\n').Select(line => line.Trim()).FirstOrDefault(line => line.StartsWith("DIMSUM-DEFAULT:", StringComparison.Ordinal));
+        if (match is null) throw new IOException("未能讀取 Windows 預設輸入法。");
+        string tip = match["DIMSUM-DEFAULT:".Length..];
+        if (tip.Length == 0) return null;
+        return ValidTip(tip) ? tip : throw new IOException("未能辨認 Windows 預設輸入法。");
+    }
+
+    public static async Task SetDimsumDefaultAsync(InputLanguageChoice language)
+    {
+        string tip = DimsumTip(language.Id);
+        await SetDefaultTipAsync(tip);
+        if (!IgnoreCase.Equals(tip, await GetDefaultTipAsync()))
+            throw new IOException("Windows 未能確認點心已設為預設輸入法。");
+    }
+
+    static Task<string> SetDefaultTipAsync(string tip) =>
+        RunLanguageQueryAsync($"$ErrorActionPreference = 'Stop'; Set-WinDefaultInputMethodOverride -InputTip '{tip}'");
+
+    public static async Task RestoreDefaultInputAsync(string? previous)
+    {
+        var current = await GetUserInputLanguagesAsync();
+        if (ValidTip(previous) && !IsDimsumProfileTip(previous!) && current.SelectMany(Tips).Contains(previous!, IgnoreCase))
+        {
+            await SetDefaultTipAsync(previous!);
+            if (IgnoreCase.Equals(previous, await GetDefaultTipAsync())) return;
+        }
+        await RunLanguageQueryAsync("$ErrorActionPreference = 'Stop'; Set-WinDefaultInputMethodOverride");
+        if (await GetDefaultTipAsync() is { } active && IsDimsumProfileTip(active))
+            throw new IOException("Windows 未能解除點心嘅預設輸入法設定。");
     }
 }

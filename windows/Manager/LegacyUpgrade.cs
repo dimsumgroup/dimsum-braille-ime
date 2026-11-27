@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Drawing;
 using System.Text.Json;
 using Microsoft.Win32;
 
@@ -17,12 +16,18 @@ sealed class LegacyUpgrade(Workspace workspace)
     enum Stage { Accepted, DataSaved, EngineReady, Deployed, Complete }
     sealed record Checkpoint(Guid Id, Stage Stage, bool DictionaryDeployed = false);
     string StateFile => Path.Combine(workspace.DataDirectory, "legacy-upgrade.json");
-    string BackupFolder => Path.Combine(workspace.DataDirectory, "舊版遷移備份");
+    string MigrationRecord(string id)
+    {
+        string previous = Path.Combine(workspace.DataDirectory, "舊版遷移備份", id);
+        return Directory.Exists(previous) ? previous : Path.Combine(workspace.DataDirectory, "舊版遷移記錄", id);
+    }
     Checkpoint? ReadState() => File.Exists(StateFile) ? JsonSerializer.Deserialize<Checkpoint>(File.ReadAllBytes(StateFile)) : null;
+
+    public bool InProgress => ReadState() is { Stage: < Stage.Complete };
 
     public bool NeedsUpgrade()
     {
-        if (ReadState() is { Stage: < Stage.Complete }) return true;
+        if (InProgress) return true;
         using var old = Registry.CurrentUser.OpenSubKey(LegacySettings);
         using var run = Registry.CurrentUser.OpenSubKey(RunKey);
         return IsLegacyVersion(old?.GetValue("AppVersion") as string) ||
@@ -33,7 +38,10 @@ sealed class LegacyUpgrade(Workspace workspace)
             MachineLegacyUpgrade.HasOwnedTask();
     }
 
-    public async Task<string?> RunAsync(IWin32Window owner, InputLanguageChoice language, Action<string> progress, bool makeDefault)
+    internal const string UpgradeNotice = "偵測到舊版點心。按「確定」後會安裝新版，並保留你嘅學習記錄同自訂詞庫。";
+    public bool NeedsNotice() => !InProgress && NeedsUpgrade();
+
+    public async Task<string?> RunAsync(IWin32Window? owner, InputLanguageChoice language, Action<string> progress, bool makeDefault, bool confirmed = false)
     {
         var state = ReadState();
         if (state?.Stage == Stage.Complete) state = null;
@@ -41,14 +49,13 @@ sealed class LegacyUpgrade(Workspace workspace)
 
         if (state is null)
         {
-            if (!Confirm(owner)) return "";
+            if (!confirmed) MessageBox.Show(owner, UpgradeNotice, "偵測到舊版點心", MessageBoxButtons.OK, MessageBoxIcon.Information);
             state = Advance(new(Guid.NewGuid(), Stage.Accepted), Stage.Accepted);
         }
 
         string id = state.Id.ToString("N");
-        string backup = Path.Combine(BackupFolder, id);
-        string nvdaBackup = Path.Combine(backup, NvdaDictionaries.BackupFolder);
-        string stage = "備份用家資料";
+        string backup = MigrationRecord(id);
+        string stage = "停用舊版自動更新";
         try
         {
             // A previous version could leave a migration checkpoint after its
@@ -57,18 +64,13 @@ sealed class LegacyUpgrade(Workspace workspace)
                 state = Advance(state with { DictionaryDeployed = false }, Stage.DataSaved);
             if (state.Stage < Stage.DataSaved)
             {
-                progress("正在備份用家資料。");
+                progress("正在停用舊版自動更新。");
                 Directory.CreateDirectory(backup);
-                SaveAndPauseOldStartup(backup);
+                PauseOldStartup();
                 SaveEngineSettings(backup);
                 await WaitForOldUpdaterAsync();
-                await WindowsSetup.StopEngineAsync();
-                MachineLegacyUpgrade.CopyTree(workspace.Rime, Path.Combine(backup, "Rime"));
                 state = Advance(state, Stage.DataSaved);
             }
-
-            stage = "備份 NVDA 配詞檔";
-            NvdaDictionaries.BackupInstalledDictionaries(NvdaDictionaries.FindInstallation(), nvdaBackup);
 
             if (state.Stage < Stage.EngineReady)
             {
@@ -83,7 +85,7 @@ sealed class LegacyUpgrade(Workspace workspace)
 
             if (state.Stage < Stage.Deployed)
             {
-                stage = "部署點心字庫同設定";
+                stage = "處理點心字庫同設定";
                 RestoreEngineSettings(backup);
                 WindowsSetup.StartAvailableEngine();
                 string engineCheckpoint = Path.Combine(MachineLegacyUpgrade.EngineBackup(id), "engine-package-installed");
@@ -91,7 +93,7 @@ sealed class LegacyUpgrade(Workspace workspace)
                     File.Exists(engineCheckpoint) && workspace.SetupDeploymentUsable(File.GetLastWriteTimeUtc(engineCheckpoint));
                 if (!verified)
                 {
-                    progress("正在部署點心字庫同設定。");
+                    progress("正在處理點心字庫同設定。");
                     await workspace.DeployAsync(applyPending: true, reporting: true, legacyMigration: true);
                 }
                 if (!state.DictionaryDeployed) state = Advance(state with { DictionaryDeployed = true }, state.Stage);
@@ -111,13 +113,10 @@ sealed class LegacyUpgrade(Workspace workspace)
             progress("正在移除舊版自動更新元件。");
             if (MachineLegacyUpgrade.NeedsMachineCleanup(id))
                 await WindowsSetup.RunAdminAsync("--finish-legacy-cleanup", id);
-            ClearOldUserEntries(backup);
+            ClearOldUserEntries();
             Advance(state, Stage.Complete);
             workspace.ConfigureStartup(retireLegacy: true);
-            string result = "已更新輸入引擎並移除舊版自動更新元件。已保留學習記錄、自訂詞庫同設定。";
-            return Directory.Exists(nvdaBackup)
-                ? result + Environment.NewLine + $"NVDA 現存配詞檔已備份到「{nvdaBackup}」。"
-                : result;
+            return "已升級點心，並移除舊版自動更新元件。已保留學習記錄、自訂詞庫同設定。";
         }
         catch (Exception error)
         {
@@ -133,7 +132,7 @@ sealed class LegacyUpgrade(Workspace workspace)
             }
             throw new IOException($"舊版遷移停喺「{stage}」。{Environment.NewLine}{error.Message}{Environment.NewLine}" +
                 recovery +
-                $"用家備份：{backup}{Environment.NewLine}引擎備份：{MachineLegacyUpgrade.EngineBackup(id)}{Environment.NewLine}" +
+                $"遷移記錄：{id}{Environment.NewLine}" +
                 "可以按「繼續設定點心」重試。", error);
         }
     }
@@ -142,14 +141,14 @@ sealed class LegacyUpgrade(Workspace workspace)
     {
         if (!NeedsUpgrade()) return null;
         string id = (ReadState()?.Id ?? Guid.NewGuid()).ToString("N");
-        SaveAndPauseOldStartup(Path.Combine(BackupFolder, id));
+        PauseOldStartup();
         await WaitForOldUpdaterAsync();
         return id;
     }
 
     public void FinishRemoval(string? id)
     {
-        if (id is not null) ClearOldUserEntries(Path.Combine(BackupFolder, id));
+        if (id is not null) ClearOldUserEntries();
         File.Delete(StateFile);
     }
 
@@ -184,42 +183,6 @@ sealed class LegacyUpgrade(Workspace workspace)
         return next;
     }
 
-    static bool Confirm(IWin32Window owner)
-    {
-        using var form = new Form
-        {
-            Text = "偵測到舊版點心", StartPosition = FormStartPosition.CenterParent,
-            Size = new Size(530, 220), FormBorderStyle = FormBorderStyle.FixedDialog,
-            MaximizeBox = false, MinimizeBox = false
-        };
-        var layout = new FlowLayoutPanel { FlowDirection = FlowDirection.TopDown, Dock = DockStyle.Fill, Padding = new Padding(18) };
-        layout.Controls.Add(new Label
-        {
-            AutoSize = true, MaximumSize = new Size(470, 0),
-            Text = "偵測到舊版點心。按「確定」後，程式會更新輸入引擎，並移除舊版自動更新元件。你嘅學習記錄、自訂詞庫同設定會保留。"
-        });
-        var confirm = new Button { Text = "確定", DialogResult = DialogResult.OK, AutoSize = true };
-        layout.Controls.Add(confirm);
-        form.Controls.Add(layout);
-        form.AcceptButton = confirm;
-        return form.ShowDialog(owner) == DialogResult.OK;
-    }
-
-    static void SaveAndPauseOldStartup(string backup)
-    {
-        using var old = Registry.CurrentUser.OpenSubKey(LegacySettings);
-        using var run = Registry.CurrentUser.OpenSubKey(RunKey, writable: true);
-        string? command = ValidatedRunCommand(run);
-        string file = Path.Combine(backup, "舊版登記.json");
-        if (!File.Exists(file))
-            Workspace.WriteAtomic(file, JsonSerializer.SerializeToUtf8Bytes(new
-            {
-                Run = command,
-                Settings = OldValues.ToDictionary(name => name, name => old?.GetValue(name))
-            }));
-        if (command is not null) run!.DeleteValue(RunName, false);
-    }
-
     internal static string? ValidatedRunCommand(RegistryKey? run)
     {
         string? value = run?.GetValue(RunName) as string;
@@ -233,7 +196,7 @@ sealed class LegacyUpgrade(Workspace workspace)
         if (ValidatedRunCommand(run) is not null) run!.DeleteValue(RunName, false);
     }
 
-    static void ClearOldUserEntries(string backup)
+    static void ClearOldUserEntries()
     {
         PauseOldStartup();
         using var old = Registry.CurrentUser.OpenSubKey(LegacySettings, writable: true);
@@ -241,7 +204,6 @@ sealed class LegacyUpgrade(Workspace workspace)
             foreach (string name in OldValues) old.DeleteValue(name, false);
         foreach (var entry in WindowsSetup.FindEntries(RegistryHive.CurrentUser).Where(entry => !entry.IsEngine).ToArray())
         {
-            MachineLegacyUpgrade.SaveRegistration(backup, entry.Hive, entry.View, entry.Key);
             MachineLegacyUpgrade.DeleteOldEntry(entry);
         }
     }
@@ -256,7 +218,7 @@ sealed class LegacyUpgrade(Workspace workspace)
         for (int attempt = 0; ConverterRunning(folders); attempt++)
         {
             if (attempt >= 70 || !await timer.WaitForNextTickAsync())
-                throw new IOException("舊版詞庫更新仍在執行。請完成後再部署。");
+                throw new IOException("舊版詞庫更新仍在執行。請完成後再處理。");
         }
     }
 

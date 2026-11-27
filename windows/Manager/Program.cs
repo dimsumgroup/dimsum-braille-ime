@@ -14,20 +14,29 @@ static class Program
     static void Main(string[] args)
     {
         if (args.Length > 0 && args[0] is "--finish-setup" or "--hide-machine-entries"
-            or "--install-engine" or "--after-install" or "--remove-components" or "--prepare-legacy-engine"
-            or "--finish-legacy-cleanup" or "--remove-engine-machine" or "--retire-legacy-on-removal"
-            or "--check-nvda-addon" or "--install-nvda-addon")
+            or "--install-engine" or "--complete-install" or "--legacy-notice" or "--remove-components" or "--prepare-legacy-engine"
+            or "--finish-legacy-cleanup" or "--remove-engine-machine")
         {
             try
             {
                 switch (args[0])
                 {
-                    case "--check-nvda-addon" when args.Length == 1:
-                        string data = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DimsumInput");
-                        if (NvdaAddon.ShouldOffer(data)) Environment.ExitCode = 6;
+                    case "--legacy-notice" when args.Length == 1:
+                        if (new LegacyUpgrade(new Workspace()).NeedsNotice()) Environment.ExitCode = 6;
                         break;
-                    case "--install-nvda-addon" when args.Length == 1:
-                        NvdaAddon.Install();
+                    case "--complete-install" when args.Length == 1:
+                        var installedWorkspace = new Workspace();
+                        var log = new OperationLog(installedWorkspace);
+                        try
+                        {
+                            log.Record(SetupCoordinator.RunAsync(installedWorkspace, WindowsSetup.LanguageChoice("zh-HK")!,
+                                repair: false, progress: log.Record, confirmed: true).GetAwaiter().GetResult());
+                        }
+                        catch (Exception error)
+                        {
+                            log.Record($"安裝未完成（0x{error.HResult:X8}）。{error.Message}");
+                            Environment.ExitCode = 1;
+                        }
                         break;
                     case "--finish-setup" when args.Length == 2 && ushort.TryParse(args[1], out ushort language):
                         WindowsSetup.RegisterProfile(language);
@@ -44,9 +53,6 @@ static class Program
                     case "--finish-legacy-cleanup" when args.Length == 2:
                         MachineLegacyUpgrade.FinalizeCleanup(args[1]);
                         break;
-                    case "--retire-legacy-on-removal" when args.Length == 2:
-                        MachineLegacyUpgrade.RetireOldInstallation(args[1]);
-                        break;
                     case "--remove-engine-machine" when args.Length is 1 or 2:
                         if (args.Length == 2) MachineLegacyUpgrade.PauseOldUpdater(args[1]);
                         var engineOutcome = WindowsSetup.RemoveEngineMachineAsync().GetAwaiter().GetResult();
@@ -54,23 +60,8 @@ static class Program
                         if (engineOutcome == WindowsSetup.EngineOutcome.RestartRequired)
                             Environment.ExitCode = 3;
                         break;
-                    case "--after-install":
-                        var installedWorkspace = new Workspace();
-                        installedWorkspace.ConfigureStartup();
-                        if (new LegacyUpgrade(installedWorkspace).NeedsUpgrade())
-                        {
-                            installedWorkspace.StartSound();
-                            break;
-                        }
-                        if (installedWorkspace.Settings.Initialized)
-                        {
-                            installedWorkspace.Save();
-                            installedWorkspace.StartSound();
-                            WindowsSetup.HideInstallationEntriesAsync().GetAwaiter().GetResult();
-                        }
-                        break;
-                    case "--remove-components" when args.Length == 2 && args[1] is "keep-engine" or "remove-engine":
-                        var removal = new Workspace().RemoveAsync(args[1] == "remove-engine").GetAwaiter().GetResult();
+                    case "--remove-components" when args.Length == 1:
+                        var removal = new Workspace().RemoveAsync().GetAwaiter().GetResult();
                         bool restartEngine = removal.Engine == WindowsSetup.EngineOutcome.RestartRequired;
                         Environment.ExitCode = (restartEngine, removal.RestartNvda) switch
                         {
@@ -88,7 +79,7 @@ static class Program
             catch (Exception error)
             {
                 Environment.ExitCode = 1;
-                if (args[0] is not ("--after-install" or "--check-nvda-addon"))
+                if (args[0] is not ("--complete-install" or "--legacy-notice"))
                     MessageBox.Show(error.Message, Title);
             }
             return;
@@ -114,10 +105,7 @@ static class Program
             return;
         }
         ApplicationConfiguration.Initialize();
-        int input = Array.IndexOf(args, "--input-language");
-        ushort installerLanguage = input >= 0 && input + 1 < args.Length && ushort.TryParse(args[input + 1], out ushort captured)
-            ? captured : (ushort)0;
-        Application.Run(new ManagerForm(workspace, args.Contains("--first-launch"), installerLanguage));
+        Application.Run(new ManagerForm(workspace, args.Contains("--setup-problem")));
     }
 
     public static void Open(string target) => Process.Start(new ProcessStartInfo(target) { UseShellExecute = true });

@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using System.IO.Compression;
-using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace Dimsum;
@@ -8,7 +6,6 @@ namespace Dimsum;
 static class NvdaAddon
 {
     const string Name = "dimsumCandidates";
-    const string Plugin = "globalPlugins/dimsumCandidates.py";
     static string Bundle => Path.Combine(AppContext.BaseDirectory, "assets", Name + ".nvda-addon");
 
     public static void Install()
@@ -42,28 +39,8 @@ static class NvdaAddon
                 ? NvdaDictionaries.InstalledConfigDirectory()
                 : Path.Combine(directory, "userConfig");
         }
-        // An add-on in another portable copy must not suppress this invitation.
-        if (profile is null) return true;
-
-        using var archive = ZipFile.OpenRead(Bundle);
-        using var manifest = new StreamReader(archive.GetEntry("manifest.ini")?.Open() ??
-            throw new IOException("內附 NVDA 附加元件缺少版本資料。"));
-        var bundled = ReadManifestVersion(manifest.ReadToEnd()) ??
-            throw new IOException("內附 NVDA 附加元件嘅版本資料無效。");
-        using var plugin = archive.GetEntry(Plugin)?.Open() ?? throw new IOException("內附 NVDA 附加元件缺少報讀程式。");
-        return NeedsPackage(profile, bundled, SHA256.HashData(plugin));
+        return profile is not null && !AddonFolders(profile).Any(folder => ReadOwnedVersion(folder) is not null);
     }
-
-    internal static bool NeedsPackage(string profile, Version bundled, byte[] bundledPluginHash) => !AddonFolders(profile)
-        .Any(folder =>
-        {
-            var version = ReadOwnedVersion(folder);
-            if (version != bundled) return version is not null && version > bundled;
-            string path = Path.Combine(folder, Plugin);
-            if (!File.Exists(path) || !OrdinaryPath(path)) return false;
-            using var plugin = File.OpenRead(path);
-            return SHA256.HashData(plugin).AsSpan().SequenceEqual(bundledPluginHash);
-        });
 
     public static bool Remove(string data)
     {

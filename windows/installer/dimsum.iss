@@ -1,4 +1,5 @@
 ﻿#define AppVer "1.3.1"
+#define ShortcutName "Dimsum Manager - 點心粵語點字輸入法管理器"
 #define ManagerName "點心粵語點字輸入法管理器"
 
 [Setup]
@@ -26,8 +27,10 @@ RestartApplications=no
 Name: "zh"; MessagesFile: "compiler:Languages\ChineseTraditional.isl"
 
 [Messages]
-zh.FinishedLabel=管理器已安裝。按「完成」設定點心並開啟管理器。
-zh.FinishedLabelNoIcons=管理器已安裝。按「完成」設定點心並開啟管理器。
+zh.FinishedLabel=安裝完成。按 Windows 鍵加空格，喺繁體中文（香港）揀「點心粵語點字輸入法」。
+zh.FinishedLabelNoIcons=安裝完成。按 Windows 鍵加空格，喺繁體中文（香港）揀「點心粵語點字輸入法」。
+
+zh.ConfirmUninstall=要移除點心粵語點字輸入法嗎？
 
 [Tasks]
 Name: "desktopicon"; Description: "建立桌面捷徑"; Flags: unchecked
@@ -37,9 +40,13 @@ Source: "..\dist\manager\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdi
 
 [Icons]
 Name: "{autoprograms}\{#ManagerName}"; Filename: "{app}\DimsumManager.exe"
-Name: "{autodesktop}\{#ManagerName}"; Filename: "{app}\DimsumManager.exe"; Tasks: desktopicon
+Name: "{autodesktop}\{#ShortcutName}"; Filename: "{app}\DimsumManager.exe"; Tasks: desktopicon
+
+[Run]
+Filename: "{app}\DimsumManager.exe"; Description: "開啟 Dimsum Manager（調整輸入同報讀進階設定、更新詞庫等）"; Flags: postinstall unchecked skipifsilent nowait runasoriginaluser; Check: OfferManagerAfterSetup
 
 [InstallDelete]
+Type: files; Name: "{autodesktop}\{#ManagerName}.lnk"
 Type: files; Name: "{app}\README.md"
 Type: files; Name: "{autoprograms}\點心粵語點字管理器.lnk"
 
@@ -67,10 +74,6 @@ const
 
 function FindWindowEx(Parent, Previous: HWND; ClassName, WindowName: LongWord): HWND;
   external 'FindWindowExW@user32.dll stdcall';
-function GetForegroundWindow: HWND;
-  external 'GetForegroundWindow@user32.dll stdcall';
-function GetKeyboardLayout(ThreadId: LongWord): LongWord;
-  external 'GetKeyboardLayout@user32.dll stdcall';
 function IsWindowVisible(Window: HWND): Boolean;
   external 'IsWindowVisible@user32.dll stdcall';
 function GetWindowThreadProcessId(Window: HWND; var ProcessID: LongWord): LongWord;
@@ -86,25 +89,7 @@ function CreateFile(Path: String; Access, Share, Security, Creation, Flags: Long
 function CloseHandle(Handle: THandle): Boolean;
   external 'CloseHandle@kernel32.dll stdcall';
 
-var
-  SoundWasRunning, SetupFinished: Boolean;
-  InitialInputLanguage: Integer;
-
-function InitializeSetup: Boolean;
-var
-  Foreground: HWND;
-  ProcessId, ThreadId: LongWord;
-begin
-  InitialInputLanguage := 0;
-  Foreground := GetForegroundWindow;
-  if Foreground <> 0 then begin
-    ProcessId := 0;
-    ThreadId := GetWindowThreadProcessId(Foreground, ProcessId);
-    if ThreadId <> 0 then
-      InitialInputLanguage := GetKeyboardLayout(ThreadId) and $FFFF;
-  end;
-  Result := True;
-end;
+var SoundWasRunning, SetupFinished, ManagerRequired: Boolean;
 
 function SoundServiceFile: String;
 begin
@@ -190,20 +175,6 @@ begin
   end;
 end;
 
-procedure OfferNvdaAddon(const Manager: String);
-var
-  Code: Integer;
-begin
-  if not Exec(Manager, '--check-nvda-addon', '', SW_HIDE, ewWaitUntilTerminated, Code) or
-     ((Code <> 0) and (Code <> 6)) then
-    MsgBox('未能檢查 NVDA。可以喺管理器按「安裝 NVDA 附加元件」。', mbInformation, MB_OK)
-  else if Code = 6 then
-    if MsgBox('偵測到 NVDA 正在執行。要安裝點心候選報讀附加元件嗎？',
-      mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
-      if not Exec(Manager, '--install-nvda-addon', '', SW_SHOWNORMAL, ewWaitUntilTerminated, Code) then
-        MsgBox('未能開啟 NVDA 附加元件安裝檔。', mbError, MB_OK);
-end;
-
 procedure CurStepChanged(Step: TSetupStep);
 var
   Code: Integer;
@@ -213,25 +184,31 @@ begin
   if Step = ssPostInstall then begin
     RestoreSoundService;
     SetupFinished := True;
-    if not Exec(Manager, '--after-install', '', SW_HIDE, ewWaitUntilTerminated, Code) or (Code <> 0) then
-      if not WizardSilent then
-        MsgBox('點心已安裝。未能完成舊版程式列表整理，可以喺管理器核對操作結果。', mbInformation, MB_OK);
-    if not WizardSilent then OfferNvdaAddon(Manager);
+    WizardForm.StatusLabel.Caption := '正在設定點心輸入法。';
+    ManagerRequired := True;
+    if Exec(Manager, '--legacy-notice', '', SW_HIDE, ewWaitUntilTerminated, Code) and ((Code = 0) or (Code = 6)) then begin
+      if Code = 6 then
+        SuppressibleMsgBox('偵測到舊版點心。按「確定」後會安裝新版，並保留你嘅學習記錄同自訂詞庫。',
+          mbInformation, MB_OK, IDOK);
+      if Exec(Manager, '--complete-install', '', SW_HIDE, ewWaitUntilTerminated, Code) and (Code = 0) then
+        ManagerRequired := False;
+    end;
   end;
-  if (Step = ssDone) and not WizardSilent then
-    Exec(Manager, '--first-launch --input-language ' + IntToStr(InitialInputLanguage), '', SW_SHOWNORMAL, ewNoWait, Code);
+  if (Step = ssDone) and ManagerRequired and not WizardSilent then
+    Exec(Manager, '--setup-problem', '', SW_SHOWNORMAL, ewNoWait, Code);
 end;
 
-function RemoveEngineRequested: Boolean;
-var
-  Index: Integer;
+function OfferManagerAfterSetup: Boolean;
 begin
-  Result := False;
-  for Index := 1 to ParamCount do
-    if CompareText(ParamStr(Index), '/DIMSUMREMOVEENGINE') = 0 then begin
-      Result := True;
-      Exit;
-    end;
+  Result := not ManagerRequired;
+end;
+
+procedure CurPageChanged(PageID: Integer);
+begin
+  if (PageID = wpFinished) and ManagerRequired then begin
+    WizardForm.FinishedHeadingLabel.Caption := '點心設定尚未完成';
+    WizardForm.FinishedLabel.Caption := '按「完成」開啟管理器，查看原因同繼續設定。';
+  end;
 end;
 
 var EngineRestart, NvdaRestart: Boolean;
@@ -239,12 +216,9 @@ var EngineRestart, NvdaRestart: Boolean;
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
   Code: Integer;
-  Option: String;
 begin
   if CurUninstallStep = usUninstall then begin
-    if RemoveEngineRequested then Option := 'remove-engine'
-    else Option := 'keep-engine';
-    if not Exec(ExpandConstant('{app}\DimsumManager.exe'), '--remove-components ' + Option, '',
+    if not Exec(ExpandConstant('{app}\DimsumManager.exe'), '--remove-components', '',
       SW_HIDE, ewWaitUntilTerminated, Code) then begin
       MsgBox('未能啟動點心移除程序。', mbError, MB_OK);
       Abort;
@@ -253,12 +227,8 @@ begin
     NvdaRestart := (Code = 4) or (Code = 5);
     if (Code <> 0) and not EngineRestart and not NvdaRestart then Abort;
   end;
-  if (CurUninstallStep = usPostUninstall) and RemoveEngineRequested then begin
-    if EngineRestart then
-      MsgBox('引擎已取消登記。請重新啟動電腦以完成移除。', mbInformation, MB_OK)
-    else
-      MsgBox('輸入引擎已移除。學習記錄同自訂詞庫已保留。', mbInformation, MB_OK);
-  end;
-  if (CurUninstallStep = usPostUninstall) and NvdaRestart and not EngineRestart then
-    MsgBox('已移除點心候選報讀附加元件。請重新啟動 NVDA 以完成移除。', mbInformation, MB_OK);
+  if (CurUninstallStep = usPostUninstall) and EngineRestart then
+    MsgBox('請重新啟動電腦以完成移除。', mbInformation, MB_OK)
+  else if (CurUninstallStep = usPostUninstall) and NvdaRestart then
+    MsgBox('請重新啟動 NVDA 以完成移除附加組件。', mbInformation, MB_OK);
 end;

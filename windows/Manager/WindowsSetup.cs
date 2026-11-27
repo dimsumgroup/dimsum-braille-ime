@@ -104,18 +104,6 @@ static partial class WindowsSetup
             Process.Start(new ProcessStartInfo(server) { UseShellExecute = false, WorkingDirectory = Path.GetDirectoryName(server)! })?.Dispose();
     }
 
-    public static ushort PreferredLanguage()
-    {
-        var current = InputLanguage.CurrentInputLanguage.Culture;
-        if (SupportedCulture(current)) return (ushort)current.KeyboardLayoutId;
-        var ui = CultureInfo.CurrentUICulture;
-        return SupportedCulture(ui) ? (ushort)ui.KeyboardLayoutId : HongKong;
-    }
-
-    static bool SupportedCulture(CultureInfo culture) =>
-        !culture.IsNeutralCulture && culture.KeyboardLayoutId is > 0 and < 0x10000 &&
-        culture.TwoLetterISOLanguageName is "en" or "zh";
-
     public static bool IsOurProfile(ushort language)
     {
         using var key = OpenProfile(language);
@@ -189,19 +177,6 @@ static partial class WindowsSetup
     [DllImport("input.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     static extern bool InstallLayoutOrTip(string profiles, uint flags);
-
-    [DllImport("input.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    static extern bool SetDefaultLayoutOrTip(string profiles, uint flags);
-
-    public static bool EnableProfileForUser(ushort language, bool makeDefault)
-    {
-        string profile = $"{language:X4}:{Service:B}{Profile:B}";
-        if (!InstallLayoutOrTip(profile, 0)) return false;
-        if (makeDefault && !SetDefaultLayoutOrTip(profile, 0))
-            throw new IOException("已加入點心。Windows 未能將點心設為預設輸入法。");
-        return true;
-    }
 
     public static Task RunAdminAsync(params string[] arguments) => RunElevatedAsync(Environment.ProcessPath!, arguments);
 

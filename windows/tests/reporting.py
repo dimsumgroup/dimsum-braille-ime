@@ -6,7 +6,7 @@ import sys
 import types
 
 ROOT = Path(__file__).resolve().parents[1]
-for module in ("api", "config", "inputCore", "keyboardHandler", "globalPluginHandler", "speech", "ui", "winsound", "wx", "braille", "globalCommands", "scriptHandler", "textInfos"):
+for module in ("api", "inputCore", "keyboardHandler", "globalPluginHandler", "speech", "ui", "winsound", "wx", "braille", "globalCommands", "scriptHandler", "textInfos"):
     sys.modules[module] = types.ModuleType(module)
 for module in ("NVDAObjects", "NVDAObjects.behaviors", "NVDAObjects.inputComposition"):
     sys.modules[module] = types.ModuleType(module)
@@ -89,46 +89,21 @@ report = "\0".join(("dimsum-win-1", "test", "1", "dimsum_cb", "tone", "1", "0", 
 assert reporter.parse_report(report) == (("test", 1), "dimsum_cb", "tone", 1, False, [("a", "不過")])
 assert reporter.parse_report(report.rsplit(b"\x00", 1)[0]) is None
 
-sys.modules["api"].getFocusObject = lambda: types.SimpleNamespace(
-    windowHandle=42, getFormattedCandidateName=lambda index, word: f"{index} {word}"
-)
-settings = {"autoReportAllCandidates": True, "announceSelectedCandidate": True}
-sys.modules["config"].conf = {"inputComposition": settings}
-plugin = reporter.GlobalPlugin.__new__(reporter.GlobalPlugin)
-plugin.preferences = {"ReportingMode": "tone", "PronounceCandidates": False}
+sys.modules["api"].getFocusObject = InputComposition
 spoken = []
-plugin.say = spoken.append
-items = [("1", "分"), ("2", "份")]
-plugin.recent_candidate_speech = [(999, 42, ("1 分",))]
-plugin.supplement(items, 1, 42, 1000)
-assert spoken == ["1 分，2 份"]
-spoken.clear()
-
-plugin.recent_candidate_speech = [(1001, 42, ("1 分, 2 份,",))]
-plugin.supplement(items, 1, 42, 1000)
-assert not spoken, "If NVDA already read the new page, skip the supplement."
-
-settings["autoReportAllCandidates"] = False
-plugin.recent_candidate_speech = [(1001, 42, ("1 分, 分開",))]
-plugin.supplement(items, 1, 42, 1000)
-assert not spoken, "Native speech may include candidate descriptions."
-plugin.recent_candidate_speech = [(1001, 84, ("1 分",))]
-plugin.supplement(items, 1, 42, 1000)
-assert spoken == ["分"]
 
 native_page = ["1 分, 2 芬, "]
 ordinary_page = (("dimsum", 1), "dimsum_cb", "page", 1, False, [("1", "分"), ("2", "芬")])
 later_same = (("dimsum", 2), *ordinary_page[1:2], "same", *ordinary_page[3:])
 
 
-def direct_plugin(mode, report=ordinary_page):
+def direct_plugin(omit_numbers=False, report=ordinary_page):
     plugin = reporter.GlobalPlugin.__new__(reporter.GlobalPlugin)
-    plugin.preferences = {"ReportingMode": mode, "PronounceCandidates": False}
+    plugin.preferences = {"OmitCandidateNumbers": omit_numbers, "PronounceCandidates": False}
     plugin.own_speech = False
     plugin.speaking_directly = False
     plugin.direct_delivery = None
     plugin.last_report = None
-    plugin.delayed = None
     plugin.refresh_settings = lambda: None
     plugin.read_report = lambda: (reporter.time.time_ns(), report)
     return plugin
@@ -136,7 +111,7 @@ def direct_plugin(mode, report=ordinary_page):
 
 spoken.clear()
 sys.modules["ui"].message = lambda text, speechPriority=None: spoken.append((text, speechPriority))
-plugin = direct_plugin("standard")
+plugin = direct_plugin()
 assert plugin.filter_native_speech(native_page) == ["1 分，2 芬"]
 sys.modules["api"].getFocusObject = CandidateItem
 assert plugin.filter_native_speech(["1 分, 分開"]) == [], "The native highlighted candidate must not repeat the page."
@@ -145,31 +120,32 @@ plugin.poll()
 assert spoken == [], "A page already delivered through the speech filter must not be repeated by the timer."
 
 sys.modules["api"].getFocusObject = InputComposition
-plugin = direct_plugin("compact")
+plugin = direct_plugin(omit_numbers=True)
 assert plugin.filter_native_speech(["分"]) == ["分，芬"]
 
 composition = InputComposition()
 composition.compositionString = "f$  [ *1. 分  2. 芬  ]"
 sys.modules["api"].getFocusObject = lambda: composition
-plugin = direct_plugin("compact")
+plugin = direct_plugin(omit_numbers=True)
 assert plugin.filter_native_speech(["2. 芬"]) == ["分，芬"]
 assert plugin.filter_native_speech(["記事本"]) == ["記事本"]
 
-plugin = direct_plugin("compact", later_same)
+plugin = direct_plugin(True, later_same)
 plugin.poll()
 assert spoken == [("分，芬", "next")], "An unread page must still be spoken after a later identical update."
 plugin.poll()
 assert len(spoken) == 1
 
-plugin = direct_plugin("standard")
+plugin = direct_plugin()
 plugin.read_report = lambda: (reporter.time.time_ns() - reporter.NATIVE_SPEECH_WINDOW_NS - 1, ordinary_page)
 assert plugin.filter_native_speech(native_page) == native_page
-for mode in ("off", "tone"):
-    assert direct_plugin(mode).filter_native_speech(native_page) == native_page
+assert reporter.omit_candidate_numbers({"ReportingMode": "compact"})
+assert not reporter.omit_candidate_numbers({"OmitCandidateNumbers": False, "ReportingMode": "compact"})
+assert not reporter.omit_candidate_numbers({})
 
 browse = (("dimsum", 3), "dimsum_cb", "browse", 2, False, [("1", "過"), ("2", "日本")])
-for mode in ("standard", "compact", "tone"):
-    plugin = direct_plugin(mode, browse)
+for omit_numbers in (False, True):
+    plugin = direct_plugin(omit_numbers, browse)
     plugin.preferences["PronounceCandidates"] = True
     plugin.pronunciations = pronunciations
     plugin.refresh_pronunciations = lambda: None
@@ -180,18 +156,26 @@ for mode in ("standard", "compact", "tone"):
     assert plugin.filter_native_speech(["2. 日本"]) == [full]
     plugin.poll()
     assert not spoken, "Native speech replacement should not repeat through the timer."
-    plugin = direct_plugin(mode, browse)
+    plugin = direct_plugin(omit_numbers, browse)
     plugin.preferences["PronounceCandidates"] = True
     plugin.pronunciations = pronunciations
     plugin.refresh_pronunciations = lambda: None
     plugin.poll()
     assert spoken == [(full, "next")], "Navigation must speak even without a native speech event."
 
-plugin = direct_plugin("off")
-assert plugin.filter_native_speech(native_page) == native_page
 spoken.clear()
+tone = (("dimsum", 2), "dimsum_cb", "tone", 1, False, [("1", "分"), ("2", "份")])
+plugin = direct_plugin(report=tone)
 plugin.poll()
-assert not spoken
+assert spoken == [("1 分，2 份", "next")], "Tone input must speak the updated page without a native event."
+
+plugin = direct_plugin()
+plugin.pronunciations = pronunciations
+plugin.refresh_pronunciations = lambda: None
+plugin.preferences["PronounceCandidates"] = True
+assert plugin.direct_candidate_text(browse[:2] + ("page",) + browse[3:], 42).endswith("2 日子，本來")
+spoken.clear()
+plugin.preferences["UseDimsumReviewDescription"] = True
 
 review = types.SimpleNamespace(text="過", expand=lambda unit: None)
 sys.modules["api"].getReviewPosition = lambda: types.SimpleNamespace(copy=lambda: review)
@@ -204,7 +188,6 @@ sys.modules["globalCommands"].commands = types.SimpleNamespace(
 sys.modules["ui"].reviewMessage = spoken.append
 plugin.pronunciations = pronunciations
 plugin.refresh_pronunciations = lambda: None
-plugin.recent_candidate_speech = []
 plugin.say = lambda text, **kwargs: spoken.append(text)
 full = reporter.describe("過", pronunciations, all_groups=True)
 for presses in range(3):
@@ -248,6 +231,6 @@ with TemporaryDirectory() as temporary:
     assert bindings == {}, "With both features off, the native shortcuts are left entirely to NVDA."
     config_path.unlink()
     reporter.GlobalPlugin.refresh_settings(plugin)
-    assert bindings == {"kb:numpad2": "reviewCharacter", "kb(laptop):NVDA+.": "reviewCharacter"}
+    assert bindings == {}, "The character-description override is off by default."
 
 print("NVDA reporting, pronunciation migration, review gestures and independent lookup passed")

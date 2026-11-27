@@ -49,10 +49,6 @@ sealed class ShortcutCapture : Form
         return true;
     }
 
-    internal static bool ValidShortcut(string shortcut) => shortcut.Length == 0 || System.Text.RegularExpressions.Regex.IsMatch(shortcut,
-        @"\A(?:(?:control|alt|shift|windows)\+){1,3}(?:[a-z0-9]|f(?:[1-9]|1[0-2]))\z",
-        System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-
     internal static string? FormatShortcut(Keys keyData, bool windows)
     {
         if (KeyName(keyData & Keys.KeyCode) is not { } name) return null;

@@ -5,18 +5,17 @@
 | 功能 | 檔案 |
 | --- | --- |
 | 管理器介面、捷徑錄製 | `Manager/ManagerForm.cs`、`Manager/ShortcutCapture.cs` |
-| 字庫下載、更新提示、部署及回復 | `Manager/Workspace.cs` |
+| 字庫下載、更新提示、處理及回復 | `Manager/Workspace.cs` |
 | Windows 輸入語言、移除及舊版遷移 | `Manager/WindowsSetup.cs`、`Manager/EngineRemoval.cs`、`Manager/LegacyUpgrade.cs`、`Manager/MachineLegacyUpgrade.cs` |
 | NVDA 安裝、版本及配詞 | `Manager/NvdaAddon.cs`、`Manager/NvdaSession.cs`、`Manager/NvdaDictionaries.cs`、`reporting/` |
 | Rime 候選及單候選音效 | `reporting/rime/lua/dimsum_windows_reporter.lua`、`Manager/SingletonSound.cs`、`audio/only.wav` |
 | 安裝程式及精簡引擎 | `installer/dimsum.iss`、`installer/engine.nsi`、`prepare-assets.py`、`build.ps1` |
 
-- 程式更新檢查正式 GitHub Release 嘅 `v主版本.次版本.修訂版` 標籤及同版本嘅 `Dimsum_Setup_v版本.exe` 發行附件。資料更新比對 `main` 上四個檔案各自嘅 Git blob ID。查詢在管理器介面進行，字庫同配詞各自顯示結果，由用家按鍵更新。成功部署前保留上一份可用資料。
-- `settings.json` 同下載資料放喺 `%LOCALAPPDATA%\DimsumInput`。Rime 用家目錄預設 `%APPDATA%\Rime`，亦會讀已設定嘅 `RimeUserDir`。維持用家自訂詞庫、學習、NVDA 語言同已清空嘅快捷鍵。
-- 候選自動報讀逐字讀第一組配詞，逐個瀏覽讀高亮候選每個字嘅全部配詞。補讀模式保留一般 NVDA 候選報讀及補聲調。
-- `UseDimsumReviewDescription` 只控制 NVDA 檢閱當前字元指令第二下。`LookupGesture` 獨立查最近報讀，保留原句畀用家比較。由管理器集中設定。點心可另存三份配詞及備份 NVDA 安裝字典，附加元件直接讀管理器已下載或內附資料。
-- 舊版遷移備份已安裝 NVDA 嘅現存中文配詞檔，目的地係當次遷移備份下嘅 `NVDA舊配詞表備份/`，安裝目錄只用作讀取來源。遷移會分開記錄字庫部署同 Windows 輸入法登記，重試時核對已部署字庫再繼續。
-- 精簡引擎使用固定版本 Weasel 0.17.4.0 原廠二進位檔。`prepare-assets.py` 驗證原始安裝檔 SHA-256；`installer/engine.nsi` 定義重封裝。完整來源位置見 `engine-notices.txt`。
-- 調整介面要驗證 NVDA 鍵盤操作、可聚焦欄位同讀出嚟嘅名稱。安裝程式擷取開始時嘅 Windows 輸入語言，按「完成」後由管理器依序檢查引擎、部署同加入語言。未完成操作用「繼續設定點心」，「修復點心」會重跑部署，已完成後換語言用「套用輸入法語言」。設定即時套用。查配詞快捷鍵嘅編輯、錄製同清除共用 `LookupGesture`，手動輸入喺離開欄位或按 Enter 時驗證。
-- `Manager/InputLanguages.cs` 先核對揀定語言有點心，再移除其他點心項目。台灣 Weasel 須核對內附引擎嘅安裝標記。普通重新部署只管 Rime 資料。Windows PowerShell 語言清單採用逐行記錄，先驗證開頭同結尾，再用於語言登記。
-- `tests/reporting.py ..` 由呢個目錄用 Python 執行，`tests/reporting.lua` 用 Lua 執行。Windows 實機重點包括更新提示、快捷鍵錄製同清除、換語言、遷移、單候選提示，以及 NVDA 開關各模式嘅行為。
+- 程式更新檢查正式 GitHub Release 嘅 v主版本.次版本.修訂版 標籤及同版本 Dimsum_Setup_v版本.exe 附件。資料更新比對主分支四個檔案嘅 Git blob ID。開管理器時有更新會提示，兩組資料可以各自處理同回復。
+- settings.json 同下載資料放喺 %LOCALAPPDATA%\DimsumInput。Rime 用家目錄預設 %APPDATA%\Rime，維護 RimeUserDir、自訂詞庫、學習資料、NVDA 語言同已清空嘅快捷鍵。
+- Rime 候選自動報讀每個字嘅第一組配詞。逐個瀏覽讀高亮候選每個字嘅全部配詞。獨立勾選項控制候選編號、配詞同提示音。附加組件相容舊設定檔嘅 ReportingMode: compact。
+- UseDimsumReviewDescription 預設關閉，只控制 NVDA 檢閱當前字元指令第二下。LookupGesture 獨立查最近報讀，清空時解除綁定。可由管理器另存三份配詞及備份 NVDA 現用字典。
+- 舊版遷移順序係停用已核對嘅自動化、更新內附引擎、處理字庫、核對 Windows 設定、清理舊檔案同登記。保留 Rime 用家資料原位，只寫重試所需嘅檢查點。單一移除流程另會移走 NVDA 附加組件。
+- 精簡引擎使用固定版本 Weasel 0.17.4.0 原廠二進位檔。prepare-assets.py 驗證 SHA-256，installer/engine.nsi 定義重封裝。來源見 engine-notices.txt。
+- 安裝器經 SetupCoordinator 喺完成前加入繁體中文（香港）。完成頁預設唔開管理器，可勾選「開啟 Dimsum Manager」。設定未完成時，管理器提供「繼續設定點心」。完成後可以「修復點心」同選擇已驗證嘅語言。
+- Manager/InputLanguages.cs 先驗證選定語言喺 Get-WinUserLanguageList 同 TSF 已啟用，先移除其他點心項目。台灣 Weasel 須核對內附引擎嘅安裝標記。更完整實機測試清單見 Windows README。

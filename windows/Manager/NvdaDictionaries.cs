@@ -179,24 +179,6 @@ static class NvdaDictionaries
         return (backup, [.. missing]);
     }
 
-    internal static void BackupInstalledDictionaries(string? install, string backup)
-    {
-        if (install is null) return;
-
-        foreach (string language in Locales)
-        foreach (string name in Names)
-        {
-            string target = Path.Combine(backup, language, name);
-            if (File.Exists(target)) continue;
-
-            byte[] contents;
-            try { contents = File.ReadAllBytes(Path.Combine(install, "locale", language, name)); }
-            catch (FileNotFoundException) { continue; }
-            catch (DirectoryNotFoundException) { continue; }
-            Workspace.WriteAtomic(target, contents);
-        }
-    }
-
     internal static byte[][] ReadBundle(string source)
     {
         byte[][] contents = Names.Select(name => File.ReadAllBytes(Path.Combine(source, name))).ToArray();

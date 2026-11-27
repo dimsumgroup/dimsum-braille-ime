@@ -81,7 +81,7 @@ static partial class WindowsSetup
         return Path.IsPathFullyQualified(path) ? Path.GetFullPath(path) : null;
     }
 
-    public static void LaunchUninstaller(bool removeEngine)
+    public static void LaunchUninstaller()
     {
         string? uninstaller = null;
         foreach (var view in new[] { RegistryView.Registry64, RegistryView.Registry32 })
@@ -100,7 +100,7 @@ static partial class WindowsSetup
         if (uninstaller is null) throw new IOException("未搵到點心管理器嘅移除程式。");
         var info = new ProcessStartInfo(uninstaller) { UseShellExecute = true };
         info.ArgumentList.Add("/SILENT");
-        if (removeEngine) info.ArgumentList.Add("/DIMSUMREMOVEENGINE");
+
         using var process = Process.Start(info) ?? throw new IOException("未能啟動移除程式。");
     }
 
