@@ -11,9 +11,22 @@ for module in ("api", "config", "speech.commands", "inputCore", "keyboardHandler
 for module in ("NVDAObjects", "NVDAObjects.behaviors", "NVDAObjects.inputComposition"):
     sys.modules[module] = types.ModuleType(module)
 sys.modules["globalPluginHandler"].GlobalPlugin = object
-sys.modules["keyboardHandler"].KeyboardInputGesture = types.SimpleNamespace(
-    fromName=lambda key: types.SimpleNamespace(identifiers=[f"kb:{key}"])
-)
+class KeyboardInputGesture:
+    def __init__(self, key, modifiers=()):
+        self.mainKeyName = key
+        self.modifierNames = modifiers
+        self.sent = 0
+
+    def send(self):
+        self.sent += 1
+
+    @staticmethod
+    def fromName(key):
+        return types.SimpleNamespace(identifiers=[f"kb:{key}"])
+
+sys.modules["keyboardHandler"].KeyboardInputGesture = KeyboardInputGesture
+sys.modules["inputCore"].manager = types.SimpleNamespace(isInputHelpActive=False)
+sys.modules["wx"].CallAfter = lambda action: action()
 sys.modules["inputCore"].normalizeGestureIdentifier = lambda key: key
 sys.modules["scriptHandler"].script = lambda **kwargs: lambda method: method
 sys.modules["textInfos"].UNIT_CHARACTER = "character"
@@ -193,6 +206,21 @@ tone = (("dimsum", 2), "dimsum_cb", "tone", 1, False, [("1", "分"), ("2", "份"
 plugin = direct_plugin(report=tone)
 plugin.poll()
 assert spoken == [("1 分，2 份", "next")], "Tone input must speak the updated page without a native event."
+
+plugin = direct_plugin()
+for key in ("upArrow", "downArrow"):
+    arrow = KeyboardInputGesture(key)
+    sys.modules["api"].getFocusObject = InputComposition
+    assert plugin.route_candidate_arrows(arrow) is False and arrow.sent == 1
+    sys.modules["api"].getFocusObject = lambda: types.SimpleNamespace(windowHandle=42)
+    assert plugin.route_candidate_arrows(arrow) is True and arrow.sent == 1
+    sys.modules["api"].getFocusObject = InputComposition
+    modified = KeyboardInputGesture(key, ("shift",))
+    assert plugin.route_candidate_arrows(modified) is True and modified.sent == 0
+sys.modules["inputCore"].manager.isInputHelpActive = True
+assert plugin.route_candidate_arrows(KeyboardInputGesture("upArrow")) is True
+sys.modules["inputCore"].manager.isInputHelpActive = False
+assert plugin.route_candidate_arrows(KeyboardInputGesture("g")) is True
 
 spoken.clear()
 next_page = (("dimsum", 3), "dimsum_cb", "page", 1, False, [("1", "過"), ("2", "日本")])

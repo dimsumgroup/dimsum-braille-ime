@@ -217,6 +217,9 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         self.refresh_settings()
         extensions.filter_speechSequence.register(self.filter_native_speech)
         extensions.pre_speech.register(self.capture)
+        self.gesture_decider = getattr(inputCore, "decide_executeGesture", None)
+        if self.gesture_decider is not None:
+            self.gesture_decider.register(self.route_candidate_arrows)
         self.timer = wx.PyTimer(self.poll)
         self.timer.Start(40)
         self.profile_marker = record_nvda_profile()
@@ -225,6 +228,8 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         self.timer.Stop()
         extensions.filter_speechSequence.unregister(self.filter_native_speech)
         extensions.pre_speech.unregister(self.capture)
+        if self.gesture_decider is not None:
+            self.gesture_decider.unregister(self.route_candidate_arrows)
         self.last_speech = ""
         if self.profile_marker is not None:
             try:
@@ -392,6 +397,30 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         # A native utterance can be canceled while NVDA is still processing
         # the key. Leave candidate delivery to the timer at NEXT priority.
         return []
+
+    def route_candidate_arrows(self, gesture):
+        if (not isinstance(gesture, KeyboardInputGesture)
+                or gesture.mainKeyName.lower() not in {"uparrow", "downarrow"}
+                or gesture.modifierNames or inputCore.manager.isInputHelpActive):
+            return True
+        snapshot = self.read_report()
+        if snapshot is None:
+            return True
+        _, (_, _, event, selected, _, items) = snapshot
+        focus = api.getFocusObject()
+        window = getattr(focus, "windowHandle", None)
+        if (event == "clear" or window is None or not 0 < selected <= len(items)
+                or not native_candidate_speech([items[selected - 1][1]], focus, items, selected)):
+            return True
+
+        # Skip NVDA's document/review arrow script for the confirmed Dimsum menu.
+        # Send outside the keyboard hook so the injected key can reach the IME.
+        def send_if_focused():
+            if getattr(api.getFocusObject(), "windowHandle", None) == window:
+                gesture.send()
+
+        wx.CallAfter(send_if_focused)
+        return False
 
     def speak_candidate(self, text, report_id, window):
         self.speaking_directly = True
