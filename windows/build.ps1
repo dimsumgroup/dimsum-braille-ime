@@ -42,5 +42,5 @@ if ($SigningThumbprint) { Sign-File (Join-Path $manager 'DimsumManager.exe') }
 if ($InnoCompiler) {
     & $InnoCompiler (Join-Path $PSScriptRoot 'installer\dimsum.iss')
     if ($LASTEXITCODE -ne 0) { throw 'Installer build failed' }
-    if ($SigningThumbprint) { Sign-File (Join-Path $PSScriptRoot 'dist\Dimsum_Setup_v1.3.4.exe') }
+    if ($SigningThumbprint) { Sign-File (Join-Path $PSScriptRoot 'dist\Dimsum_Setup_v1.3.2.exe') }
 }

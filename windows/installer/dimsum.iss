@@ -1,4 +1,4 @@
-﻿#define AppVer "1.3.4"
+﻿#define AppVer "1.3.2"
 #define ShortcutName "Dimsum Manager - 點心粵語點字輸入法管理器"
 #define ManagerName "點心粵語點字輸入法管理器"
 
@@ -202,7 +202,7 @@ begin
     if not ManagerRequired and not WizardSilent then begin
       if Exec(Manager, '--check-nvda-addon', '', SW_HIDE, ewWaitUntilTerminated, Code) and (Code = 6) then begin
         NvdaOfferShown := True;
-        InstallNvdaAfterSetup := MsgBox('偵測到 NVDA 正在執行。要安裝或更新點心 NVDA 附加組件，報讀候選同查配詞嗎？按「是」後，完成點心安裝時請跟隨 NVDA 指示。',
+        InstallNvdaAfterSetup := MsgBox('偵測到 NVDA 正在執行。要安裝或更新點心 NVDA 附加組件至 {#AppVer}，報讀候選同查配詞嗎？按「是」後，完成點心安裝時請跟隨 NVDA 指示。',
           mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES;
       end;
     end;

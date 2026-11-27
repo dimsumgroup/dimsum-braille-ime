@@ -130,7 +130,7 @@ sealed class ManagerForm : Form
             var programCheck = Workspace.NewReleaseAsync(updateTimeout.Token);
             bool offer = CanOfferAddon();
             SetAddonButtons(offer);
-            if (offer && !nvdaPromptAlreadyShown && Confirm("偵測到 NVDA 正在執行。要安裝或更新點心 NVDA 附加組件嗎？"))
+            if (offer && !nvdaPromptAlreadyShown && Confirm($"偵測到 NVDA 正在執行。要安裝或更新點心 NVDA 附加組件至 {NvdaAddon.BundledVersion.ToString(3)} 嗎？"))
                 await RunOperationAsync(InstallAddonAsync);
             if (IsDisposed || Disposing) return;
             nvdaMonitor.Start();
