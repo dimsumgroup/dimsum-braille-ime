@@ -399,7 +399,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         _, schema, event, selected, _, items = report
         if event == "clear" or not items:
             return None
-        omit_numbers = omit_candidate_numbers(self.preferences)
+        speak_numbers = not omit_candidate_numbers(self.preferences) and schema != "dimsum_full"
         use_descriptions = self.preferences.get("PronounceCandidates", True)
         if use_descriptions:
             try:
@@ -407,13 +407,15 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             except (OSError, UnicodeError):
                 pass
         if event == "browse" and 0 < selected <= len(items):
-            word = items[selected - 1][1]
+            label, word = items[selected - 1]
             text = (describe(word, self.pronunciations, all_groups=True) or word) if use_descriptions else word
+            if speak_numbers:
+                text = f"{label} {text}"
         else:
             spoken = []
             for label, candidate in items:
                 word = (describe(candidate, self.pronunciations) or candidate) if use_descriptions else candidate
-                spoken.append(f"{label} {word}" if not omit_numbers and schema != "dimsum_full" else word)
+                spoken.append(f"{label} {word}" if speak_numbers else word)
             text = "，".join(spoken)
 
         return text or None

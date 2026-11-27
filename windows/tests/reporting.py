@@ -189,17 +189,18 @@ for omit_numbers in (False, True):
     spoken.clear()
     full = reporter.describe("日本", pronunciations, all_groups=True)
     assert full != "日子，本來"
+    expected = full if omit_numbers else f"2 {full}"
     assert plugin.filter_native_speech(["2. 日本"]) == []
     plugin.poll()
     plugin.poll()
-    assert spoken == [(full, "next")], "The highlighted word should be read only once."
+    assert spoken == [(expected, "next")], "The highlighted word should be read only once."
     spoken.clear()
     plugin = direct_plugin(omit_numbers, browse)
     plugin.preferences["PronounceCandidates"] = True
     plugin.pronunciations = pronunciations
     plugin.refresh_pronunciations = lambda: None
     plugin.poll()
-    assert spoken == [(full, "next")], "Navigation must speak even without a native speech event."
+    assert spoken == [(expected, "next")], "Navigation must speak even without a native speech event."
 
 spoken.clear()
 tone = (("dimsum", 2), "dimsum_cb", "tone", 1, False, [("1", "分"), ("2", "份")])
@@ -255,7 +256,7 @@ for event, key_name in (("page", "pageDown"), ("page", "pageUp"), ("browse", "up
     if event == "page":
         assert spoken == [("1 過去，戈先生，戈小姐，2 日子，本來", "next")]
     else:
-        assert spoken == [(reporter.describe("過", pronunciations, all_groups=True), "next")]
+        assert spoken == [("1 " + reporter.describe("過", pronunciations, all_groups=True), "next")]
 
 composition.compositionString = "f$  [ *1. 過  2. 日本  ]"
 assert plugin.filter_native_speech(["f$", "1 過, 2 日本,"]) == []
@@ -273,7 +274,14 @@ for revision, (key_name, selected) in enumerate((("downArrow", 2), ("upArrow", 1
     assert plugin.route_candidate_navigation(gesture) is False and gesture.sent == 1
     assert plugin.filter_native_speech(["f$"]) == []
     plugin.poll()
-assert [text for text, _ in spoken] == [reporter.describe(chosen[i][1], pronunciations, all_groups=True) for i in (1, 0, 1, 0)]
+assert [text for text, _ in spoken] == [
+    f"{chosen[i][0]} {reporter.describe(chosen[i][1], pronunciations, all_groups=True)}" for i in (1, 0, 1, 0)
+]
+one_finger = (new_page[0], "dimsum_full", "browse", 1, False, chosen)
+assert plugin.direct_candidate_text(one_finger) == reporter.describe("過", pronunciations, all_groups=True)
+plugin.preferences["PronounceCandidates"] = False
+assert plugin.direct_candidate_text(("dimsum", "dimsum_cb", "browse", 1, False, chosen)) == "1 過"
+plugin.preferences["PronounceCandidates"] = True
 
 single = (("older-reporter", 10), "dimsum_cb", "page", 1, False, [("1", "過")])
 plugin = direct_plugin(report=single)
