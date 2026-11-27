@@ -43,7 +43,7 @@ Name: "{autoprograms}\{#ManagerName}"; Filename: "{app}\DimsumManager.exe"
 Name: "{autodesktop}\{#ShortcutName}"; Filename: "{app}\DimsumManager.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\DimsumManager.exe"; Description: "開啟 Dimsum Manager（調整輸入同報讀進階設定、更新詞庫等）"; Flags: postinstall unchecked skipifsilent nowait runasoriginaluser; Check: OfferManagerAfterSetup
+Filename: "{app}\DimsumManager.exe"; Description: "開啟 Dimsum Manager（調整輸入同報讀進階設定、更新詞庫等）"; Parameters: "{code:AfterSetupManagerArguments}"; Flags: postinstall unchecked skipifsilent nowait runasoriginaluser; Check: OfferManagerAfterSetup
 
 [InstallDelete]
 Type: files; Name: "{autodesktop}\{#ManagerName}.lnk"
@@ -89,7 +89,9 @@ function CreateFile(Path: String; Access, Share, Security, Creation, Flags: Long
 function CloseHandle(Handle: THandle): Boolean;
   external 'CloseHandle@kernel32.dll stdcall';
 
-var SoundWasRunning, SetupFinished, ManagerRequired: Boolean;
+var
+  SoundWasRunning, SetupFinished, ManagerRequired: Boolean;
+  NvdaOfferShown, InstallNvdaAfterSetup: Boolean;
 
 function SoundServiceFile: String;
 begin
@@ -193,9 +195,26 @@ begin
       if Exec(Manager, '--complete-install', '', SW_HIDE, ewWaitUntilTerminated, Code) and (Code = 0) then
         ManagerRequired := False;
     end;
+    if not ManagerRequired and not WizardSilent then begin
+      if Exec(Manager, '--check-nvda-addon', '', SW_HIDE, ewWaitUntilTerminated, Code) and (Code = 6) then begin
+        NvdaOfferShown := True;
+        InstallNvdaAfterSetup := MsgBox('偵測到 NVDA 正在執行。要安裝點心 NVDA 附加組件，報讀候選同查配詞嗎？按「是」後，完成點心安裝時請跟隨 NVDA 指示。',
+          mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES;
+      end;
+    end;
   end;
-  if (Step = ssDone) and ManagerRequired and not WizardSilent then
-    Exec(Manager, '--setup-problem', '', SW_SHOWNORMAL, ewNoWait, Code);
+  if (Step = ssDone) and not WizardSilent then begin
+    if ManagerRequired then
+      Exec(Manager, '--setup-problem', '', SW_SHOWNORMAL, ewNoWait, Code)
+    else if InstallNvdaAfterSetup then
+      Exec(Manager, '--install-nvda-addon', '', SW_SHOWNORMAL, ewNoWait, Code);
+  end;
+end;
+
+function AfterSetupManagerArguments(Param: String): String;
+begin
+  Result := '';
+  if NvdaOfferShown then Result := '--skip-nvda-prompt';
 end;
 
 function OfferManagerAfterSetup: Boolean;

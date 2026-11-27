@@ -15,7 +15,7 @@ static class Program
     {
         if (args.Length > 0 && args[0] is "--finish-setup" or "--hide-machine-entries"
             or "--install-engine" or "--complete-install" or "--legacy-notice" or "--remove-components" or "--prepare-legacy-engine"
-            or "--finish-legacy-cleanup" or "--remove-engine-machine")
+            or "--finish-legacy-cleanup" or "--remove-engine-machine" or "--check-nvda-addon" or "--install-nvda-addon")
         {
             try
             {
@@ -23,6 +23,14 @@ static class Program
                 {
                     case "--legacy-notice" when args.Length == 1:
                         if (new LegacyUpgrade(new Workspace()).NeedsNotice()) Environment.ExitCode = 6;
+                        break;
+                    case "--check-nvda-addon" when args.Length == 1:
+                        if (NvdaAddon.ShouldOffer(new Workspace().DataDirectory)) Environment.ExitCode = 6;
+                        break;
+                    case "--install-nvda-addon" when args.Length == 1:
+                        if (NvdaAddon.ShouldOffer(new Workspace().DataDirectory)) NvdaAddon.Install();
+                        else if (NvdaSession.Find() is null)
+                            throw new IOException("NVDA 已關閉。請先開啟 NVDA，再喺點心管理器安裝附加組件。");
                         break;
                     case "--complete-install" when args.Length == 1:
                         var installedWorkspace = new Workspace();
@@ -79,7 +87,7 @@ static class Program
             catch (Exception error)
             {
                 Environment.ExitCode = 1;
-                if (args[0] is not ("--complete-install" or "--legacy-notice"))
+                if (args[0] is not ("--complete-install" or "--legacy-notice" or "--check-nvda-addon"))
                     CopyDialog.Show(null, "操作未完成",
                         $"錯誤碼 0x{error.HResult:X8}。{Environment.NewLine}{error.Message}");
             }
@@ -106,7 +114,7 @@ static class Program
             return;
         }
         ApplicationConfiguration.Initialize();
-        Application.Run(new ManagerForm(workspace, args.Contains("--setup-problem")));
+        Application.Run(new ManagerForm(workspace, args.Contains("--setup-problem"), args.Contains("--skip-nvda-prompt")));
     }
 
     public static void Open(string target) => Process.Start(new ProcessStartInfo(target) { UseShellExecute = true });

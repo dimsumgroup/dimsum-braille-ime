@@ -259,13 +259,13 @@ sealed class Workspace
         }
     }
 
-    public static async Task<(Version Version, string Page)?> NewReleaseAsync()
+    public static async Task<(Version Version, string Page)?> NewReleaseAsync(CancellationToken cancellationToken = default)
     {
         var current = typeof(Workspace).Assembly.GetName().Version!;
         (Version Version, string Page)? best = null;
         for (int page = 1; page <= 10; page++)
         {
-            using var json = await Http.GetFromJsonAsync<JsonDocument>(Api + $"/releases?per_page=30&page={page}");
+            using var json = await Http.GetFromJsonAsync<JsonDocument>(Api + $"/releases?per_page=30&page={page}", cancellationToken);
             var list = json!.RootElement;
             foreach (var release in list.EnumerateArray())
             {

@@ -15,11 +15,12 @@ sealed class ManagerForm : Form
     readonly CheckBox defaultIme = new() { AutoSize = true, Text = "將點心設為目前預設輸入法", Enabled = false };
     readonly ComboBox inputLanguage = new() { Width = 310, DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "點心輸入法語言" };
     readonly System.Windows.Forms.Timer nvdaMonitor = new() { Interval = 3000 };
-    readonly Button rimeUpdate, pronunciationUpdate, inputAddon, reviewAddon, continueSetup, applyLanguage, recordShortcut;
+    readonly Button rimeUpdate, pronunciationUpdate, inputAddon, reviewAddon, continueSetup, applyLanguage, recordShortcut, updateOverview;
     (DataUpdate Dictionary, DataUpdate Pronunciations) dataUpdates;
-    bool busy, refreshingControls, setupReady;
+    (Version Version, string Page)? programUpdate;
+    bool busy, refreshingControls, setupReady, showUpdatesWhenIdle;
 
-    public ManagerForm(Workspace workspace, bool setupProblem)
+    public ManagerForm(Workspace workspace, bool setupProblem, bool nvdaPromptAlreadyShown)
     {
         this.workspace = workspace;
         log = new OperationLog(workspace);
@@ -89,6 +90,7 @@ sealed class ManagerForm : Form
         Add(support, inputLanguage);
         applyLanguage = AddButton(support, "套用輸入法語言", ApplyLanguageAsync);
         inputLanguage.SelectedIndexChanged += (_, _) => RefreshLanguageControls();
+        updateOverview = AddButton(support, "查看可用更新", ShowAvailableUpdatesAsync);
         AddButton(support, "檢查程式更新", CheckProgramAsync);
         AddButton(support, "查看" + OperationLog.Title, () =>
         {
@@ -107,7 +109,7 @@ sealed class ManagerForm : Form
         });
         RefreshShortcut();
         RefreshLanguageChoices();
-        SetDataUpdateButtons();
+        SetUpdateButtons();
         SetAddonButtons(false);
         if (!setupReady)
         {
@@ -121,15 +123,17 @@ sealed class ManagerForm : Form
         Shown += async (_, _) =>
         {
             var dataCheck = Workspace.CheckDataIndexAsync();
+            using var updateTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            var programCheck = Workspace.NewReleaseAsync(updateTimeout.Token);
             bool offer = CanOfferAddon();
             SetAddonButtons(offer);
-            if (offer && Confirm("偵測到 NVDA 正在執行。要安裝點心 NVDA 附加組件嗎？"))
+            if (offer && !nvdaPromptAlreadyShown && Confirm("偵測到 NVDA 正在執行。要安裝點心 NVDA 附加組件嗎？"))
                 await RunOperationAsync(InstallAddonAsync);
             if (IsDisposed || Disposing) return;
             nvdaMonitor.Start();
             try { await RefreshDefaultAsync(); }
             catch (Exception error) { log.Record(ErrorText("查看 Windows 預設輸入法", error)); }
-            await CheckForDataUpdatesAsync(dataCheck);
+            await CheckForUpdatesOnOpenAsync(dataCheck, programCheck);
         };
     }
 
@@ -326,11 +330,12 @@ sealed class ManagerForm : Form
 
     async Task<string> CheckProgramAsync()
     {
-        var found = await Workspace.NewReleaseAsync();
-        if (found is not { } release) return "目前已經係最新 Windows 版本。";
-        if (Confirm($"有 Windows 新版 {release.Version.ToString(3)}。開啟官方下載頁？"))
-            Program.Open(release.Page);
-        return $"有 Windows 版 {release.Version.ToString(3)}。";
+        programUpdate = await Workspace.NewReleaseAsync();
+        SetUpdateButtons();
+        if (programUpdate is not { } release) return "目前已經係最新 Windows 版本。";
+        return Confirm($"有 Windows 新版 {release.Version.ToString(3)}。開啟官方下載頁？")
+            ? OpenProgramDownload(release)
+            : $"有 Windows 新版 {release.Version.ToString(3)}。";
     }
 
     bool CanOfferAddon()
@@ -354,11 +359,13 @@ sealed class ManagerForm : Form
 
     bool HasRimeUpdate => dataUpdates.Dictionary is DataUpdate.Available or DataUpdate.Downloaded;
     bool HasPronunciationUpdate => dataUpdates.Pronunciations == DataUpdate.Available;
+    bool HasUpdates => programUpdate is not null || HasRimeUpdate || HasPronunciationUpdate;
 
-    void SetDataUpdateButtons()
+    void SetUpdateButtons()
     {
         rimeUpdate.Visible = HasRimeUpdate;
         pronunciationUpdate.Visible = HasPronunciationUpdate;
+        updateOverview.Visible = HasUpdates;
     }
 
     async Task RefreshDataUpdatesAsync(Task<Dictionary<string, string>> dataCheck)
@@ -366,43 +373,92 @@ sealed class ManagerForm : Form
         var index = await dataCheck;
         if (IsDisposed || Disposing) return;
         dataUpdates = workspace.DataUpdates(index);
-        SetDataUpdateButtons();
+        SetUpdateButtons();
     }
 
-    async Task CheckForDataUpdatesAsync(Task<Dictionary<string, string>> dataCheck)
+    async Task CheckForUpdatesOnOpenAsync(Task<Dictionary<string, string>> dataCheck,
+        Task<(Version Version, string Page)?> programCheck)
     {
+        bool programChecked = false;
         try
         {
-            await RefreshDataUpdatesAsync(dataCheck);
-            if (IsDisposed || Disposing) return;
-            if (busy)
-            {
-                var retry = new System.Windows.Forms.Timer { Interval = 750 };
-                retry.Tick += async (_, _) =>
-                {
-                    if (busy && !IsDisposed) return;
-                    retry.Dispose();
-                    if (!IsDisposed) await CheckForDataUpdatesAsync(dataCheck);
-                };
-                retry.Start();
-                return;
-            }
-            if (HasRimeUpdate || HasPronunciationUpdate)
-            {
-                string updates = HasRimeUpdate && HasPronunciationUpdate ? "輸入法字庫同報讀配詞都有更新。" :
-                    HasRimeUpdate ? "輸入法字庫有更新。" : "報讀配詞有更新。";
-                if (Confirm(updates + "而家更新？"))
-                    await RunOperationAsync(() => UpdateDataAsync(HasRimeUpdate, HasPronunciationUpdate));
-                else SetStatus(updates);
-            }
-            else
-            {
-                string rime = dataUpdates.Dictionary == DataUpdate.Current ? "輸入法字庫已經係最新版本。" : "暫時未能檢查 輸入法字庫更新。";
-                string review = dataUpdates.Pronunciations == DataUpdate.Current ? "報讀配詞已經係最新版本。" : "暫時未能檢查報讀配詞更新。";
-                if (setupReady) SetStatus(rime + Environment.NewLine + review);
-            }
+            programUpdate = await programCheck;
+            programChecked = true;
         }
+        catch (Exception error) { log.Record(ErrorText("檢查程式更新", error)); }
+
+        try { await RefreshDataUpdatesAsync(dataCheck); }
         catch (Exception error) { log.Record(ErrorText("檢查詞庫更新", error)); }
+        if (IsDisposed || Disposing) return;
+        SetUpdateButtons();
+        if (HasUpdates)
+        {
+            await OfferUpdatesWhenIdleAsync();
+        }
+        else if (setupReady && !busy)
+        {
+            string program = programChecked ? "目前已經係最新 Windows 版本。" : "暫時未能檢查程式更新。";
+            string rime = dataUpdates.Dictionary == DataUpdate.Current ? "輸入法字庫已經係最新版本。" : "暫時未能檢查輸入法字庫更新。";
+            string review = dataUpdates.Pronunciations == DataUpdate.Current ? "報讀配詞已經係最新版本。" : "暫時未能檢查報讀配詞更新。";
+            SetStatus(string.Join(Environment.NewLine, program, rime, review));
+        }
+    }
+
+    Task OfferUpdatesWhenIdleAsync()
+    {
+        if (IsDisposed || Disposing || !HasUpdates) return Task.CompletedTask;
+        if (!busy) return RunOperationAsync(ShowAvailableUpdatesAsync);
+        showUpdatesWhenIdle = true;
+        return Task.CompletedTask;
+    }
+
+    async Task<string> ShowAvailableUpdatesAsync()
+    {
+        var release = programUpdate;
+        var options = new List<(string Label, Func<Task<string>> Action)>();
+        if (release is { } availableProgram)
+            options.Add(($"開啟 Windows {availableProgram.Version.ToString(3)} 下載頁",
+                () => Task.FromResult(OpenProgramDownload(availableProgram))));
+        if (HasRimeUpdate)
+            options.Add(("更新輸入法字庫", () => UpdateDataAsync(rime: true, pronunciations: false)));
+        if (HasPronunciationUpdate)
+            options.Add(("更新報讀配詞表", () => UpdateDataAsync(rime: false, pronunciations: true)));
+        if (options.Count == 0) return "";
+
+        using var dialog = new Form
+        {
+            Text = "有更新可用", StartPosition = FormStartPosition.CenterParent, AutoScaleMode = AutoScaleMode.Font,
+            FormBorderStyle = FormBorderStyle.FixedDialog, ShowInTaskbar = false, MinimizeBox = false, MaximizeBox = false,
+            AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink
+        };
+        var actions = new FlowLayoutPanel
+        {
+            AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Padding = new Padding(12)
+        };
+        Func<Task<string>>? selected = null;
+        foreach (var option in options)
+        {
+            var button = new Button { Text = option.Label, AutoSize = true, MinimumSize = new Size(295, 31) };
+            button.Click += (_, _) =>
+            {
+                selected = option.Action;
+                dialog.DialogResult = DialogResult.OK;
+            };
+            actions.Controls.Add(button);
+        }
+        var later = new Button { Text = "稍後", AutoSize = true, MinimumSize = new Size(295, 31), DialogResult = DialogResult.Cancel };
+        actions.Controls.Add(later);
+        dialog.Controls.Add(actions);
+        dialog.CancelButton = later;
+        dialog.ActiveControl = actions.Controls[0];
+        dialog.ShowDialog(this);
+        return selected is null ? "有更新可用。可喺「修復與支援」查看。" : await selected();
+    }
+
+    static string OpenProgramDownload((Version Version, string Page) release)
+    {
+        Program.Open(release.Page);
+        return $"已開啟 Windows {release.Version.ToString(3)} 下載頁。";
     }
 
     async Task<string> UpdateDataAsync(bool rime, bool pronunciations)
@@ -422,13 +478,13 @@ sealed class ManagerForm : Form
                 {
                     SetStatus("正在處理輸入法字庫。");
                     await workspace.DeployAsync(applyPending: true);
-                    results.Add("已更新及處理 輸入法字庫。");
+                    results.Add("已更新及處理輸入法字庫。");
                 }
                 else results.Add("輸入法字庫已下載。完成點心設定時會套用。");
             }
             catch (Exception error)
             {
-                results.Add(ErrorText("更新 輸入法字庫", error));
+                results.Add(ErrorText("更新輸入法字庫", error));
                 errorOccurred = true;
             }
         }
@@ -500,6 +556,11 @@ sealed class ManagerForm : Form
             tabs.Enabled = true;
             busy = false;
             if (focus?.CanFocus == true) focus.Focus();
+            if (showUpdatesWhenIdle && !IsDisposed && !Disposing)
+            {
+                showUpdatesWhenIdle = false;
+                BeginInvoke((Action)(async () => await OfferUpdatesWhenIdleAsync()));
+            }
         }
     }
 
