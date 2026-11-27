@@ -32,10 +32,10 @@
           "alternateName": "Dimsum Braille IME",
           "description": "專為香港視障人士度身訂做的免費粵語點字輸入工具，採用 Rime 引擎，支援 Windows 10/11 及 NVDA 螢幕閱讀器，收錄完整香港用字、屋邨名稱與日本城市。",
           "url": "https://www.dimsumbrl.work/",
-          "downloadUrl": "https://github.com/dimsumgroup/dimsum-braille-ime/releases/download/v1.1.2/Dimsum_Setup_v1.1.2.exe",
+          "downloadUrl": "https://github.com/dimsumgroup/dimsum-braille-ime/releases/download/v1.3.1/Dimsum_Setup_v1.3.1.exe",
           "version": "1.1.2",
           "datePublished": "2026-08-09",
-          "softwareVersion": "1.1.2",
+          "softwareVersion": "1.3.1",
           "operatingSystem": "Windows 10, Windows 11",
           "applicationCategory": "UtilitiesApplication",
           "offers": { "@type": "Offer", "price": "0", "priceCurrency": "HKD" },
@@ -222,11 +222,11 @@
                 專為視障人士與粵語點字用家設計的輸入工具，支援 Windows 和 macOS。
             </p>
             <div class="flex flex-wrap justify-center gap-4 mb-8">
-                <a href="https://github.com/dimsumgroup/dimsum-braille-ime/releases/download/v1.1.2/Dimsum_Setup_v1.1.2.exe"
+                <a href="https://github.com/dimsumgroup/dimsum-braille-ime/releases/download/v1.3.1/Dimsum_Setup_v1.3.1.exe"
                    class="bg-primary text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-amber-700 transition-colors focus:ring-4 focus:ring-amber-300"
-                   aria-label="下載 Windows 版安裝程式 v1.1.2"
+                   aria-label="下載 Windows 版安裝程式 v1.3.1"
                    rel="noopener">
-                    下載 Windows 版（v1.1.2）
+                    下載 Windows 版（v1.3.1）
                 </a>
                 <a href="https://github.com/dimsumgroup/dimsum-braille-ime/releases/download/v1.2.1/Dimsum_mac_v1.2.1.dmg"
                    class="bg-primary text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-amber-700 transition-colors focus:ring-4 focus:ring-amber-300"
@@ -238,14 +238,11 @@
                     閱讀使用說明
                 </a>
             </div>
-            <p class="text-gray-700 text-lg leading-relaxed mb-6 px-4 max-w-2xl mx-auto">
-                感謝熱心網友製作並分享原始碼，經過測試並稍作修改，也加入了些功能，點心粵語點字輸入法mac版正式面世
-            </p>
             <div role="note" aria-label="字庫更新提示" class="bg-amber-50 border-l-4 border-primary p-5 max-w-2xl mx-auto text-left rounded shadow-sm">
                 <h3 class="text-gray-800 text-lg font-bold mb-2">字庫更新</h3>
                 <ul class="list-disc pl-6 text-gray-800 text-lg space-y-2">
                     <li>
-                        <strong>Windows 版</strong>會自動更新字庫。
+                        <strong>Windows 版</strong>會在管理器開啟時檢查程式、輸入法字庫及報讀配詞表。有更新時會集中提示。
                     </li>
                     <li>
                         <strong>Mac 版</strong>會在 DimsumManager 開啟時檢查字庫。有新版時，管理器會提示你，按「更新字庫」即可自行更新。你也可以按「檢查更新」。
@@ -255,13 +252,28 @@
         </section>
 
         <section id="changelog" aria-labelledby="changelog-heading" class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-gray-100">
-            <h2 id="changelog-heading" class="text-3xl font-bold mb-6 pb-2 border-b-2 border-primary">
-                Windows 版更新日誌 (v1.1.2) - 2026-08-09
-            </h2>
-            <div class="prose prose-lg max-w-none text-gray-800">
-                <ul class="list-disc pl-6 space-y-4">
-                    <li>基本修復</li>
-                </ul>
+            <h2 id="changelog-heading" class="text-3xl font-bold mb-6 pb-2 border-b-2 border-primary">更新日誌</h2>
+            <div class="text-gray-800 text-lg space-y-8">
+                <section id="changelog-windows" aria-labelledby="changelog-windows-heading">
+                    <h3 id="changelog-windows-heading" class="text-2xl font-bold mb-4">Windows 版</h3>
+                    <h4 class="text-xl font-bold mb-3">v1.3.1（<time datetime="2026-11-27">2026-11-27</time>）</h4>
+                    <ul class="list-disc pl-6 space-y-4">
+                        <li>因應多位使用者希望有更大彈性調整進階設定，我們重整了 Windows 版架構。使用舊版的朋友請務必升級。</li>
+                        <li>NVDA 使用者請務必安裝點心 NVDA 附加組件。安裝點心時，如果 NVDA 正在執行而尚未安裝附加組件，安裝程式會提示。也可以稍後在管理器安裝。附加組件負責候選報讀，可減少 Windows 更新對候選報讀的影響。</li>
+                        <li>即使毋須調整設定，也可以開啟「Dimsum Manager - 點心粵語點字輸入法管理器」，更新輸入法字庫和報讀配詞表。</li>
+                        <li>點心的配詞解釋和 NVDA 原有解釋各自處理。「在 NVDA 開啟點心配詞解釋」預設關閉。開啟後，在 NVDA 桌面配置連按兩下數字鍵盤 2，或在手提電腦配置連按兩下 NVDA 鍵加句號，就會讀出點心的配詞解釋。</li>
+                        <li>管理器提供「另存配詞表供 NVDA 獨立使用」。選擇資料夾後可一次另存三份配詞檔，再按需要自行複製到指定位置。</li>
+                    </ul>
+                    <h4 class="text-xl font-bold mt-6 mb-3">v1.1.2（<time datetime="2026-08-09">2026-08-09</time>）</h4>
+                    <ul class="list-disc pl-6">
+                        <li>基本修復。</li>
+                    </ul>
+                </section>
+                <section id="changelog-mac" aria-labelledby="changelog-mac-heading">
+                    <h3 id="changelog-mac-heading" class="text-2xl font-bold mb-4">Mac 版</h3>
+                    <h4 class="text-xl font-bold mb-3">v1.2.1</h4>
+                    <p>感謝熱心網友李俊彥製作並分享原始碼。經過測試、修改及加入新功能後，點心粵語點字輸入法 Mac 版正式面世。</p>
+                </section>
             </div>
         </section>
 
@@ -328,7 +340,7 @@
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-semibold">網路連線</td>
-                            <td class="px-5 py-3">安裝時需要網路連線檢查更新（無網路則使用離線包）</td>
+                            <td class="px-5 py-3">可離線安裝。檢查及下載更新時需要網路。</td>
                         </tr>
                     </tbody>
                 </table>
@@ -372,30 +384,26 @@
                 <li class="flex gap-4" itemprop="step" itemscope itemtype="https://schema.org/HowToStep">
                     <span class="flex-shrink-0 w-9 h-9 rounded-full bg-primary text-white font-bold flex items-center justify-center text-base" aria-hidden="true">1</span>
                     <div itemprop="text">
-                        <strong itemprop="name">下載安裝程式</strong>：點擊上方「下載 Windows 版（v1.1.2）」按鈕，或前往
-                        <a href="https://github.com/dimsumgroup/dimsum-braille-ime/releases/tag/v1.1.2" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">GitHub 的 Windows 版發行頁</a>
+                        <strong itemprop="name">下載安裝程式</strong>：點擊上方「下載 Windows 版（v1.3.1）」按鈕，或前往
+                        <a href="https://github.com/dimsumgroup/dimsum-braille-ime/releases/tag/v1.3.1" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">GitHub 的 Windows 版發行頁</a>
                         取得安裝程式。
                     </div>
                 </li>
                 <li class="flex gap-4" itemprop="step" itemscope itemtype="https://schema.org/HowToStep">
                     <span class="flex-shrink-0 w-9 h-9 rounded-full bg-primary text-white font-bold flex items-center justify-center text-base" aria-hidden="true">2</span>
-                    <div itemprop="text"><strong itemprop="name">執行安裝程式與系統授權</strong>：找到下載好的執行檔案，按下 <code class="bg-gray-100 px-1 rounded text-sm">Enter</code> 鍵執行。系統會跳出「使用者帳戶控制 (UAC)」的安全提示，請按下 <strong>「是 (Y)」</strong> 授權管理員權限繼續。</div>
+                    <div itemprop="text"><strong itemprop="name">執行安裝程式與系統授權</strong>。執行下載的安裝程式，並按安裝精靈指示繼續。如 Windows 顯示「使用者帳戶控制」提示，請選擇「是」。</div>
                 </li>
                 <li class="flex gap-4" itemprop="step" itemscope itemtype="https://schema.org/HowToStep">
                     <span class="flex-shrink-0 w-9 h-9 rounded-full bg-primary text-white font-bold flex items-center justify-center text-base" aria-hidden="true">3</span>
-                    <div itemprop="text"><strong itemprop="name">雲端版本檢查</strong>：啟動後，安裝程式會自動檢查最新發行版本。如果發現新版本，系統會彈出對話框提示。選擇「是」將自動從網路下載並繼續新版的安裝；選擇「否」繼續安裝目前的版本；選擇「取消」將自動開啟點心官方網站供您手動下載，並關閉目前的安裝程式。</div>
+                    <div itemprop="text"><strong itemprop="name">從舊版升級</strong>。如果安裝程式偵測到舊版點心，請按「確定」繼續升級。系統會保留學習記錄和自訂詞庫。</div>
                 </li>
                 <li class="flex gap-4" itemprop="step" itemscope itemtype="https://schema.org/HowToStep">
                     <span class="flex-shrink-0 w-9 h-9 rounded-full bg-primary text-white font-bold flex items-center justify-center text-base" aria-hidden="true">4</span>
-                    <div itemprop="text"><strong itemprop="name">安裝 NVDA 配詞解釋庫點心版</strong>：接下來，畫面上會詢問：「是否要安裝『NVDA 配詞解釋庫點心版』？」。在有網路狀態下選擇「是」會嘗試從網路下載最新版字典。若下載失敗，會自動切換為安裝包內附的備用版本。無網路狀態下選擇「是」會直接使用安裝包內附的備用版本。注意：如果您選擇「是」，系統在安裝過程中會自動關閉 NVDA，並自動重新啟動 NVDA，請不用擔心。</div>
+                    <div itemprop="text"><strong itemprop="name">安裝點心 NVDA 附加組件</strong>。如果 NVDA 正在執行而尚未安裝點心附加組件，安裝程式會邀請安裝。選擇「是」，按「完成」後依 NVDA 的指示安裝，再重新啟動 NVDA。</div>
                 </li>
                 <li class="flex gap-4" itemprop="step" itemscope itemtype="https://schema.org/HowToStep">
                     <span class="flex-shrink-0 w-9 h-9 rounded-full bg-primary text-white font-bold flex items-center justify-center text-base" aria-hidden="true">5</span>
-                    <div itemprop="text"><strong itemprop="name">背景自動化安裝</strong>：點擊確認後，安裝程式將會全自動執行以下後台作業，過程中請稍後：轉換舊有點寫易詞庫（自動整合舊詞庫）；自動從雲端（或本地備用檔）更新字典檔與相關設定。</div>
-                </li>
-                <li class="flex gap-4" itemprop="step" itemscope itemtype="https://schema.org/HowToStep">
-                    <span class="flex-shrink-0 w-9 h-9 rounded-full bg-primary text-white font-bold flex items-center justify-center text-base" aria-hidden="true">6</span>
-                    <div itemprop="text"><strong itemprop="name">完成安裝與閱讀指南</strong>：安裝完成後，系統會自動使用記事本開啟說明文件，供您閱讀最新的操作指引。現在，您可以按下鍵盤上的 <kbd class="bg-gray-100 border border-gray-300 px-2 py-0.5 rounded text-sm font-mono">Windows 鍵 + 空白鍵</kbd> （或 <kbd class="bg-gray-100 border border-gray-300 px-2 py-0.5 rounded text-sm font-mono">Ctrl + Shift</kbd>）來切換輸入法。當您聽到 NVDA 報讀「<strong>點心粵語點字</strong>」時，就可以馬上使用熟悉的點字指法開始打字了！</div>
+                    <div itemprop="text"><strong itemprop="name">完成安裝並開始打字</strong>。按 <kbd class="bg-gray-100 border border-gray-300 px-2 py-0.5 rounded text-sm font-mono">Windows 鍵＋空白鍵</kbd>，在「繁體中文（香港）」下選擇「點心粵語點字輸入法」。如要調整設定或更新字庫，可以在完成頁勾選「開啟 Dimsum Manager」。</div>
                 </li>
             </ol>
         </section>
