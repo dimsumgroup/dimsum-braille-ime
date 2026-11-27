@@ -230,6 +230,66 @@ plugin.last_report = ordinary_page[0]
 plugin.delivered_window = 43
 assert plugin.route_candidate_navigation(KeyboardInputGesture("pageUp")) is True
 
+# Notepad may expose only the preedit (including its raw code), or a
+# previous Weasel inline preview while Rime has already changed pages.
+assert reporter.preedit_signature("bp") == "/p2:00597757"
+raw = "f$"
+chosen = [("1", "過"), ("2", "日本")]
+for event, key_name in (("page", "pageDown"), ("page", "pageUp"), ("browse", "upArrow"), ("browse", "downArrow")):
+    new_page = (("dimsum" + reporter.preedit_signature(raw), 4), "dimsum_cb", event, 1, False, chosen)
+    plugin = direct_plugin(report=new_page)
+    plugin.preferences["PronounceCandidates"] = True
+    plugin.pronunciations = pronunciations
+    plugin.refresh_pronunciations = lambda: None
+    plugin.read_report = lambda: (report_time(), new_page)
+    sys.modules["api"].getFocusObject = lambda: composition
+    for preedit in (raw, "f$  [ *1. 分  2. 芬  ]", "f$  [ *1. 過  2. 日本  ]"):
+        composition.compositionString = preedit
+        key = KeyboardInputGesture(key_name)
+        assert plugin.route_candidate_navigation(key) is False and key.sent == 1
+        assert plugin.filter_native_speech(["f", "$"]) == []
+        assert plugin.filter_native_speech([preedit]) == []
+        assert plugin.filter_native_speech(["已確認的內容"]) == ["已確認的內容"]
+    spoken.clear()
+    plugin.poll()
+    if event == "page":
+        assert spoken == [("1 過去，戈先生，戈小姐，2 日子，本來", "next")]
+    else:
+        assert spoken == [(reporter.describe("過", pronunciations, all_groups=True), "next")]
+
+composition.compositionString = "f$  [ *1. 過  2. 日本  ]"
+assert plugin.filter_native_speech(["f$", "1 過, 2 日本,"]) == []
+composition.compositionString = "other"
+assert plugin.filter_native_speech(["other"]) == ["other"]
+assert plugin.route_candidate_navigation(KeyboardInputGesture("downArrow")) is True
+
+# Alternate arrows while the native inline display lags the candidate snapshot.
+composition.compositionString = "f$  [ *1. 分  2. 芬  ]"
+spoken.clear()
+for revision, (key_name, selected) in enumerate((("downArrow", 2), ("upArrow", 1), ("downArrow", 2), ("upArrow", 1)), start=11):
+    current = (new_page[0][:1] + (revision,), "dimsum_cb", "browse", selected, False, chosen)
+    plugin.read_report = lambda: (report_time(), current)
+    gesture = KeyboardInputGesture(key_name)
+    assert plugin.route_candidate_navigation(gesture) is False and gesture.sent == 1
+    assert plugin.filter_native_speech(["f$"]) == []
+    plugin.poll()
+assert [text for text, _ in spoken] == [reporter.describe(chosen[i][1], pronunciations, all_groups=True) for i in (1, 0, 1, 0)]
+
+single = (("older-reporter", 10), "dimsum_cb", "page", 1, False, [("1", "過")])
+plugin = direct_plugin(report=single)
+composition.compositionString = "f$  [ *1. 過  ]"
+assert plugin.filter_native_speech(["f$"]) == []
+assert plugin.route_candidate_navigation(KeyboardInputGesture("pageUp")) is False
+
+# Restore native edit gestures and speech when there is no matching Dimsum composition.
+plugin.read_report = lambda: (report_time(), cleared)
+assert plugin.filter_native_speech(["f$"]) == ["f$"]
+assert plugin.route_candidate_navigation(KeyboardInputGesture("pageDown")) is True
+plugin = direct_plugin(report=new_page)
+sys.modules["api"].getFocusObject = lambda: types.SimpleNamespace(windowHandle=42)
+assert plugin.filter_native_speech(["f$"]) == ["f$"]
+assert plugin.route_candidate_navigation(KeyboardInputGesture("downArrow")) is True
+
 spoken.clear()
 next_page = (("dimsum", 3), "dimsum_cb", "page", 1, False, [("1", "過"), ("2", "日本")])
 plugin = direct_plugin(report=next_page)

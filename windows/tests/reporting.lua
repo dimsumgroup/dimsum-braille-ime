@@ -49,6 +49,7 @@ local segment = {
 }
 local context = {
     input = "bp",
+    get_preedit = function(self) return {text = self.input} end,
     get_option = function() return false end,
     composition = {empty = function() return #candidates == 0 end, back = function() return segment end},
     update_notifier = notifier(),
@@ -68,7 +69,10 @@ local reporter = dofile("reporting/rime/lua/dimsum_windows_reporter.lua")
 reporter.init(env)
 context.update_notifier.emit(context)
 assert(published[5] == "page" and published[8] == "a" and published[9] == "不過")
-for _, field in ipairs(published) do assert(field ~= "bp", "Raw input must not be written") end
+for _, field in ipairs(published) do
+    assert(not field:find("bp", 1, true), "Raw input must not be written")
+end
+assert(published[2]:match("/p2:00597757$"), "Publish a signature of the private preedit")
 context.input = "bpA"
 context.update_notifier.emit(context)
 assert(published[5] == "tone")

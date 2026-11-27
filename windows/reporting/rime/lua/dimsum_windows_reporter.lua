@@ -99,6 +99,16 @@ local function write_snapshot(path, payload)
     end
 end
 
+local function preedit_signature(context)
+    -- Match Windows' inline composition without transmitting the input itself.
+    local text = context:get_preedit().text:match("^%s*(.-)%s*$")
+    local hash = 5381
+    for index = 1, #text do
+        hash = (hash * 33 + text:byte(index)) % 4294967296
+    end
+    return string.format("/p%d:%08x", #text, hash)
+end
+
 local function publish(context, env, navigation)
     if not env.path then return end
     local report = enabled(env.flag)
@@ -138,8 +148,11 @@ local function publish(context, env, navigation)
     end
 
     revision = revision + 1
+    -- Older add-ons treat this field as an opaque token.
+    local token = env.session
+    if #current.fields > 0 then token = token .. preedit_signature(context) end
     local fields = {
-        "dimsum-win-1", env.session, tostring(revision), env.engine.schema.schema_id,
+        "dimsum-win-1", token, tostring(revision), env.engine.schema.schema_id,
         event, tostring(current.selected), current.singleton and "1" or "0"
     }
     for _, value in ipairs(current.fields) do fields[#fields + 1] = value end

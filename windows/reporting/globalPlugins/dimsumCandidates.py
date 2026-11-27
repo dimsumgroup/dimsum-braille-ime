@@ -83,6 +83,66 @@ def omit_candidate_numbers(preferences):
     return preferences.get("OmitCandidateNumbers", preferences.get("ReportingMode") == "compact")
 
 
+def preedit_signature(text):
+    data = text.strip(" \t\r\n").encode("utf-8")
+    checksum = 5381
+    for byte in data:
+        checksum = (checksum * 33 + byte) & 0xffffffff
+    return f"/p{len(data)}:{checksum:08x}"
+
+
+def matching_inline_preedit(focus, report):
+    composition = focus
+    for _ in range(3):
+        if isinstance(composition, InputComposition):
+            break
+        composition = getattr(composition, "parent", None)
+    if not isinstance(composition, InputComposition) or composition.isReading:
+        return None
+
+    text = composition.compositionString.strip()
+    if not text:
+        return None
+    report_id, _, _, _, _, items = report
+    prefix, separator, preview = text.rpartition("  [")
+    if not separator or not preview.endswith("]"):
+        prefix, preview = text, ""
+    if report_id[0].endswith(preedit_signature(prefix)):
+        return prefix, preview
+
+    # The actual candidate list can still identify an unsigned or changing
+    # inline preview, including the one-item last page.
+    if not preview or not items:
+        return None
+    remainder = preview[:-1]
+    for _, word in items:
+        if not word:
+            return None
+        _, found, remainder = remainder.partition(word)
+        if not found:
+            return None
+    return prefix, preview
+
+
+def inline_preedit_speech(sequence, preedit):
+    strings = [part for part in sequence if isinstance(part, str)]
+    text = "".join("".join(strings).split())
+    if not text:
+        return False
+    prefix, preview = preedit
+    raw = "".join(prefix.split())
+    candidates = "".join(preview.split())
+    if text in raw or (candidates and (text in candidates or text == raw + "[" + candidates)):
+        return True
+    if not raw or not candidates or not text.startswith(raw):
+        return False
+    # NVDA can emit the code and a flattened candidate list together,
+    # dropping Weasel's brackets or changing label punctuation.
+    spoken_candidates = re.sub(r"[\[\].*，,]", "", text[len(raw):])
+    preview_text = re.sub(r"[\[\].*，,]", "", candidates)
+    return bool(spoken_candidates) and spoken_candidates == preview_text
+
+
 def native_candidate_speech(sequence, focus, items, selected):
     text = " ".join(part.strip() for part in sequence if isinstance(part, str)).rstrip(" ,，")
     if not text or not 0 < selected <= len(items):
@@ -92,30 +152,12 @@ def native_candidate_speech(sequence, focus, items, selected):
     if len(names) > 1 and text == ", ".join(names):
         return True
     word = words[selected - 1]
+    name = names[selected - 1]
     if isinstance(focus, CandidateItem):
-        name = names[selected - 1]
-        if getattr(focus, "basicText", None) == word and (
+        return getattr(focus, "basicText", None) == word and (
             text in {word, name} or text.startswith((name + ", ", name + "，"))
-        ):
-            return True
-
-    composition = focus if isinstance(focus, InputComposition) else getattr(focus, "parent", None)
-    if not isinstance(composition, InputComposition) or composition.isReading:
-        return False
-    preedit = composition.compositionString.strip()
-    if preedit == word:
-        return text == word
-
-    # Weasel's preview_all style appends a bracketed candidate page to the preedit.
-    _, opening, preview = preedit.rpartition("  [")
-    if not opening or not preview.endswith("]") or len(words) < 2:
-        return False
-    remainder = preview[:-1]
-    for word in words:
-        _, found, remainder = remainder.partition(word)
-        if not found:
-            return False
-    return text in preview or text == preedit
+        )
+    return isinstance(focus, InputComposition) and not focus.isReading and focus.compositionString.strip() == text == word
 
 
 def record_nvda_profile():
@@ -385,14 +427,17 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         if snapshot is None:
             return value
         stamp, report = snapshot
-        if not 0 <= time.time_ns() - stamp <= NATIVE_SPEECH_WINDOW_NS:
-            return value
         _, _, event, selected, _, items = report
         focus = api.getFocusObject()
         handle = getattr(focus, "windowHandle", None)
-        if handle is None or event == "clear" or not native_candidate_speech(value, focus, items, selected):
+        if handle is None or event == "clear" or (self.last_report == report[0] and self.delivered_window != handle):
             return value
-        if self.last_report == report[0] and self.delivered_window != handle:
+        preedit = matching_inline_preedit(focus, report)
+        if preedit is not None and inline_preedit_speech(value, preedit):
+            return []
+        if not 0 <= time.time_ns() - stamp <= NATIVE_SPEECH_WINDOW_NS:
+            return value
+        if not native_candidate_speech(value, focus, items, selected):
             return value
         # A native utterance can be canceled while NVDA is still processing
         # the key. Leave candidate delivery to the timer at NEXT priority.
@@ -406,12 +451,14 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         snapshot = self.read_report()
         if snapshot is None:
             return True
-        _, (report_id, _, event, selected, _, items) = snapshot
+        _, report = snapshot
+        report_id, _, event, selected, _, items = report
         focus = api.getFocusObject()
         window = getattr(focus, "windowHandle", None)
         if (event == "clear" or window is None or not 0 < selected <= len(items)
                 or (self.last_report == report_id and self.delivered_window not in (None, window))
-                or not native_candidate_speech([items[selected - 1][1]], focus, items, selected)):
+                or (matching_inline_preedit(focus, report) is None
+                    and not native_candidate_speech([items[selected - 1][1]], focus, items, selected))):
             return True
 
         # Send candidate navigation to Rime instead of running a document script.
