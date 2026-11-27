@@ -219,7 +219,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         extensions.pre_speech.register(self.capture)
         self.gesture_decider = getattr(inputCore, "decide_executeGesture", None)
         if self.gesture_decider is not None:
-            self.gesture_decider.register(self.route_candidate_arrows)
+            self.gesture_decider.register(self.route_candidate_navigation)
         self.timer = wx.PyTimer(self.poll)
         self.timer.Start(40)
         self.profile_marker = record_nvda_profile()
@@ -229,7 +229,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         extensions.filter_speechSequence.unregister(self.filter_native_speech)
         extensions.pre_speech.unregister(self.capture)
         if self.gesture_decider is not None:
-            self.gesture_decider.unregister(self.route_candidate_arrows)
+            self.gesture_decider.unregister(self.route_candidate_navigation)
         self.last_speech = ""
         if self.profile_marker is not None:
             try:
@@ -398,22 +398,23 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         # the key. Leave candidate delivery to the timer at NEXT priority.
         return []
 
-    def route_candidate_arrows(self, gesture):
+    def route_candidate_navigation(self, gesture):
         if (not isinstance(gesture, KeyboardInputGesture)
-                or gesture.mainKeyName.lower() not in {"uparrow", "downarrow"}
+                or gesture.mainKeyName.lower() not in {"uparrow", "downarrow", "pageup", "pagedown"}
                 or gesture.modifierNames or inputCore.manager.isInputHelpActive):
             return True
         snapshot = self.read_report()
         if snapshot is None:
             return True
-        _, (_, _, event, selected, _, items) = snapshot
+        _, (report_id, _, event, selected, _, items) = snapshot
         focus = api.getFocusObject()
         window = getattr(focus, "windowHandle", None)
         if (event == "clear" or window is None or not 0 < selected <= len(items)
+                or (self.last_report == report_id and self.delivered_window not in (None, window))
                 or not native_candidate_speech([items[selected - 1][1]], focus, items, selected)):
             return True
 
-        # Skip NVDA's document/review arrow script for the confirmed Dimsum menu.
+        # Send candidate navigation to Rime instead of running a document script.
         # Send outside the keyboard hook so the injected key can reach the IME.
         def send_if_focused():
             if getattr(api.getFocusObject(), "windowHandle", None) == window:

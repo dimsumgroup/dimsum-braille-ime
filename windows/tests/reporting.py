@@ -208,19 +208,27 @@ plugin.poll()
 assert spoken == [("1 分，2 份", "next")], "Tone input must speak the updated page without a native event."
 
 plugin = direct_plugin()
-for key in ("upArrow", "downArrow"):
+for key in ("upArrow", "downArrow", "pageUp", "pageDown"):
     arrow = KeyboardInputGesture(key)
     sys.modules["api"].getFocusObject = InputComposition
-    assert plugin.route_candidate_arrows(arrow) is False and arrow.sent == 1
+    assert plugin.route_candidate_navigation(arrow) is False and arrow.sent == 1
     sys.modules["api"].getFocusObject = lambda: types.SimpleNamespace(windowHandle=42)
-    assert plugin.route_candidate_arrows(arrow) is True and arrow.sent == 1
+    assert plugin.route_candidate_navigation(arrow) is True and arrow.sent == 1
     sys.modules["api"].getFocusObject = InputComposition
     modified = KeyboardInputGesture(key, ("shift",))
-    assert plugin.route_candidate_arrows(modified) is True and modified.sent == 0
+    assert plugin.route_candidate_navigation(modified) is True and modified.sent == 0
 sys.modules["inputCore"].manager.isInputHelpActive = True
-assert plugin.route_candidate_arrows(KeyboardInputGesture("upArrow")) is True
+assert plugin.route_candidate_navigation(KeyboardInputGesture("upArrow")) is True
 sys.modules["inputCore"].manager.isInputHelpActive = False
-assert plugin.route_candidate_arrows(KeyboardInputGesture("g")) is True
+assert plugin.route_candidate_navigation(KeyboardInputGesture("g")) is True
+
+cleared = (("dimsum", 2), "dimsum_cb", "clear", 0, False, [])
+plugin.read_report = lambda: (report_time(), cleared)
+assert plugin.route_candidate_navigation(KeyboardInputGesture("pageDown")) is True
+plugin = direct_plugin()
+plugin.last_report = ordinary_page[0]
+plugin.delivered_window = 43
+assert plugin.route_candidate_navigation(KeyboardInputGesture("pageUp")) is True
 
 spoken.clear()
 next_page = (("dimsum", 3), "dimsum_cb", "page", 1, False, [("1", "過"), ("2", "日本")])
