@@ -127,7 +127,7 @@ sealed class Workspace
         }
         if (!reportCandidates)
         {
-            foreach (string suffix in new[] { "1", "2", "1.tmp", "2.tmp" })
+            foreach (string suffix in new[] { "1", "2", "3", "1.tmp", "2.tmp", "3.tmp" })
             {
                 try { File.Delete(Path.Combine(data, "candidate-report-" + suffix)); }
                 catch (Exception error) when (error is IOException or UnauthorizedAccessException) { }

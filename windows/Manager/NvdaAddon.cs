@@ -39,7 +39,10 @@ static class NvdaAddon
                 ? NvdaDictionaries.InstalledConfigDirectory()
                 : Path.Combine(directory, "userConfig");
         }
-        return profile is not null && !AddonFolders(profile).Any(folder => ReadOwnedVersion(folder) is not null);
+        // A same or newer installed/pending package already covers this build.
+        Version bundledVersion = typeof(NvdaAddon).Assembly.GetName().Version!;
+        return profile is not null && !AddonFolders(profile).Any(folder =>
+            ReadOwnedVersion(folder) is { } version && version >= bundledVersion);
     }
 
     public static bool Remove(string data)

@@ -102,7 +102,8 @@ def direct_plugin(omit_numbers=False, report=ordinary_page):
     plugin.preferences = {"OmitCandidateNumbers": omit_numbers, "PronounceCandidates": False}
     plugin.own_speech = False
     plugin.speaking_directly = False
-    plugin.direct_delivery = None
+    plugin.delivered_window = None
+    plugin.latest_stamp = 0
     plugin.last_report = None
     plugin.refresh_settings = lambda: None
     plugin.read_report = lambda: (reporter.time.time_ns(), report)
@@ -112,29 +113,40 @@ def direct_plugin(omit_numbers=False, report=ordinary_page):
 spoken.clear()
 sys.modules["ui"].message = lambda text, speechPriority=None: spoken.append((text, speechPriority))
 plugin = direct_plugin()
-assert plugin.filter_native_speech(native_page) == ["1 分，2 芬"]
+assert plugin.filter_native_speech(native_page) == []
+assert plugin.last_report is None, "Filtering a native utterance must not acknowledge the Rime report."
 sys.modules["api"].getFocusObject = CandidateItem
-assert plugin.filter_native_speech(["1 分, 分開"]) == [], "The native highlighted candidate must not repeat the page."
+assert plugin.filter_native_speech(["1 分, 分開"]) == []
 assert plugin.filter_native_speech(["Word 文件內容"]) == ["Word 文件內容"]
 plugin.poll()
-assert spoken == [], "A page already delivered through the speech filter must not be repeated by the timer."
+plugin.poll()
+assert spoken == [("1 分，2 芬", "next")], "The timer speaks once even if the native utterance would be canceled."
+assert plugin.filter_native_speech(["1 分, 分開"]) == []
 
 sys.modules["api"].getFocusObject = InputComposition
 plugin = direct_plugin(omit_numbers=True)
-assert plugin.filter_native_speech(["分"]) == ["分，芬"]
+assert plugin.filter_native_speech(["分"]) == []
 
 composition = InputComposition()
 composition.compositionString = "f$  [ *1. 分  2. 芬  ]"
 sys.modules["api"].getFocusObject = lambda: composition
 plugin = direct_plugin(omit_numbers=True)
-assert plugin.filter_native_speech(["2. 芬"]) == ["分，芬"]
+assert plugin.filter_native_speech(["2. 芬"]) == []
 assert plugin.filter_native_speech(["記事本"]) == ["記事本"]
 
+spoken.clear()
 plugin = direct_plugin(True, later_same)
 plugin.poll()
 assert spoken == [("分，芬", "next")], "An unread page must still be spoken after a later identical update."
 plugin.poll()
 assert len(spoken) == 1
+
+spoken.clear()
+plugin = direct_plugin(omit_numbers=True)
+plugin.poll()
+plugin.read_report = lambda: (reporter.time.time_ns(), later_same)
+plugin.poll()
+assert spoken == [("分，芬", "next")] * 2, "A fresh input event should speak even when it yields the same candidates."
 
 plugin = direct_plugin()
 plugin.read_report = lambda: (reporter.time.time_ns() - reporter.NATIVE_SPEECH_WINDOW_NS - 1, ordinary_page)
@@ -153,9 +165,11 @@ for omit_numbers in (False, True):
     spoken.clear()
     full = reporter.describe("日本", pronunciations, all_groups=True)
     assert full != "日子，本來"
-    assert plugin.filter_native_speech(["2. 日本"]) == [full]
+    assert plugin.filter_native_speech(["2. 日本"]) == []
     plugin.poll()
-    assert not spoken, "Native speech replacement should not repeat through the timer."
+    plugin.poll()
+    assert spoken == [(full, "next")], "The highlighted word should be read only once."
+    spoken.clear()
     plugin = direct_plugin(omit_numbers, browse)
     plugin.preferences["PronounceCandidates"] = True
     plugin.pronunciations = pronunciations
@@ -169,11 +183,45 @@ plugin = direct_plugin(report=tone)
 plugin.poll()
 assert spoken == [("1 分，2 份", "next")], "Tone input must speak the updated page without a native event."
 
+spoken.clear()
+next_page = (("dimsum", 3), "dimsum_cb", "page", 1, False, [("1", "過"), ("2", "日本")])
+plugin = direct_plugin(report=next_page)
+plugin.refresh_settings = lambda: (_ for _ in ()).throw(OSError("temporary settings read"))
+original_message = sys.modules["ui"].message
+
+def temporarily_unavailable(text, speechPriority=None):
+    raise RuntimeError("speech temporarily unavailable")
+
+sys.modules["ui"].message = temporarily_unavailable
+plugin.poll()
+assert plugin.last_report is None
+sys.modules["ui"].message = original_message
+plugin.poll()
+plugin.poll()
+assert spoken == [("1 過，2 日本", "next")], "A transient failure should leave the latest page pending."
+
+with TemporaryDirectory() as temporary:
+    reporter.BASE = Path(temporary)
+    def snapshot_file(slot, revision):
+        file = reporter.BASE / f"candidate-report-{slot}"
+        file.write_bytes("\0".join(("dimsum-win-1", "test", str(revision), "dimsum_cb", "page", "1", "0", "1", "你")).encode())
+        reporter.os.utime(file, ns=(100, 100))
+        return file
+
+    snapshot_file(1, 8)
+    newer = snapshot_file(3, 9)
+    plugin = direct_plugin()
+    plugin.read_report = types.MethodType(reporter.GlobalPlugin.read_report, plugin)
+    assert plugin.read_report()[1][0] == ("test", 9), "Read the alternate slot when file timestamps tie."
+    plugin.poll()
+    newer.unlink()
+    assert plugin.read_report() is None, "Do not fall back to an older report with the same timestamp."
+
 plugin = direct_plugin()
 plugin.pronunciations = pronunciations
 plugin.refresh_pronunciations = lambda: None
 plugin.preferences["PronounceCandidates"] = True
-assert plugin.direct_candidate_text(browse[:2] + ("page",) + browse[3:], 42).endswith("2 日子，本來")
+assert plugin.direct_candidate_text(browse[:2] + ("page",) + browse[3:]).endswith("2 日子，本來")
 spoken.clear()
 plugin.preferences["UseDimsumReviewDescription"] = True
 

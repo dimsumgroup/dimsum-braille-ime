@@ -29,6 +29,7 @@ DICTIONARY_DATA = runpy.run_path(str(ASSETS / "dictionaryData.py"))
 SCHEMAS = {"dimsum_cb", "dimsum_cb_std", "dimsum_full"}
 # Native candidate speech normally follows the Rime update immediately.
 NATIVE_SPEECH_WINDOW_NS = 500_000_000
+REPORT_SLOTS = 3
 
 
 def load_pronunciations(directory):
@@ -175,7 +176,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         self.last_speech = ""
         self.own_speech = False
         self.speaking_directly = False
-        self.direct_delivery = None
+        self.delivered_window = None
         self.pronunciation_revision = None
         self.pronunciations = {}
         self.preferences = {}
@@ -226,9 +227,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         if stamp == self.settings_stamp:
             return
         preferences = json.loads(settings.read_text(encoding="utf-8")) if stamp else {}
-        if (omit_candidate_numbers(preferences) != omit_candidate_numbers(self.preferences)
-                or preferences.get("PronounceCandidates", True) != self.preferences.get("PronounceCandidates", True)):
-            self.direct_delivery = None
         self.preferences = preferences
         self.settings_stamp = stamp
         self.clearGestureBindings()
@@ -305,7 +303,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
     def read_report(self):
         found = []
-        for slot in (1, 2):
+        for slot in range(1, REPORT_SLOTS + 1):
             file = BASE / f"candidate-report-{slot}"
             try:
                 with file.open("rb") as stream:
@@ -313,36 +311,18 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                     if stat.st_size > 65536 or stat.st_mtime_ns < self.latest_stamp:
                         continue
                     report = parse_report(stream.read(65537))
-                    if report:
+                    if report and not (stat.st_mtime_ns == self.latest_stamp and self.last_report
+                                       and report[0][1] < self.last_report[1]):
                         found.append((stat.st_mtime_ns, report))
             except (OSError, UnicodeError, ValueError):
                 continue
         return max(found, key=lambda entry: (entry[0], entry[1][0][1]), default=None)
 
-    def latest_report(self):
-        snapshot = self.read_report()
-        if snapshot is None:
-            return None
-        stamp, latest = snapshot
-        if self.last_report == latest[0]:
-            return None
-        self.latest_stamp = stamp
-        self.last_report = latest[0]
-        return latest
-
-    def direct_candidate_text(self, report, window):
-        revision, schema, event, selected, _, items = report
+    def direct_candidate_text(self, report):
+        _, schema, event, selected, _, items = report
         if event == "clear" or not items:
-            self.direct_delivery = None
             return None
         omit_numbers = omit_candidate_numbers(self.preferences)
-        key = (window, revision)
-        page = (window, revision[0], schema, selected, items)
-        if self.direct_delivery:
-            last_key, last_page = self.direct_delivery
-            if key == last_key or (event == "same" and page == last_page):
-                return None
-
         use_descriptions = self.preferences.get("PronounceCandidates", True)
         if use_descriptions:
             try:
@@ -351,18 +331,15 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                 pass
         if event == "browse" and 0 < selected <= len(items):
             word = items[selected - 1][1]
-            text = describe(word, self.pronunciations, all_groups=True) if use_descriptions else word
+            text = (describe(word, self.pronunciations, all_groups=True) or word) if use_descriptions else word
         else:
             spoken = []
             for label, candidate in items:
-                word = describe(candidate, self.pronunciations) if use_descriptions else candidate
+                word = (describe(candidate, self.pronunciations) or candidate) if use_descriptions else candidate
                 spoken.append(f"{label} {word}" if not omit_numbers and schema != "dimsum_full" else word)
             text = "，".join(spoken)
 
-        if not text:
-            return None
-        self.direct_delivery = (key, page)
-        return text
+        return text or None
 
     def filter_native_speech(self, value):
         if self.speaking_directly or self.own_speech:
@@ -380,27 +357,35 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         handle = getattr(focus, "windowHandle", None)
         if handle is None or event == "clear" or not native_candidate_speech(value, focus, items, selected):
             return value
-        if self.direct_delivery:
-            last_key, _ = self.direct_delivery
-            if last_key[1] == report[0] and last_key[0] != handle:
-                return value
-        text = self.direct_candidate_text(report, handle)
-        return [text] if text else []
+        if self.last_report == report[0] and self.delivered_window != handle:
+            return value
+        # A native utterance can be canceled while NVDA is still processing
+        # the key. Leave candidate delivery to the timer at NEXT priority.
+        return []
 
     def poll(self):
         try:
             self.refresh_settings()
-            latest = self.latest_report()
-            if latest is None or (self.direct_delivery and self.direct_delivery[0][1] == latest[0]):
+        except (OSError, UnicodeError, ValueError):
+            pass  # Keep the last usable settings if a refresh fails.
+
+        try:
+            snapshot = self.read_report()
+            if snapshot is None:
                 return
-            focus = api.getFocusObject()
-            handle = getattr(focus, "windowHandle", None)
-            text = self.direct_candidate_text(latest, handle)
+            stamp, report = snapshot
+            if self.last_report == report[0]:
+                return
+            text = self.direct_candidate_text(report)
+            handle = getattr(api.getFocusObject(), "windowHandle", None)
             if text:
                 self.speaking_directly = True
                 try:
                     ui.message(text, speechPriority=speech.Spri.NEXT)
                 finally:
                     self.speaking_directly = False
-        except (OSError, UnicodeError, ValueError):
+            self.latest_stamp = stamp
+            self.last_report = report[0]
+            self.delivered_window = handle
+        except (OSError, RuntimeError, UnicodeError, ValueError):
             return

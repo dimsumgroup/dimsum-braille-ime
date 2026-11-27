@@ -53,7 +53,7 @@ sealed class ManagerForm : Form
             value => workspace.Settings.ShiftSwitch = value, save: SaveShiftAsync);
         AddButton(input, "匯入舊點寫易自訂詞庫", ImportAsync);
         rimeUpdate = AddButton(input, "更新輸入法字庫", () => UpdateDataAsync(rime: true, pronunciations: false));
-        inputAddon = AddButton(input, "安裝 NVDA 附加組件", InstallAddonAsync);
+        inputAddon = AddButton(input, "安裝或更新 NVDA 附加組件", InstallAddonAsync);
 
         var review = AddPage("配詞解釋報讀設定");
         AddSetting(review, "在 NVDA 開啟點心配詞解釋", () => workspace.Settings.UseDimsumReviewDescription,
@@ -69,7 +69,7 @@ sealed class ManagerForm : Form
         AddButton(review, "清除查配詞快捷鍵", () => Task.FromResult(SaveShortcut("")));
         AddButton(review, "另存配詞表供 NVDA 獨立使用", () => Task.FromResult(ExportPronunciations()));
         pronunciationUpdate = AddButton(review, "更新報讀配詞表", () => UpdateDataAsync(rime: false, pronunciations: true));
-        reviewAddon = AddButton(review, "安裝 NVDA 附加組件", InstallAddonAsync);
+        reviewAddon = AddButton(review, "安裝或更新 NVDA 附加組件", InstallAddonAsync);
 
         var support = AddPage("修復與支援");
         AddButton(support, "使用說明", () =>
@@ -130,7 +130,7 @@ sealed class ManagerForm : Form
             var programCheck = Workspace.NewReleaseAsync(updateTimeout.Token);
             bool offer = CanOfferAddon();
             SetAddonButtons(offer);
-            if (offer && !nvdaPromptAlreadyShown && Confirm("偵測到 NVDA 正在執行。要安裝點心 NVDA 附加組件嗎？"))
+            if (offer && !nvdaPromptAlreadyShown && Confirm("偵測到 NVDA 正在執行。要安裝或更新點心 NVDA 附加組件嗎？"))
                 await RunOperationAsync(InstallAddonAsync);
             if (IsDisposed || Disposing) return;
             nvdaMonitor.Start();

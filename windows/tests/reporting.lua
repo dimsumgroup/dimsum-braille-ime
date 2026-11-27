@@ -1,7 +1,8 @@
 -- Run from the windows directory. Use real Lua with a small Rime/Windows file mock.
 local writer
 local files = {}
-local published
+local published, published_path
+local blocked = {}
 local reporting_enabled, sound_enabled = true, false
 os.getenv = function() return "mock" end
 local prefix = "mock\\DimsumInput\\"
@@ -16,11 +17,16 @@ io.open = function(path, mode)
         close = function() files[path] = writer; return true end,
     }
 end
-os.remove = function(path) files[path] = nil end
+os.remove = function(path)
+    if blocked[path] then return nil, "sharing violation" end
+    files[path] = nil
+    return true
+end
 os.rename = function(from, to)
+    if blocked[to] then return nil, "sharing violation" end
     assert(not files[to], "Windows rename must use a free destination")
     files[to], files[from] = files[from], nil
-    published = {}
+    published, published_path = {}, to
     for field in (files[to] .. "\0"):gmatch("([^%z]*)%z") do
         published[#published + 1] = field
     end
@@ -101,6 +107,36 @@ end
 revision = tonumber(published[3])
 assert(reporter.func(key, env) == 1 and tonumber(published[3]) == revision + 1,
     "A notified move and the navigation fallback must report once")
+local function page_key(rep, to, notify)
+    local event = {repr = function() return rep end}
+    env.engine.process_key = function(_, key_event)
+        assert(reporter.func(key_event, env) == 2)
+        segment.selected_index = to
+        if notify then context.update_notifier.emit(context) end
+        return true
+    end
+    assert(reporter.func(event, env) == 1)
+end
+
+-- A one-item final page can change the absolute index by only one.
+segment.selected_index = 1
+page_key("Next", 2, true)
+assert(published[5] == "page" and published[9] == "日本" and published[7] == "0")
+page_key("Page_Up", 1, false)
+assert(published[5] == "page" and published[9] == "不便" and published[11] == "不過")
+revision = published[3]
+page_key("KP_Page_Up", 1, false)
+assert(published[3] == revision, "An unchanged boundary must not report again")
+
+local active = tonumber(published_path:sub(-1))
+local locked = prefix .. "candidate-report-" .. tostring(active % 3 + 1)
+files[locked] = files[published_path]
+blocked[locked] = true
+page_key("KP_Next", 2, false)
+assert(published_path ~= locked and tonumber(published[3]) == tonumber(revision) + 1 and published[9] == "日本",
+    "Use an alternate slot when a reader holds the next report file open")
+blocked[locked] = nil
+
 candidates = {"你"}
 segment.start, segment.selected_index = 3, 0
 context.select_notifier.emit(context)
