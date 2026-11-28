@@ -4,7 +4,11 @@
 
 # 🔍 什麼是點心粵語點字輸入法？
 
-點心粵語點字輸入法（Dimsum Braille IME）是一款專為香港視障人士設計的粵語點字輸入工具，支援 Windows 和 macOS。Windows 版支援 NVDA、JAWS 及 Windows 朗讀程式（Narrator），亦可使用 Windows 內置語音合成器。macOS 版提供候選報讀及 VoiceOver、TurnOver 查配詞。
+點心粵語點字輸入法（Dimsum Braille IME）是一款專為香港視障人士設計的粵語點字輸入工具，提供 **Windows 版和 Mac 版**，兩個版本都可在打字時聽取候選。
+
+- **Windows 版**支援 NVDA、JAWS、Windows 朗讀程式（Narrator）及 Windows 內置語音合成器。
+- **Mac 版**可搭配 macOS 旁白（VoiceOver）或 TurnOver，透過點心報讀助手聽取候選，亦可查詢讀屏最近報讀內容的配詞。
+
 本輸入法採用 Rime（中州韻）引擎，提供高效、準確的粵語點字輸入體驗，適合日常打字、學習及工作。
 支援關鍵功能包括：
 •
@@ -12,7 +16,7 @@
 •
 無障礙輸入法（Accessibility IME）
 •
-支援 NVDA、JAWS 及 Windows 朗讀程式（Narrator）
+Windows 和 Mac 版均提供候選報讀
 •
 香港用字與口語詞庫
 
@@ -25,7 +29,7 @@
 
 ### macOS
 
-適用於 macOS 13 或更新版本。從 GitHub Releases 下載 Mac 的 DMG，打開後把 DimsumManager 拖到「應用程式」。DMG 內附安裝及使用說明。
+適用於 macOS 13 或更新版本。從 GitHub Releases 下載 Mac 的 DMG，打開後把 DimsumManager 拖到「應用程式」。依指示完成安裝並啟動點心報讀助手，即可聽取候選。旁白（VoiceOver）及 TurnOver 的查配詞設定見 DMG 內附使用說明。
 
 [下載 Mac 版](https://github.com/dimsumgroup/dimsum-braille-ime/releases) · [安裝及使用說明](mac/安裝及使用說明.txt) · [Mac 原始碼及編譯方法](mac/BUILD.md)
 
@@ -59,9 +63,9 @@
 
 ## 📖 使用指南
 
-歡迎使用「點心粵語點字輸入法」！這是一套專為香港視障朋友度身訂做、在 Windows 系統上完美運作的粵語點字打字工具。
+以下介紹 Windows 和 Mac 版共用的點字輸入方式。個別快捷鍵和報讀設定請參考各平台的使用說明。
 
-本輸入法採用先進的 Rime (中州韻) 引擎驅動，並完美支援 NVDA 螢幕閱讀器，讓您能用最熟悉的點字邏輯，在電腦上飛快地輸入繁體中文與香港生僻用字。
+兩個版本都採用 Rime（中州韻）引擎，可用粵語點字輸入繁體中文及香港用字。
 
 官方網站：[https://www.dimsumbrl.work/](https://www.dimsumbrl.work/)
 
@@ -150,7 +154,7 @@
 * **完美支援粵語點字編碼**：採用標準六點字系統
 * **智慧學習功能**：自動記錄您的選字習慣與新詞
 * **香港本地化**：收錄香港口語字與常用地名用字
-* **NVDA 完美相容**：支援最新版 NVDA 螢幕閱讀器
+* **候選報讀**：Windows 和 Mac 版均可在輸入時報讀候選。Mac 版可搭配旁白（VoiceOver）或 TurnOver。
 * **開源免費**：完全開源，永久免費使用
 * **長句連打**：強大的自動組句功能
 * **客製化自由度高**：設定為純文字檔，輕鬆新增專屬字彙
@@ -161,10 +165,12 @@
 
 | 項目 | 要求 |
 | --- | --- |
-| **作業系統** | Windows 10 或以上版本（64 位元） |
-| **磁碟空間** | 約 50 MB |
-| **螢幕閱讀器** | NVDA、JAWS、Windows 朗讀程式（Narrator） |
-| **網路連線** | 安裝時不需要網路連線 |
+| **Windows** | Windows 10 或更新版本（64 位元） |
+| **Mac** | macOS 13 或更新版本 |
+| **Windows 讀屏軟件** | NVDA、JAWS、Windows 朗讀程式（Narrator） |
+| **Mac 讀屏軟件** | macOS 旁白（VoiceOver）、TurnOver |
+| **Windows 磁碟空間** | 約 50 MB |
+| **Windows 網路連線** | 安裝時不需要網路連線 |
 
 ---
 
