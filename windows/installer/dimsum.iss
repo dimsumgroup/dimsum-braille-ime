@@ -191,7 +191,7 @@ end;
 procedure CurStepChanged(Step: TSetupStep);
 var
   Code: Integer;
-  Manager, NvdaPrompt: String;
+  Manager: String;
 begin
   Manager := ExpandConstant('{app}\DimsumManager.exe');
   if Step = ssPostInstall then begin
@@ -207,13 +207,9 @@ begin
         ManagerRequired := False;
     end;
     if not ManagerRequired and not WizardSilent then begin
-      if Exec(Manager, '--check-nvda-addon', '', SW_HIDE, ewWaitUntilTerminated, Code) and ((Code = 6) or (Code = 7)) then begin
+      if Exec(Manager, '--check-nvda-addon', '', SW_HIDE, ewWaitUntilTerminated, Code) and (Code = 6) then begin
         NvdaOfferShown := True;
-        if Code = 7 then
-          NvdaPrompt := '要喺完成安裝後開啟 NVDA 並更新點心 NVDA 附加組件至 {#AppVer} 嗎？'
-        else
-          NvdaPrompt := '偵測到 NVDA 正在執行。要安裝或更新點心 NVDA 附加組件至 {#AppVer}，報讀候選同查配詞嗎？';
-        InstallNvdaAfterSetup := MsgBox(NvdaPrompt + ' 按「是」後，完成點心安裝時請跟隨 NVDA 指示。',
+        InstallNvdaAfterSetup := MsgBox('偵測到 NVDA 正在執行。要安裝或更新點心 NVDA 附加組件至 {#AppVer}，報讀候選同查配詞嗎？按「是」後，完成點心安裝時請跟隨 NVDA 指示。',
           mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES;
       end;
     end;

@@ -10,17 +10,14 @@ sealed record NvdaSession(int Id, string? Directory, DateTime? StartedUtc)
 {
     internal sealed record Profile(string Language, string ConfigDirectory, string? DictionaryLanguage = null);
 
-    internal static NvdaSession? FindReady()
+    public static NvdaSession? Find()
     {
         // NVDA uses this top-level window to find its existing instance.
         nint window = FindWindow("wxWindowClassNR", "NVDA");
-        return window != 0 && GetWindowThreadProcessId(window, out uint id) != 0
-            ? Describe(checked((int)id)) : null;
-    }
+        if (window != 0 && GetWindowThreadProcessId(window, out uint id) != 0 &&
+            Describe(checked((int)id)) is { } active)
+            return active;
 
-    public static NvdaSession? Find()
-    {
-        if (FindReady() is { } active) return active;
         using var current = Process.GetCurrentProcess();
         int sessionId = current.SessionId;
         var processes = Process.GetProcessesByName("nvda");

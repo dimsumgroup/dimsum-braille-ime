@@ -25,15 +25,10 @@ static class Program
                         if (new LegacyUpgrade(new Workspace()).NeedsNotice()) Environment.ExitCode = 6;
                         break;
                     case "--check-nvda-addon" when args.Length == 1:
-                        Environment.ExitCode = NvdaAddon.GetOffer(new Workspace().DataDirectory) switch
-                        {
-                            NvdaAddonOffer.Running => 6,
-                            NvdaAddonOffer.StartNvda => 7,
-                            _ => 0
-                        };
+                        if (NvdaAddon.ShouldOffer(new Workspace().DataDirectory)) Environment.ExitCode = 6;
                         break;
                     case "--install-nvda-addon" when args.Length == 1:
-                        NvdaAddon.InstallAsync(new Workspace().DataDirectory).GetAwaiter().GetResult();
+                        NvdaAddon.InstallIfOffered(new Workspace().DataDirectory);
                         break;
                     case "--complete-install" when args.Length == 1:
                         var installedWorkspace = new Workspace();
