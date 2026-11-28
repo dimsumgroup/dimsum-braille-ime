@@ -28,9 +28,7 @@ static class Program
                         if (NvdaAddon.ShouldOffer(new Workspace().DataDirectory)) Environment.ExitCode = 6;
                         break;
                     case "--install-nvda-addon" when args.Length == 1:
-                        if (NvdaAddon.ShouldOffer(new Workspace().DataDirectory)) NvdaAddon.Install();
-                        else if (NvdaSession.Find() is null)
-                            throw new IOException("NVDA 已關閉。請先開啟 NVDA，再喺點心管理器安裝附加組件。");
+                        NvdaAddon.InstallIfOffered(new Workspace().DataDirectory);
                         break;
                     case "--complete-install" when args.Length == 1:
                         var installedWorkspace = new Workspace();

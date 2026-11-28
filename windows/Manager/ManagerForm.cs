@@ -4,25 +4,48 @@ namespace Dimsum;
 
 sealed class ManagerForm : Form
 {
+    const string AutomaticSpeechHint = "有多款讀屏開啟時，優先使用 NVDA，其次係 JAWS，再到 Windows 朗讀程式（Narrator）。關閉自動偵測就可以自行揀報讀方式。";
     const string ReviewDescription = "用 NVDA 原有快捷鍵連按兩下，讀出檢閱游標所在字嘅點心配詞。關閉後會用返 NVDA 原有解釋。";
-    const string LookupLabel = "查最近報讀配詞快捷鍵（可留空）";
-    const string LookupDescription = "有設定快捷鍵，就可以查 NVDA 最近讀過嘅字詞或句子。呢個快捷鍵同上面嘅開關各自生效。即係話，就算上面關閉咗，呢度你設定咗快捷鍵，你就可以好快咁對比兩套字表嘅解釋。";
+    const string LookupLabel = "查配詞快捷鍵（可留空）";
+    const string LookupDescription = "非 NVDA 使用者可以設定呢個快捷鍵去聆聽配詞解釋報讀。先複製想查嘅文字或讀屏報讀，再按點心快捷鍵。";
+    const string JawsLookupDescription = "按 JAWS 鍵加空格，再按 H 開啟語音紀錄。複製要查嘅一句，再按點心查配詞快捷鍵。";
+    const string NarratorLookupDescription = "按朗讀程式鍵加 Ctrl 加 X 複製最近一句，再按點心查配詞快捷鍵。";
     readonly Workspace workspace;
     readonly OperationLog log;
     readonly TabControl tabs = new() { Dock = DockStyle.Fill };
     readonly Label status = new() { AutoSize = true, Dock = DockStyle.Fill, AccessibleName = "操作結果", Padding = new Padding(10, 5, 10, 8) };
     readonly Label shortcut = new() { AutoSize = true, TabStop = false };
     readonly CheckBox defaultIme = new() { AutoSize = true, Text = "將點心設為目前預設輸入法", Enabled = false };
+    static readonly (CandidateOutput Mode, string Name)[] CandidateModes =
+    [
+        (CandidateOutput.Off, "關閉"),
+        (CandidateOutput.Nvda, "NVDA"),
+        (CandidateOutput.Jaws, "JAWS"),
+        (CandidateOutput.Narrator, "Windows 朗讀程式（Narrator）"),
+        (CandidateOutput.WindowsVoice, "Windows 內置語音合成器")
+    ];
+    readonly CheckBox automaticSpeech = new() { AutoSize = true, Text = "自動偵測讀屏軟件" };
+    readonly ComboBox speechOutput = new() { Width = 320, DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "候選報讀方式" };
+    readonly ComboBox speechVoice = new() { Width = 320, DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "Windows 發音聲線" };
+    readonly Label voiceLabel = new() { AutoSize = true, Text = "Windows 發音聲線" };
+    readonly ComboBox lookupVoice = new() { Width = 320, DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "配詞解釋報讀聲線" };
+    readonly Label lookupVoiceLabel = new() { AutoSize = true, Text = "配詞解釋報讀聲線" };
+    readonly Label lookupVoiceHint = new() { AutoSize = true, MaximumSize = new Size(450, 0) };
+    const string ChooseVoiceHint = "請選擇已安裝嘅聲線，或者喺 Windows 語音設定安裝廣東話聲線。";
+    readonly Label speechHint = new() { AutoSize = true, MaximumSize = new Size(450, 0) };
+    Windows.Media.SpeechSynthesis.VoiceInformation[] speechVoices = [];
     readonly ComboBox inputLanguage = new() { Width = 310, DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "點心輸入法語言" };
     readonly System.Windows.Forms.Timer nvdaMonitor = new() { Interval = 3000 };
     readonly Button rimeUpdate, pronunciationUpdate, inputAddon, reviewAddon, continueSetup, applyLanguage, recordShortcut, updateOverview;
     (DataUpdate Dictionary, DataUpdate Pronunciations) dataUpdates;
     (Version Version, string Page)? programUpdate;
+    bool nvdaPromptShown;
     bool busy, refreshingControls, setupReady, showUpdatesWhenIdle;
 
     public ManagerForm(Workspace workspace, bool setupProblem, bool nvdaPromptAlreadyShown)
     {
         this.workspace = workspace;
+        nvdaPromptShown = nvdaPromptAlreadyShown;
         log = new OperationLog(workspace);
         setupReady = workspace.SetupComplete && Workspace.FindDeployer() is not null && !setupProblem && !new LegacyUpgrade(workspace).InProgress;
         Text = Program.Title;
@@ -38,6 +61,7 @@ sealed class ManagerForm : Form
         Controls.Add(layout);
 
         var input = AddPage("輸入設定");
+        AddSpeechSettings(input);
         AddSetting(input, "聆聽候選時不報讀數字", () => workspace.Settings.OmitCandidateNumbers,
             value => workspace.Settings.OmitCandidateNumbers = value);
         AddSetting(input, "只有一個候選時不播放聲音", () => !workspace.SoundEnabled,
@@ -59,9 +83,27 @@ sealed class ManagerForm : Form
         AddSetting(review, "在 NVDA 開啟點心配詞解釋", () => workspace.Settings.UseDimsumReviewDescription,
             value => workspace.Settings.UseDimsumReviewDescription = value, ReviewDescription);
         AddLabel(review, ReviewDescription);
+        AddSetting(review, "在 JAWS 開啟點心配詞解釋", () => workspace.Settings.UseJawsSpeechLookup,
+            value => workspace.Settings.UseJawsSpeechLookup = value, JawsLookupDescription,
+            save: () => SaveExternalLookupAsync(workspace.Settings.UseJawsSpeechLookup && !workspace.Settings.UseNarratorSpeechLookup && !workspace.Settings.UseWindowsVoiceLookup));
+        AddSetting(review, "在 Windows 朗讀程式（Narrator）開啟點心配詞解釋", () => workspace.Settings.UseNarratorSpeechLookup,
+            value => workspace.Settings.UseNarratorSpeechLookup = value, NarratorLookupDescription,
+            save: () => SaveExternalLookupAsync(workspace.Settings.UseNarratorSpeechLookup && !workspace.Settings.UseJawsSpeechLookup && !workspace.Settings.UseWindowsVoiceLookup));
+        AddSetting(review, "用 Windows 內置語音合成器讀配詞解釋", () => workspace.Settings.UseWindowsVoiceLookup,
+            value => workspace.Settings.UseWindowsVoiceLookup = value, "複製想查嘅文字，再按點心查配詞快捷鍵。其他已啟用嘅讀屏報讀方式會優先使用。",
+            save: () => SaveExternalLookupAsync(workspace.Settings.UseWindowsVoiceLookup &&
+                !workspace.Settings.UseJawsSpeechLookup && !workspace.Settings.UseNarratorSpeechLookup));
+        Add(review, lookupVoiceLabel);
+        Add(review, lookupVoice);
+        Add(review, lookupVoiceHint);
+        lookupVoice.SelectedIndexChanged += async (_, _) =>
+        {
+            if (!refreshingControls && lookupVoice.SelectedIndex >= 0)
+                await RunOperationAsync(() => SaveLookupVoiceAsync(speechVoices[lookupVoice.SelectedIndex].Id));
+        };
         Add(review, shortcut);
         AddLabel(review, LookupDescription);
-        recordShortcut = AddButton(review, "錄製查配詞快捷鍵", () =>
+        recordShortcut = AddButton(review, "設定查配詞快捷鍵", () =>
         {
             using var capture = new ShortcutCapture();
             return Task.FromResult(capture.ShowDialog(this) == DialogResult.OK ? SaveShortcut(capture.Shortcut) : "");
@@ -84,6 +126,12 @@ sealed class ManagerForm : Form
             Program.Open(Program.Website);
             return Task.FromResult("");
         });
+        var manualAddon = AddButton(support, "安裝 NVDA 附加組件", () =>
+        {
+            NvdaAddon.InstallManually();
+            return Task.FromResult("已開啟 NVDA 附加組件安裝檔。");
+        });
+        manualAddon.AccessibleDescription = "請先開啟 NVDA。可以喺呢度手動開啟內附嘅附加組件安裝檔。";
         continueSetup = AddButton(support, "繼續設定點心", () => SetupAsync(repair: false));
         const string repairHint = "如果打唔到字，或者輸入法出現錯誤，請按呢個按鈕。";
         var repair = AddButton(support, "輸入法設定修復", () => SetupAsync(repair: true));
@@ -121,23 +169,146 @@ sealed class ManagerForm : Form
             SetStatus(setupProblem ? latest : "點心設定尚未完成。可以按「繼續設定點心」。");
         }
 
-        nvdaMonitor.Tick += (_, _) => { if (!busy) SetAddonButtons(CanOfferAddon()); };
+        nvdaMonitor.Tick += async (_, _) =>
+        {
+            if (busy) return;
+            RefreshSpeechSettings();
+            await CheckNvdaAddonAsync(allowPrompt: ActiveForm == this);
+        };
         FormClosed += (_, _) => nvdaMonitor.Dispose();
         Shown += async (_, _) =>
         {
             var dataCheck = Workspace.CheckDataIndexAsync();
             using var updateTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             var programCheck = Workspace.NewReleaseAsync(updateTimeout.Token);
-            bool offer = CanOfferAddon();
-            SetAddonButtons(offer);
-            if (offer && !nvdaPromptAlreadyShown && Confirm($"偵測到 NVDA 正在執行。要安裝或更新點心 NVDA 附加組件至 {NvdaAddon.BundledVersion.ToString(3)} 嗎？"))
-                await RunOperationAsync(InstallAddonAsync);
+            await CheckNvdaAddonAsync(allowPrompt: true);
             if (IsDisposed || Disposing) return;
             nvdaMonitor.Start();
             try { await RefreshDefaultAsync(); }
             catch (Exception error) { log.Record(ErrorText("查看 Windows 預設輸入法", error)); }
             await CheckForUpdatesOnOpenAsync(dataCheck, programCheck);
         };
+    }
+
+    void AddSpeechSettings(TableLayoutPanel page)
+    {
+        Add(page, automaticSpeech);
+        AddLabel(page, "候選報讀方式");
+        Add(page, speechOutput);
+        Add(page, voiceLabel);
+        Add(page, speechVoice);
+        Add(page, speechHint);
+        speechOutput.Items.AddRange(CandidateModes.Select(mode => mode.Name).ToArray());
+        RefreshSpeechSettings();
+
+        automaticSpeech.CheckedChanged += async (_, _) =>
+        {
+            if (!refreshingControls)
+                await RunOperationAsync(() => SaveSpeechSettings(automaticSpeech.Checked ? null :
+                    CandidateModes[speechOutput.SelectedIndex].Mode, workspace.Settings.CandidateVoiceId));
+        };
+        speechOutput.SelectedIndexChanged += async (_, _) =>
+        {
+            if (!refreshingControls && speechOutput.SelectedIndex >= 0)
+                await RunOperationAsync(() => SaveSpeechSettings(CandidateModes[speechOutput.SelectedIndex].Mode,
+                    workspace.Settings.CandidateVoiceId));
+        };
+        speechVoice.SelectedIndexChanged += async (_, _) =>
+        {
+            if (!refreshingControls && speechVoice.SelectedIndex >= 0)
+                await RunOperationAsync(() => SaveSpeechSettings(CandidateOutput.WindowsVoice,
+                    speechVoices[speechVoice.SelectedIndex].Id));
+        };
+    }
+
+    void RefreshSpeechSettings()
+    {
+        var readers = ScreenReaders.Detect();
+        var mode = readers.Select(workspace.Settings.CandidateSpeechOutput);
+        RefreshControls(() =>
+        {
+            automaticSpeech.Checked = workspace.Settings.CandidateSpeechOutput is null;
+            speechOutput.Enabled = !automaticSpeech.Checked;
+            speechOutput.SelectedIndex = Array.FindIndex(CandidateModes, item => item.Mode == mode);
+            automaticSpeech.AccessibleDescription = automaticSpeech.Checked
+                ? $"目前報讀方式係{speechOutput.Text}。{AutomaticSpeechHint}" : AutomaticSpeechHint;
+            bool candidateVoiceEnabled = mode == CandidateOutput.WindowsVoice;
+            bool lookupVoiceEnabled = workspace.Settings.UseWindowsVoiceLookup;
+            if (candidateVoiceEnabled || lookupVoiceEnabled)
+            {
+                var installed = WindowsVoiceSpeech.Voices();
+                if (!installed.Select(voice => voice.Id).SequenceEqual(speechVoices.Select(voice => voice.Id)))
+                {
+                    speechVoices = installed;
+                    string[] names = speechVoices.Select(voice => $"{voice.DisplayName}（{voice.Language}）").ToArray();
+                    foreach (var combo in new[] { speechVoice, lookupVoice })
+                    {
+                        combo.Items.Clear();
+                        combo.Items.AddRange(names);
+                    }
+                }
+            }
+            RefreshVoice(speechVoice, voiceLabel, candidateVoiceEnabled, workspace.Settings.CandidateVoiceId);
+            RefreshVoice(lookupVoice, lookupVoiceLabel, lookupVoiceEnabled, workspace.Settings.LookupVoiceId);
+            lookupVoiceHint.Visible = lookupVoiceEnabled && lookupVoice.SelectedIndex < 0;
+            lookupVoiceHint.Text = ChooseVoiceHint;
+            lookupVoice.AccessibleDescription = lookupVoice.SelectedIndex < 0 ? ChooseVoiceHint : "";
+
+            speechHint.Text = mode switch
+            {
+                CandidateOutput.Off when automaticSpeech.Checked => "暫時未偵測到讀屏軟件，候選報讀已關閉。",
+                CandidateOutput.Off => "已關閉點心候選報讀。",
+                CandidateOutput.Nvda when !readers.Nvda => "未偵測到 NVDA 正在執行。",
+                CandidateOutput.Nvda => "由點心 NVDA 附加組件報讀候選。",
+                CandidateOutput.Jaws when !readers.Jaws => "未偵測到 JAWS。已手動選用 JAWS，請確認 JAWS 已開啟。",
+                CandidateOutput.Jaws => "由 JAWS 報讀候選。如果未能聽到候選，可以改用 Windows 內置語音合成器。",
+                CandidateOutput.Narrator when !readers.CanNotifyNarrator => "請先關閉 NVDA 同 JAWS，先可以由 Windows 朗讀程式報讀候選。",
+                CandidateOutput.Narrator when !readers.Narrator => "未偵測到 Windows 朗讀程式。已手動選用，請確認朗讀程式已開啟。",
+                CandidateOutput.Narrator => "由 Windows 朗讀程式報讀候選。",
+                CandidateOutput.WindowsVoice when speechVoice.SelectedIndex < 0 => ChooseVoiceHint,
+                _ => ""
+            };
+            speechOutput.AccessibleDescription = speechHint.Text;
+            speechVoice.AccessibleDescription = speechHint.Text;
+        });
+    }
+
+    void RefreshVoice(ComboBox combo, Label label, bool enabled, string? voiceId)
+    {
+        label.Visible = combo.Visible = enabled;
+        if (!enabled) return;
+        combo.SelectedIndex = Array.FindIndex(speechVoices, voice =>
+            voiceId is null ? WindowsVoiceSpeech.IsCantonese(voice.Language) : voice.Id == voiceId);
+        combo.Enabled = speechVoices.Length > 0;
+    }
+
+    Task<string> SaveLookupVoiceAsync(string voiceId)
+    {
+        string? previous = workspace.Settings.LookupVoiceId;
+        workspace.Settings.LookupVoiceId = voiceId;
+        try { workspace.Save(); }
+        catch
+        {
+            workspace.Settings.LookupVoiceId = previous;
+            throw;
+        }
+        finally { RefreshSpeechSettings(); }
+        return Task.FromResult("已更新配詞解釋報讀聲線。");
+    }
+
+    Task<string> SaveSpeechSettings(CandidateOutput? mode, string? voiceId)
+    {
+        var previous = (workspace.Settings.CandidateSpeechOutput, workspace.Settings.CandidateVoiceId);
+        workspace.Settings.CandidateSpeechOutput = mode;
+        workspace.Settings.CandidateVoiceId = voiceId;
+        try { workspace.Save(); }
+        catch
+        {
+            (workspace.Settings.CandidateSpeechOutput, workspace.Settings.CandidateVoiceId) = previous;
+            throw;
+        }
+        finally { RefreshSpeechSettings(); }
+        return Task.FromResult("已更新候選報讀方式。");
     }
 
     TableLayoutPanel AddPage(string name)
@@ -215,9 +386,20 @@ sealed class ManagerForm : Form
         recordShortcut.AccessibleDescription = shortcut.Text + LookupDescription;
     }
 
+    Task SaveExternalLookupAsync(bool enablingFirst)
+    {
+        if (enablingFirst) SpeechLookup.CheckAvailability(workspace.Settings.LookupGesture);
+        workspace.Save();
+        RefreshSpeechSettings();
+        return Task.CompletedTask;
+    }
+
     string SaveShortcut(string value)
     {
         string previous = workspace.Settings.LookupGesture;
+        if (value != previous && (workspace.Settings.UseJawsSpeechLookup || workspace.Settings.UseNarratorSpeechLookup ||
+            workspace.Settings.UseWindowsVoiceLookup))
+            SpeechLookup.CheckAvailability(value);
         workspace.Settings.LookupGesture = value;
         try { workspace.Save(); }
         catch
@@ -341,22 +523,35 @@ sealed class ManagerForm : Form
             : $"有 Windows 新版 {release.Version.ToString(3)}。";
     }
 
-    bool CanOfferAddon()
+    async Task CheckNvdaAddonAsync(bool allowPrompt)
     {
-        try { return NvdaAddon.ShouldOffer(workspace.DataDirectory); }
-        catch (Exception error) when (error is IOException or UnauthorizedAccessException) { return false; }
+        NvdaAddonOffer offer;
+        try { offer = NvdaAddon.GetOffer(workspace.DataDirectory); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+        {
+            offer = NvdaAddonOffer.None;
+        }
+
+        SetAddonButtons(offer != NvdaAddonOffer.None);
+        if (offer == NvdaAddonOffer.None || !allowPrompt || nvdaPromptShown) return;
+
+        nvdaPromptShown = true;
+        string version = NvdaAddon.BundledVersion.ToString(3);
+        string message = offer == NvdaAddonOffer.Install
+            ? "偵測到 NVDA 正在執行，但未安裝點心 NVDA 附加組件。要安裝嗎？"
+            : $"偵測到點心 NVDA 附加組件需要更新。要更新至 {version} 嗎？";
+        if (Confirm(message)) await RunOperationAsync(InstallAddonAsync);
     }
 
     void SetAddonButtons(bool available) => inputAddon.Visible = reviewAddon.Visible = available;
 
     Task<string> InstallAddonAsync()
     {
-        if (!CanOfferAddon())
+        if (!NvdaAddon.InstallIfOffered(workspace.DataDirectory))
         {
             SetAddonButtons(false);
             return Task.FromResult("");
         }
-        NvdaAddon.Install();
         return Task.FromResult("已開啟 NVDA 附加組件安裝檔。");
     }
 

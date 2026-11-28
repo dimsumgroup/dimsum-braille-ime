@@ -23,31 +23,46 @@ static class SingletonSound
         string service = Path.Combine(directory, Service);
         string notification = Path.Combine(directory, Event);
         using var sound = new SoundPlayer(Path.Combine(AppContext.BaseDirectory, "assets", "only.wav"));
-        sound.Load();
+        try { sound.Load(); }
+        catch (Exception error) when (error is IOException or InvalidOperationException or TimeoutException) { }
         string? last = null;
         var started = DateTime.UtcNow;
-        while (File.Exists(service))
+        using var speech = new CandidateSpeech(directory);
+        using var timer = new System.Windows.Forms.Timer { Interval = 35 };
+        timer.Tick += async (_, _) =>
         {
-            if (!File.Exists(flag))
+            if (!File.Exists(service))
             {
-                started = DateTime.UtcNow;
-                Thread.Sleep(250);
-                continue;
+                timer.Stop();
+                Application.ExitThread();
+                return;
             }
-            try
+
+            if (!File.Exists(flag)) started = DateTime.UtcNow;
+            else
             {
-                if (File.Exists(notification) && File.GetLastWriteTimeUtc(notification) >= started)
+                try
                 {
-                    string value = File.ReadAllText(notification);
-                    if (value.EndsWith('\n') && value != last)
+                    if (File.GetLastWriteTimeUtc(notification) >= started)
                     {
-                        last = value;
-                        sound.Play();
+                        string value = File.ReadAllText(notification);
+                        if (value.EndsWith('\n') && value != last)
+                        {
+                            last = value;
+                            sound.Play();
+                        }
                     }
                 }
+                catch (Exception error) when (error is IOException or InvalidOperationException or UnauthorizedAccessException) { }
             }
-            catch (IOException) { }
-            Thread.Sleep(35);
-        }
+
+            try { await speech.PollAsync(); }
+            catch (Exception error) when (error is System.Runtime.InteropServices.COMException or
+                System.Reflection.TargetInvocationException or Microsoft.CSharp.RuntimeBinder.RuntimeBinderException or
+                InvalidOperationException or TypeLoadException or FileNotFoundException) { }
+        };
+        if (!File.Exists(service)) return;
+        timer.Start();
+        Application.Run();
     }
 }

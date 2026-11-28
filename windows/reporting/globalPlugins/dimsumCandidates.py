@@ -379,6 +379,8 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             self.own_speech = False
 
     def read_report(self):
+        if self.preferences.get("CandidateSpeechOutput") not in (None, "Nvda"):
+            return None
         found = []
         for slot in range(1, REPORT_SLOTS + 1):
             file = BASE / f"candidate-report-{slot}"
@@ -503,6 +505,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         try:
             snapshot = self.read_report()
             if snapshot is None:
+                self.observed_report = None
                 return
             stamp, report = snapshot
             self.observed_report = report[0]
