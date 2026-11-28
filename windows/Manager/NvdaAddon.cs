@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 
 namespace Dimsum;
 
+enum NvdaAddonOffer { None, Install, Update }
+
 static class NvdaAddon
 {
     const string Name = "dimsumCandidates";
@@ -41,10 +43,12 @@ static class NvdaAddon
         Program.Open(Bundle);
     }
 
-    public static bool ShouldOffer(string data)
+    public static bool ShouldOffer(string data) => GetOffer(data) != NvdaAddonOffer.None;
+
+    public static NvdaAddonOffer GetOffer(string data)
     {
         var running = NvdaSession.Find();
-        if (running is null) return false;
+        if (running is null) return NvdaAddonOffer.None;
         string? profile = running.ReadProfile(data)?.ConfigDirectory;
         if (profile is null && running.Directory is { } directory)
         {
@@ -53,9 +57,17 @@ static class NvdaAddon
                 ? NvdaDictionaries.InstalledConfigDirectory()
                 : Path.Combine(directory, "userConfig");
         }
-        if (profile is null) return false;
+        if (profile is null) return NvdaAddonOffer.None;
+
         _ = BundledVersion;
-        return !AddonFolders(profile).Any(IsCurrentOrNewer);
+        bool hasAddon = false;
+        foreach (string folder in AddonFolders(profile))
+        {
+            if (ReadOwnedVersion(folder) is not { } version) continue;
+            hasAddon = true;
+            if (IsCurrentOrNewer(folder, version)) return NvdaAddonOffer.None;
+        }
+        return hasAddon ? NvdaAddonOffer.Update : NvdaAddonOffer.Install;
     }
 
     static (Version Version, byte[] PluginHash) ReadBundle()
@@ -72,10 +84,9 @@ static class NvdaAddon
         return (version, SHA256.HashData(plugin));
     }
 
-    static bool IsCurrentOrNewer(string folder)
+    static bool IsCurrentOrNewer(string folder, Version installed)
     {
-        var installed = ReadOwnedVersion(folder);
-        if (installed is null || installed < BundledVersion) return false;
+        if (installed < BundledVersion) return false;
         if (installed > BundledVersion) return true;
 
         // A previous test installer used the same public version number.

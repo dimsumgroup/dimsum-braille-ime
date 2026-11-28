@@ -35,11 +35,13 @@ sealed class ManagerForm : Form
     readonly Button rimeUpdate, pronunciationUpdate, inputAddon, reviewAddon, continueSetup, applyLanguage, recordShortcut, updateOverview;
     (DataUpdate Dictionary, DataUpdate Pronunciations) dataUpdates;
     (Version Version, string Page)? programUpdate;
+    bool nvdaPromptShown;
     bool busy, refreshingControls, setupReady, showUpdatesWhenIdle;
 
     public ManagerForm(Workspace workspace, bool setupProblem, bool nvdaPromptAlreadyShown)
     {
         this.workspace = workspace;
+        nvdaPromptShown = nvdaPromptAlreadyShown;
         log = new OperationLog(workspace);
         setupReady = workspace.SetupComplete && Workspace.FindDeployer() is not null && !setupProblem && !new LegacyUpgrade(workspace).InProgress;
         Text = Program.Title;
@@ -151,11 +153,11 @@ sealed class ManagerForm : Form
             SetStatus(setupProblem ? latest : "點心設定尚未完成。可以按「繼續設定點心」。");
         }
 
-        nvdaMonitor.Tick += (_, _) =>
+        nvdaMonitor.Tick += async (_, _) =>
         {
             if (busy) return;
-            SetAddonButtons(CanOfferAddon());
             RefreshSpeechSettings();
+            await CheckNvdaAddonAsync(allowPrompt: ActiveForm == this);
         };
         FormClosed += (_, _) => nvdaMonitor.Dispose();
         Shown += async (_, _) =>
@@ -163,10 +165,7 @@ sealed class ManagerForm : Form
             var dataCheck = Workspace.CheckDataIndexAsync();
             using var updateTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             var programCheck = Workspace.NewReleaseAsync(updateTimeout.Token);
-            bool offer = CanOfferAddon();
-            SetAddonButtons(offer);
-            if (offer && !nvdaPromptAlreadyShown && Confirm($"偵測到 NVDA 正在執行。要安裝或更新點心 NVDA 附加組件至 {NvdaAddon.BundledVersion.ToString(3)} 嗎？"))
-                await RunOperationAsync(InstallAddonAsync);
+            await CheckNvdaAddonAsync(allowPrompt: true);
             if (IsDisposed || Disposing) return;
             nvdaMonitor.Start();
             try { await RefreshDefaultAsync(); }
@@ -477,10 +476,24 @@ sealed class ManagerForm : Form
             : $"有 Windows 新版 {release.Version.ToString(3)}。";
     }
 
-    bool CanOfferAddon()
+    async Task CheckNvdaAddonAsync(bool allowPrompt)
     {
-        try { return NvdaAddon.ShouldOffer(workspace.DataDirectory); }
-        catch (Exception error) when (error is IOException or UnauthorizedAccessException) { return false; }
+        NvdaAddonOffer offer;
+        try { offer = NvdaAddon.GetOffer(workspace.DataDirectory); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+        {
+            offer = NvdaAddonOffer.None;
+        }
+
+        SetAddonButtons(offer != NvdaAddonOffer.None);
+        if (offer == NvdaAddonOffer.None || !allowPrompt || nvdaPromptShown) return;
+
+        nvdaPromptShown = true;
+        string version = NvdaAddon.BundledVersion.ToString(3);
+        string message = offer == NvdaAddonOffer.Install
+            ? "偵測到 NVDA 正在執行，但未安裝點心 NVDA 附加組件。要安裝嗎？"
+            : $"偵測到點心 NVDA 附加組件需要更新。要更新至 {version} 嗎？";
+        if (Confirm(message)) await RunOperationAsync(InstallAddonAsync);
     }
 
     void SetAddonButtons(bool available) => inputAddon.Visible = reviewAddon.Visible = available;
