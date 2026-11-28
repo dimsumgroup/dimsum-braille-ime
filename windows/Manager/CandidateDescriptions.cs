@@ -12,6 +12,20 @@ sealed class CandidateDescriptions(string data)
 
     public string Describe(string word, bool allGroups)
     {
+        Refresh();
+        return Format(word, allGroups);
+    }
+
+    public string? Lookup(string text)
+    {
+        Refresh();
+        return text.EnumerateRunes().Any(rune => descriptions.ContainsKey(rune.ToString()))
+            ? Format(text, !Rune.TryGetRuneAt(text, 0, out Rune rune) || rune.Utf16SequenceLength == text.Length)
+            : null;
+    }
+
+    void Refresh()
+    {
         try
         {
             string path = Workspace.ActivePronunciations(data) ?? Bundled;
@@ -26,7 +40,10 @@ sealed class CandidateDescriptions(string data)
             }
         }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException) { }
+    }
 
+    string Format(string word, bool allGroups)
+    {
         var parts = new List<string>();
         foreach (Rune rune in word.EnumerateRunes())
         {

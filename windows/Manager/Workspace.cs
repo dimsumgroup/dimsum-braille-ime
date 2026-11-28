@@ -28,6 +28,8 @@ sealed class Preferences
     // Retain a compatible value for a Dimsum NVDA add-on already installed.
     public string ReportingMode => OmitCandidateNumbers ? "compact" : "standard";
     public bool UseDimsumReviewDescription { get; set; }
+    public bool UseJawsSpeechLookup { get; set; }
+    public bool UseNarratorSpeechLookup { get; set; }
     public string? PreviousDefaultInputTip { get; set; }
     public List<string> VerifiedInputLanguages { get; set; } = [];
     public bool PronounceCandidates { get; set; } = true;

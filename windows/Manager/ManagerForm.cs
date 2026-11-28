@@ -6,8 +6,10 @@ sealed class ManagerForm : Form
 {
     const string AutomaticSpeechHint = "有多款讀屏開啟時，優先使用 NVDA，其次係 JAWS，再到 Windows 朗讀程式。關閉自動偵測就可以自行揀報讀方式。";
     const string ReviewDescription = "用 NVDA 原有快捷鍵連按兩下，讀出檢閱游標所在字嘅點心配詞。關閉後會用返 NVDA 原有解釋。";
-    const string LookupLabel = "查最近報讀配詞快捷鍵（可留空）";
-    const string LookupDescription = "有設定快捷鍵，就可以查 NVDA 最近讀過嘅字詞或句子。呢個快捷鍵同上面嘅開關各自生效。即係話，就算上面關閉咗，呢度你設定咗快捷鍵，你就可以好快咁對比兩套字表嘅解釋。";
+    const string LookupLabel = "查配詞快捷鍵（可留空）";
+    const string LookupDescription = "非 NVDA 使用者可以設定呢個快捷鍵去聆聽配詞解釋報讀。先複製要查嘅讀屏報讀，再按點心快捷鍵。";
+    const string JawsLookupDescription = "按 JAWS 鍵加空格，再按 H 開啟語音紀錄。複製要查嘅一句，再按點心查配詞快捷鍵。";
+    const string NarratorLookupDescription = "用支援呢個功能嘅 Windows 朗讀程式，按朗讀程式鍵加 Ctrl 加 X 複製最近一句，再按點心查配詞快捷鍵。";
     readonly Workspace workspace;
     readonly OperationLog log;
     readonly TabControl tabs = new() { Dock = DockStyle.Fill };
@@ -75,9 +77,15 @@ sealed class ManagerForm : Form
         AddSetting(review, "在 NVDA 開啟點心配詞解釋", () => workspace.Settings.UseDimsumReviewDescription,
             value => workspace.Settings.UseDimsumReviewDescription = value, ReviewDescription);
         AddLabel(review, ReviewDescription);
+        AddSetting(review, "在 JAWS 開啟點心配詞解釋", () => workspace.Settings.UseJawsSpeechLookup,
+            value => workspace.Settings.UseJawsSpeechLookup = value, JawsLookupDescription,
+            save: () => SaveExternalLookupAsync(workspace.Settings.UseJawsSpeechLookup && !workspace.Settings.UseNarratorSpeechLookup));
+        AddSetting(review, "在 Windows 朗讀程式開啟點心配詞解釋", () => workspace.Settings.UseNarratorSpeechLookup,
+            value => workspace.Settings.UseNarratorSpeechLookup = value, NarratorLookupDescription,
+            save: () => SaveExternalLookupAsync(workspace.Settings.UseNarratorSpeechLookup && !workspace.Settings.UseJawsSpeechLookup));
         Add(review, shortcut);
         AddLabel(review, LookupDescription);
-        recordShortcut = AddButton(review, "錄製查配詞快捷鍵", () =>
+        recordShortcut = AddButton(review, "設定查配詞快捷鍵", () =>
         {
             using var capture = new ShortcutCapture();
             return Task.FromResult(capture.ShowDialog(this) == DialogResult.OK ? SaveShortcut(capture.Shortcut) : "");
@@ -328,9 +336,18 @@ sealed class ManagerForm : Form
         recordShortcut.AccessibleDescription = shortcut.Text + LookupDescription;
     }
 
+    Task SaveExternalLookupAsync(bool enablingFirst)
+    {
+        if (enablingFirst) SpeechLookup.CheckAvailability(workspace.Settings.LookupGesture);
+        workspace.Save();
+        return Task.CompletedTask;
+    }
+
     string SaveShortcut(string value)
     {
         string previous = workspace.Settings.LookupGesture;
+        if (value != previous && (workspace.Settings.UseJawsSpeechLookup || workspace.Settings.UseNarratorSpeechLookup))
+            SpeechLookup.CheckAvailability(value);
         workspace.Settings.LookupGesture = value;
         try { workspace.Save(); }
         catch
