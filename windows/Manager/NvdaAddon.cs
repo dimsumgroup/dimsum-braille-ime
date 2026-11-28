@@ -17,7 +17,14 @@ static class NvdaAddon
     {
         if (!ShouldOffer(data) || NvdaSession.Find() is not { } active) return false;
 
-        string? running = active.Directory;
+        Install(active.Directory);
+        return true;
+    }
+
+    public static void InstallManually() => Install(NvdaSession.Find()?.Directory);
+
+    static void Install(string? running)
+    {
         if (running is not null)
         {
             string helper = Path.Combine(running, "nvda_slave.exe");
@@ -28,11 +35,10 @@ static class NvdaAddon
                 command.ArgumentList.Add("addons_installAddonPackage");
                 command.ArgumentList.Add(Bundle);
                 using var process = Process.Start(command) ?? throw new IOException("未能開啟 NVDA 附加元件安裝檔。");
-                return true;
+                return;
             }
         }
         Program.Open(Bundle);
-        return true;
     }
 
     public static bool ShouldOffer(string data)

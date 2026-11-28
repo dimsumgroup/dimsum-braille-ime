@@ -108,6 +108,12 @@ sealed class ManagerForm : Form
             Program.Open(Program.Website);
             return Task.FromResult("");
         });
+        var manualAddon = AddButton(support, "安裝 NVDA 附加組件", () =>
+        {
+            NvdaAddon.InstallManually();
+            return Task.FromResult("已開啟 NVDA 附加組件安裝檔。");
+        });
+        manualAddon.AccessibleDescription = "請先開啟 NVDA。可以喺呢度手動開啟內附嘅附加組件安裝檔。";
         continueSetup = AddButton(support, "繼續設定點心", () => SetupAsync(repair: false));
         const string repairHint = "如果打唔到字，或者輸入法出現錯誤，請按呢個按鈕。";
         var repair = AddButton(support, "輸入法設定修復", () => SetupAsync(repair: true));
