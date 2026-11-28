@@ -4,7 +4,7 @@
 
 # 🔍 什麼是點心粵語點字輸入法？
 
-點心粵語點字輸入法（Dimsum Braille IME）是一款專為香港視障人士設計的粵語點字輸入工具，支援 Windows 和 macOS。Windows 版支援 NVDA，macOS 版提供候選報讀及 VoiceOver、TurnOver 查配詞。
+點心粵語點字輸入法（Dimsum Braille IME）是一款專為香港視障人士設計的粵語點字輸入工具，支援 Windows 和 macOS。Windows 版支援 NVDA、JAWS 及 Windows 朗讀程式（Narrator），亦可使用 Windows 內置語音合成器。macOS 版提供候選報讀及 VoiceOver、TurnOver 查配詞。
 本輸入法採用 Rime（中州韻）引擎，提供高效、準確的粵語點字輸入體驗，適合日常打字、學習及工作。
 支援關鍵功能包括：
 •
@@ -12,7 +12,7 @@
 •
 無障礙輸入法（Accessibility IME）
 •
-NVDA / JAWS 螢幕閱讀器支援
+支援 NVDA、JAWS 及 Windows 朗讀程式（Narrator）
 •
 香港用字與口語詞庫
 
@@ -31,11 +31,11 @@ NVDA / JAWS 螢幕閱讀器支援
 
 ### Windows 安裝步驟
 
-1. [下載 Windows 版 v1.3.2 安裝程式](https://github.com/dimsumgroup/dimsum-braille-ime/releases/download/v1.3.2/Dimsum_Setup_v1.3.2.exe)。
+1. [下載 Windows 版 v1.3.3 安裝程式](https://github.com/dimsumgroup/dimsum-braille-ime/releases/download/v1.3.3/Dimsum_Setup_v1.3.3.exe)。
 2. 執行安裝程式，按畫面指示完成安裝。如果 NVDA 正在執行，而點心附加組件尚未安裝或版本較舊，安裝程式會邀請安裝或更新。
 3. 安裝完成後，按 **Windows 鍵＋空白鍵**，在「繁體中文（香港）」下選擇「點心粵語點字輸入法」。
 
-[Windows 版發行頁](https://github.com/dimsumgroup/dimsum-braille-ime/releases/tag/v1.3.2)
+[Windows 版發行頁](https://github.com/dimsumgroup/dimsum-braille-ime/releases/tag/v1.3.3)
 
 ---
 
@@ -43,12 +43,11 @@ NVDA / JAWS 螢幕閱讀器支援
 
 ### Windows 版
 
-#### v1.3.2（2026-11-28）
+#### v1.3.3（2026-11-28）
 
-- 修正用上、下方向鍵瀏覽候選，以及用 Page Up、Page Down 翻頁時讀出未上屏字碼的問題。開啟配詞報讀後，逐個瀏覽會讀出選字編號和高亮候選的全部配詞，翻頁會讀出新一頁的選字編號和每字的第一組配詞。選字編號仍由報讀設定控制。
-- 改善快速打字時偶爾漏讀或讀出上一組候選的情況。
-- 安裝程式會比對正在使用的 NVDA 附加組件版本。如尚未安裝或已有較舊版本，會邀請安裝或更新至內附的 1.3.2。請依 NVDA 指示完成更新並重新啟動 NVDA。
-- 安裝位置會在按下「安裝」前以唯讀方式顯示。
+- 候選報讀新增 JAWS、Windows 朗讀程式（Narrator）及 Windows 內置語音合成器。管理器預設自動偵測讀屏，也可手動指定報讀方式。選用語音合成器時可挑選已安裝的聲線。
+- JAWS 和 Windows 朗讀程式使用者可先複製要查的報讀，再按點心查配詞快捷鍵。沒有開啟讀屏時，也可複製想查的文字，用 Windows 內置語音合成器讀配詞，並為配詞解釋獨立選擇聲線。
+- 安裝程式和管理器只在偵測到 NVDA 正在執行，而附加組件尚未安裝或需要更新時提示。也可在「修復與支援」手動開啟內附的 NVDA 附加組件安裝檔。
 
 ### Mac 版
 
@@ -164,7 +163,7 @@ NVDA / JAWS 螢幕閱讀器支援
 | --- | --- |
 | **作業系統** | Windows 10 或以上版本（64 位元） |
 | **磁碟空間** | 約 50 MB |
-| **螢幕閱讀器** | NVDA、JAWS、Windows 內建朗讀程式 |
+| **螢幕閱讀器** | NVDA、JAWS、Windows 朗讀程式（Narrator） |
 | **網路連線** | 安裝時不需要網路連線 |
 
 ---
