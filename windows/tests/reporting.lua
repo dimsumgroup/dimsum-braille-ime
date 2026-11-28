@@ -3,11 +3,12 @@ local writer
 local files = {}
 local published, published_path
 local blocked = {}
-local reporting_enabled, sound_enabled = true, false
+local reporting_enabled, sound_enabled, external_enabled = true, false, false
 os.getenv = function() return "mock" end
 local prefix = "mock\\DimsumInput\\"
 io.open = function(path, mode)
     if mode == "rb" and ((reporting_enabled and path == prefix .. "candidate-reporting-enabled")
+        or (external_enabled and path == prefix .. "external-candidate-reporting-enabled")
         or (sound_enabled and path == prefix .. "singleton-sound-enabled")) then
         return {close = function() return true end}
     end
@@ -188,5 +189,21 @@ context.update_notifier.emit(context)
 candidates = {"魚"}
 context.update_notifier.emit(context)
 assert(files[sound_path] ~= signal, "A new composition may offer the same candidate again.")
+reporter.fini(env)
+reporting_enabled, sound_enabled, external_enabled = true, false, false
+reporter.init(env)
+candidates = {"過", "日本", "天氣"}
+context.update_notifier.emit(context)
+assert(published_path == prefix .. "candidate-report-1")
+reporting_enabled, external_enabled = false, true
+context.update_notifier.emit(context)
+assert(published_path:find("external-candidate-report-", 1, true) and published[9] == "過")
+assert(not files[prefix .. "candidate-report-1"], "Old NVDA add-ons may only see the NVDA channel.")
+page_key("Next", 2, false)
+assert(published[5] == "page" and published[9] == "天氣")
+reporting_enabled, external_enabled = true, false
+context.update_notifier.emit(context)
+assert(published_path:find(prefix .. "candidate-report-", 1, true))
+assert(not files[prefix .. "external-candidate-report-1"] and not files[prefix .. "external-candidate-report-2"])
 reporter.fini(env)
 print("Lua reporting passed")

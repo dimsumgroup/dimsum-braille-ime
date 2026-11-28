@@ -175,6 +175,11 @@ assert spoken == [("分，芬", "next")] * 2, "A fresh input event should speak 
 plugin = direct_plugin()
 plugin.read_report = lambda: (reporter.time.time_ns() - reporter.NATIVE_SPEECH_WINDOW_NS - 1, ordinary_page)
 assert plugin.filter_native_speech(native_page) == native_page
+for output in ("Off", "Jaws", "Narrator", "WindowsVoice"):
+    plugin.preferences["CandidateSpeechOutput"] = output
+    assert reporter.GlobalPlugin.read_report(plugin) is None, "The NVDA add-on must leave other output modes alone."
+plugin.preferences.pop("CandidateSpeechOutput")
+
 assert reporter.omit_candidate_numbers({"ReportingMode": "compact"})
 assert not reporter.omit_candidate_numbers({"OmitCandidateNumbers": False, "ReportingMode": "compact"})
 assert not reporter.omit_candidate_numbers({})

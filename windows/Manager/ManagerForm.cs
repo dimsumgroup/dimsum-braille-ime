@@ -4,6 +4,7 @@ namespace Dimsum;
 
 sealed class ManagerForm : Form
 {
+    const string AutomaticSpeechHint = "有多款讀屏開啟時，優先使用 NVDA，其次係 JAWS，再到 Windows 朗讀程式。關閉自動偵測就可以自行揀報讀方式。";
     const string ReviewDescription = "用 NVDA 原有快捷鍵連按兩下，讀出檢閱游標所在字嘅點心配詞。關閉後會用返 NVDA 原有解釋。";
     const string LookupLabel = "查最近報讀配詞快捷鍵（可留空）";
     const string LookupDescription = "有設定快捷鍵，就可以查 NVDA 最近讀過嘅字詞或句子。呢個快捷鍵同上面嘅開關各自生效。即係話，就算上面關閉咗，呢度你設定咗快捷鍵，你就可以好快咁對比兩套字表嘅解釋。";
@@ -13,6 +14,20 @@ sealed class ManagerForm : Form
     readonly Label status = new() { AutoSize = true, Dock = DockStyle.Fill, AccessibleName = "操作結果", Padding = new Padding(10, 5, 10, 8) };
     readonly Label shortcut = new() { AutoSize = true, TabStop = false };
     readonly CheckBox defaultIme = new() { AutoSize = true, Text = "將點心設為目前預設輸入法", Enabled = false };
+    static readonly (CandidateOutput Mode, string Name)[] CandidateModes =
+    [
+        (CandidateOutput.Off, "關閉"),
+        (CandidateOutput.Nvda, "NVDA"),
+        (CandidateOutput.Jaws, "JAWS"),
+        (CandidateOutput.Narrator, "Windows 內置讀屏（朗讀程式）"),
+        (CandidateOutput.WindowsVoice, "Windows 內置發音")
+    ];
+    readonly CheckBox automaticSpeech = new() { AutoSize = true, Text = "自動偵測讀屏軟件" };
+    readonly ComboBox speechOutput = new() { Width = 320, DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "候選報讀方式" };
+    readonly ComboBox speechVoice = new() { Width = 320, DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "Windows 發音聲線" };
+    readonly Label voiceLabel = new() { AutoSize = true, Text = "Windows 發音聲線" };
+    readonly Label speechHint = new() { AutoSize = true, MaximumSize = new Size(450, 0) };
+    Windows.Media.SpeechSynthesis.VoiceInformation[] speechVoices = [];
     readonly ComboBox inputLanguage = new() { Width = 310, DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "點心輸入法語言" };
     readonly System.Windows.Forms.Timer nvdaMonitor = new() { Interval = 3000 };
     readonly Button rimeUpdate, pronunciationUpdate, inputAddon, reviewAddon, continueSetup, applyLanguage, recordShortcut, updateOverview;
@@ -38,6 +53,7 @@ sealed class ManagerForm : Form
         Controls.Add(layout);
 
         var input = AddPage("輸入設定");
+        AddSpeechSettings(input);
         AddSetting(input, "聆聽候選時不報讀數字", () => workspace.Settings.OmitCandidateNumbers,
             value => workspace.Settings.OmitCandidateNumbers = value);
         AddSetting(input, "只有一個候選時不播放聲音", () => !workspace.SoundEnabled,
@@ -121,7 +137,12 @@ sealed class ManagerForm : Form
             SetStatus(setupProblem ? latest : "點心設定尚未完成。可以按「繼續設定點心」。");
         }
 
-        nvdaMonitor.Tick += (_, _) => { if (!busy) SetAddonButtons(CanOfferAddon()); };
+        nvdaMonitor.Tick += (_, _) =>
+        {
+            if (busy) return;
+            SetAddonButtons(CanOfferAddon());
+            RefreshSpeechSettings();
+        };
         FormClosed += (_, _) => nvdaMonitor.Dispose();
         Shown += async (_, _) =>
         {
@@ -138,6 +159,98 @@ sealed class ManagerForm : Form
             catch (Exception error) { log.Record(ErrorText("查看 Windows 預設輸入法", error)); }
             await CheckForUpdatesOnOpenAsync(dataCheck, programCheck);
         };
+    }
+
+    void AddSpeechSettings(TableLayoutPanel page)
+    {
+        Add(page, automaticSpeech);
+        AddLabel(page, "候選報讀方式");
+        Add(page, speechOutput);
+        Add(page, voiceLabel);
+        Add(page, speechVoice);
+        Add(page, speechHint);
+        speechOutput.Items.AddRange(CandidateModes.Select(mode => mode.Name).ToArray());
+        RefreshSpeechSettings();
+
+        automaticSpeech.CheckedChanged += async (_, _) =>
+        {
+            if (!refreshingControls)
+                await RunOperationAsync(() => SaveSpeechSettings(automaticSpeech.Checked ? null :
+                    CandidateModes[speechOutput.SelectedIndex].Mode, workspace.Settings.CandidateVoiceId));
+        };
+        speechOutput.SelectedIndexChanged += async (_, _) =>
+        {
+            if (!refreshingControls && speechOutput.SelectedIndex >= 0)
+                await RunOperationAsync(() => SaveSpeechSettings(CandidateModes[speechOutput.SelectedIndex].Mode,
+                    workspace.Settings.CandidateVoiceId));
+        };
+        speechVoice.SelectedIndexChanged += async (_, _) =>
+        {
+            if (!refreshingControls && speechVoice.SelectedIndex >= 0)
+                await RunOperationAsync(() => SaveSpeechSettings(CandidateOutput.WindowsVoice,
+                    speechVoices[speechVoice.SelectedIndex].Id));
+        };
+    }
+
+    void RefreshSpeechSettings()
+    {
+        var readers = ScreenReaders.Detect();
+        var mode = readers.Select(workspace.Settings.CandidateSpeechOutput);
+        RefreshControls(() =>
+        {
+            automaticSpeech.Checked = workspace.Settings.CandidateSpeechOutput is null;
+            speechOutput.Enabled = !automaticSpeech.Checked;
+            speechOutput.SelectedIndex = Array.FindIndex(CandidateModes, item => item.Mode == mode);
+            automaticSpeech.AccessibleDescription = automaticSpeech.Checked
+                ? $"目前報讀方式係{speechOutput.Text}。{AutomaticSpeechHint}" : AutomaticSpeechHint;
+            voiceLabel.Visible = speechVoice.Visible = mode == CandidateOutput.WindowsVoice;
+            if (mode == CandidateOutput.WindowsVoice)
+            {
+                var installed = WindowsVoiceSpeech.Voices();
+                if (!installed.Select(voice => voice.Id).SequenceEqual(speechVoices.Select(voice => voice.Id)))
+                {
+                    speechVoices = installed;
+                    speechVoice.Items.Clear();
+                    speechVoice.Items.AddRange(speechVoices.Select(voice => $"{voice.DisplayName}（{voice.Language}）").ToArray());
+                }
+                string? voiceId = workspace.Settings.CandidateVoiceId;
+                speechVoice.SelectedIndex = Array.FindIndex(speechVoices, voice =>
+                    voiceId is null ? WindowsVoiceSpeech.IsCantonese(voice.Language) : voice.Id == voiceId);
+                speechVoice.Enabled = speechVoices.Length > 0;
+            }
+
+            speechHint.Text = mode switch
+            {
+                CandidateOutput.Off when automaticSpeech.Checked => "暫時未偵測到讀屏軟件，候選報讀已關閉。",
+                CandidateOutput.Off => "已關閉點心候選報讀。",
+                CandidateOutput.Nvda when !readers.Nvda => "請開啟 NVDA 並安裝點心 NVDA 附加組件。",
+                CandidateOutput.Nvda => "由點心 NVDA 附加組件報讀候選。",
+                CandidateOutput.Jaws when !readers.Jaws => "未偵測到 JAWS。已手動選用 JAWS，請確認 JAWS 已開啟。",
+                CandidateOutput.Jaws => "由 JAWS 報讀候選。如果未能聽到候選，可以改用 Windows 內置發音。",
+                CandidateOutput.Narrator when !readers.CanNotifyNarrator => "請先關閉 NVDA 同 JAWS，先可以由 Windows 朗讀程式報讀候選。",
+                CandidateOutput.Narrator when !readers.Narrator => "未偵測到 Windows 朗讀程式。已手動選用，請確認朗讀程式已開啟。",
+                CandidateOutput.Narrator => "由 Windows 朗讀程式報讀候選。",
+                CandidateOutput.WindowsVoice when speechVoice.SelectedIndex < 0 => "請選擇已安裝嘅聲線，或者喺 Windows 語音設定安裝廣東話聲線。",
+                _ => ""
+            };
+            speechOutput.AccessibleDescription = speechHint.Text;
+            speechVoice.AccessibleDescription = speechHint.Text;
+        });
+    }
+
+    Task<string> SaveSpeechSettings(CandidateOutput? mode, string? voiceId)
+    {
+        var previous = (workspace.Settings.CandidateSpeechOutput, workspace.Settings.CandidateVoiceId);
+        workspace.Settings.CandidateSpeechOutput = mode;
+        workspace.Settings.CandidateVoiceId = voiceId;
+        try { workspace.Save(); }
+        catch
+        {
+            (workspace.Settings.CandidateSpeechOutput, workspace.Settings.CandidateVoiceId) = previous;
+            throw;
+        }
+        finally { RefreshSpeechSettings(); }
+        return Task.FromResult("已更新候選報讀方式。");
     }
 
     TableLayoutPanel AddPage(string name)

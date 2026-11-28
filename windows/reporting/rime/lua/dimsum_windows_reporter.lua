@@ -4,6 +4,7 @@ local report_slots = 3
 local revision = 0
 local active_slot
 local active_engine
+local active_path
 local sound_revision = 0
 
 local function enabled(path)
@@ -73,12 +74,19 @@ local function page_snapshot(context, env)
     }
 end
 
+local function remove_snapshots(path)
+    for slot = 1, report_slots do
+        os.remove(path .. tostring(slot))
+        os.remove(path .. tostring(slot) .. ".tmp")
+    end
+end
+
 local function write_snapshot(path, payload)
     -- Never replace the last complete report. If a reader has another slot
     -- open without delete sharing, publish through the remaining slot.
     for offset = 1, report_slots do
         local slot = ((active_slot or 0) + offset - 1) % report_slots + 1
-        if slot ~= active_slot then
+        if path ~= active_path or slot ~= active_slot then
             local target = path .. tostring(slot)
             local temporary = target .. ".tmp"
             local file = io.open(temporary, "wb")
@@ -111,20 +119,20 @@ end
 
 local function publish(context, env, navigation)
     if not env.path then return end
-    local report = enabled(env.flag)
+    local path = enabled(env.external_flag) and env.external_path or enabled(env.flag) and env.path
     local sound = enabled(env.sound_flag)
-    if not report and not sound then
+    if not path and not sound then
         env.previous = nil
         env.last_sound = nil
         return
     end
     local current = page_snapshot(context, env)
     if sound then publish_sound(env, current) else env.last_sound = nil end
-    if not report then
+    if not path then
         env.previous = nil
         return
     end
-    local previous = active_engine == env.session and env.previous
+    local previous = active_engine == env.session and active_path == path and env.previous
 
     local same_candidates = previous and previous.candidates == current.candidates
         and previous.start == current.start and previous.page == current.page
@@ -156,9 +164,10 @@ local function publish(context, env, navigation)
         event, tostring(current.selected), current.singleton and "1" or "0"
     }
     for _, value in ipairs(current.fields) do fields[#fields + 1] = value end
-    local slot = write_snapshot(env.path, table.concat(fields, "\0"))
+    local slot = write_snapshot(path, table.concat(fields, "\0"))
     if slot then
-        active_slot = slot
+        if active_path and active_path ~= path then remove_snapshots(active_path) end
+        active_slot, active_path = slot, path
         active_engine = env.session
         env.previous = current
     end
@@ -170,6 +179,8 @@ function reporter.init(env)
     local local_data = os.getenv("LOCALAPPDATA")
     if not local_data then return end
     env.path = local_data .. "\\DimsumInput\\candidate-report-"
+    env.external_path = local_data .. "\\DimsumInput\\external-candidate-report-"
+    env.external_flag = local_data .. "\\DimsumInput\\external-candidate-reporting-enabled"
     env.flag = local_data .. "\\DimsumInput\\candidate-reporting-enabled"
     env.sound_flag = local_data .. "\\DimsumInput\\singleton-sound-enabled"
     env.sound_event = local_data .. "\\DimsumInput\\singleton-sound-event"
@@ -185,11 +196,8 @@ function reporter.fini(env)
     if env.update then env.update:disconnect() end
     if env.selection then env.selection:disconnect() end
     if env.path and active_engine == env.session then
-        for slot = 1, report_slots do
-            os.remove(env.path .. tostring(slot))
-            os.remove(env.path .. tostring(slot) .. ".tmp")
-        end
-        active_slot, active_engine = nil, nil
+        remove_snapshots(active_path)
+        active_slot, active_engine, active_path = nil, nil, nil
     end
 end
 
@@ -204,7 +212,7 @@ function reporter.func(key, env)
     local navigation = navigation_keys[key:repr()]
     if not navigation then return 2 end
     local context = env.engine.context
-    if not context:has_menu() or not enabled(env.flag) then return 2 end
+    if not context:has_menu() or not (enabled(env.flag) or enabled(env.external_flag)) then return 2 end
 
     -- Let the normal key chain change the highlight or page, including
     -- arrows sent by G/H bindings. Publish once with the actual result.

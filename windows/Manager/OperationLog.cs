@@ -41,6 +41,8 @@ sealed class OperationLog(Workspace workspace)
             Rime 引擎 {VersionOf(deployer)}
             NVDA {VersionOf(nvda is null ? null : Path.Combine(nvda, "nvda.exe"))}
             點心輸入法語言 {settings.InputLanguageTag ?? "未設定"}
+            候選報讀方式 {settings.CandidateSpeechOutput?.ToString() ?? "自動偵測"}
+            Windows 發音聲線 {settings.CandidateVoiceId ?? "預設"}
             聆聽候選時不報讀數字 {Enabled(settings.OmitCandidateNumbers)}
             只有一個候選時不播放聲音 {Enabled(!workspace.SoundEnabled)}
             輸入候選不讀配詞解釋 {Enabled(!settings.PronounceCandidates)}

@@ -22,6 +22,8 @@ sealed class Preferences
     public string? PendingInputLanguageTag { get; set; }
     public string? InputLanguageTag { get; set; }
     public bool Initialized { get; set; }
+    public CandidateOutput? CandidateSpeechOutput { get; set; }
+    public string? CandidateVoiceId { get; set; }
     public bool OmitCandidateNumbers { get; set; }
     // Retain a compatible value for a Dimsum NVDA add-on already installed.
     public string ReportingMode => OmitCandidateNumbers ? "compact" : "standard";
@@ -93,13 +95,15 @@ sealed class Workspace
 
     public void Save()
     {
-        string reporting = Path.Combine(data, "candidate-reporting-enabled");
-        bool reportCandidates = Settings.Initialized;
+        bool reportNvda = Settings.Initialized && Settings.CandidateSpeechOutput is null or CandidateOutput.Nvda;
+        bool reportExternal = Settings.Initialized && Settings.CandidateSpeechOutput is
+            CandidateOutput.Jaws or CandidateOutput.Narrator or CandidateOutput.WindowsVoice;
         (string Path, bool Enabled)[] flags =
         [
             (Path.Combine(data, SingletonSound.Service), Settings.Initialized),
             (Path.Combine(data, SingletonSound.Flag), Settings.Initialized && SoundEnabled),
-            (reporting, reportCandidates)
+            (Path.Combine(data, "candidate-reporting-enabled"), reportNvda),
+            (Path.Combine(data, "external-candidate-reporting-enabled"), reportExternal)
         ];
         var changed = new List<(string Path, bool Enabled)>();
         try
@@ -125,13 +129,16 @@ sealed class Workspace
             }
             throw;
         }
-        if (!reportCandidates)
+        if (!reportNvda) ClearReports("candidate-report-");
+        if (!reportExternal) ClearReports("external-candidate-report-");
+    }
+
+    void ClearReports(string prefix)
+    {
+        foreach (string suffix in new[] { "1", "2", "3", "1.tmp", "2.tmp", "3.tmp" })
         {
-            foreach (string suffix in new[] { "1", "2", "3", "1.tmp", "2.tmp", "3.tmp" })
-            {
-                try { File.Delete(Path.Combine(data, "candidate-report-" + suffix)); }
-                catch (Exception error) when (error is IOException or UnauthorizedAccessException) { }
-            }
+            try { File.Delete(Path.Combine(data, prefix + suffix)); }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException) { }
         }
     }
 
@@ -321,13 +328,15 @@ sealed class Workspace
         WriteAtomic(Path.Combine(pronunciations, "active.txt"), Utf8.GetBytes(bundleName));
     }
 
-    string? ActivePronunciations()
+    string? ActivePronunciations() => ActivePronunciations(data);
+
+    internal static string? ActivePronunciations(string directory)
     {
-        string pointer = Path.Combine(data, "pronunciations", "active.txt");
+        string pointer = Path.Combine(directory, "pronunciations", "active.txt");
         if (!File.Exists(pointer)) return null;
         string revision = File.ReadAllText(pointer).Trim();
         return Regex.IsMatch(revision, @"\A[0-9a-f]{40}(?:-[0-9a-f]{32})?\z") ?
-            Path.Combine(data, "pronunciations", revision) : null;
+            Path.Combine(directory, "pronunciations", revision) : null;
     }
 
     public void ExportPronunciations(string destination, bool overwrite)
