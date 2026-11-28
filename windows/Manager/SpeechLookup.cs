@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Dimsum;
 
-sealed class SpeechLookup(Action<string> lookup) : NativeWindow, IDisposable
+sealed class SpeechLookup(Func<string, Task> lookup) : NativeWindow, IDisposable
 {
     const int HotkeyId = 1;
     const int ProbeId = 2;
@@ -17,7 +17,7 @@ sealed class SpeechLookup(Action<string> lookup) : NativeWindow, IDisposable
         if (settings.UseJawsSpeechLookup && readers.Jaws) return CandidateOutput.Jaws;
         if (settings.UseNarratorSpeechLookup && readers.Narrator && readers.CanNotifyNarrator)
             return CandidateOutput.Narrator;
-        return null;
+        return settings.UseWindowsVoiceLookup ? CandidateOutput.WindowsVoice : null;
     }
 
     public void Update(Preferences settings, ScreenReaders readers)
@@ -38,7 +38,7 @@ sealed class SpeechLookup(Action<string> lookup) : NativeWindow, IDisposable
         if (gesture.Length == 0) return;
         if (Parse(gesture) is not { } key || key.VirtualKey == (uint)Keys.F12 ||
             !RegisterHotKey(0, ProbeId, key.Modifiers | NoRepeat, key.VirtualKey))
-            throw new IOException("呢組快捷鍵唔能夠用作 JAWS 或 Windows 朗讀程式查配詞。請揀另一組鍵。");
+            throw new IOException("呢組快捷鍵唔能夠用作點心查配詞。請揀另一組鍵。");
         UnregisterHotKey(0, ProbeId);
     }
 
@@ -75,7 +75,7 @@ sealed class SpeechLookup(Action<string> lookup) : NativeWindow, IDisposable
         {
             var key = Parse(registered)!.Value;
             if ((message.LParam.ToInt64() & 0xFFFF000F) == (key.VirtualKey << 16 | key.Modifiers))
-                lookup(registered);
+                _ = lookup(registered);
             return;
         }
         base.WndProc(ref message);

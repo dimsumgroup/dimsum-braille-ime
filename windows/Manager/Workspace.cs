@@ -30,6 +30,8 @@ sealed class Preferences
     public bool UseDimsumReviewDescription { get; set; }
     public bool UseJawsSpeechLookup { get; set; }
     public bool UseNarratorSpeechLookup { get; set; }
+    public bool UseWindowsVoiceLookup { get; set; }
+    public string? LookupVoiceId { get; set; }
     public string? PreviousDefaultInputTip { get; set; }
     public List<string> VerifiedInputLanguages { get; set; } = [];
     public bool PronounceCandidates { get; set; } = true;

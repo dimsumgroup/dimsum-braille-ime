@@ -7,7 +7,7 @@ sealed class ManagerForm : Form
     const string AutomaticSpeechHint = "有多款讀屏開啟時，優先使用 NVDA，其次係 JAWS，再到 Windows 朗讀程式（Narrator）。關閉自動偵測就可以自行揀報讀方式。";
     const string ReviewDescription = "用 NVDA 原有快捷鍵連按兩下，讀出檢閱游標所在字嘅點心配詞。關閉後會用返 NVDA 原有解釋。";
     const string LookupLabel = "查配詞快捷鍵（可留空）";
-    const string LookupDescription = "非 NVDA 使用者可以設定呢個快捷鍵去聆聽配詞解釋報讀。先複製要查嘅讀屏報讀，再按點心快捷鍵。";
+    const string LookupDescription = "非 NVDA 使用者可以設定呢個快捷鍵去聆聽配詞解釋報讀。先複製想查嘅文字或讀屏報讀，再按點心快捷鍵。";
     const string JawsLookupDescription = "按 JAWS 鍵加空格，再按 H 開啟語音紀錄。複製要查嘅一句，再按點心查配詞快捷鍵。";
     const string NarratorLookupDescription = "按朗讀程式鍵加 Ctrl 加 X 複製最近一句，再按點心查配詞快捷鍵。";
     readonly Workspace workspace;
@@ -28,6 +28,10 @@ sealed class ManagerForm : Form
     readonly ComboBox speechOutput = new() { Width = 320, DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "候選報讀方式" };
     readonly ComboBox speechVoice = new() { Width = 320, DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "Windows 發音聲線" };
     readonly Label voiceLabel = new() { AutoSize = true, Text = "Windows 發音聲線" };
+    readonly ComboBox lookupVoice = new() { Width = 320, DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "配詞解釋報讀聲線" };
+    readonly Label lookupVoiceLabel = new() { AutoSize = true, Text = "配詞解釋報讀聲線" };
+    readonly Label lookupVoiceHint = new() { AutoSize = true, MaximumSize = new Size(450, 0) };
+    const string ChooseVoiceHint = "請選擇已安裝嘅聲線，或者喺 Windows 語音設定安裝廣東話聲線。";
     readonly Label speechHint = new() { AutoSize = true, MaximumSize = new Size(450, 0) };
     Windows.Media.SpeechSynthesis.VoiceInformation[] speechVoices = [];
     readonly ComboBox inputLanguage = new() { Width = 310, DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "點心輸入法語言" };
@@ -81,10 +85,22 @@ sealed class ManagerForm : Form
         AddLabel(review, ReviewDescription);
         AddSetting(review, "在 JAWS 開啟點心配詞解釋", () => workspace.Settings.UseJawsSpeechLookup,
             value => workspace.Settings.UseJawsSpeechLookup = value, JawsLookupDescription,
-            save: () => SaveExternalLookupAsync(workspace.Settings.UseJawsSpeechLookup && !workspace.Settings.UseNarratorSpeechLookup));
+            save: () => SaveExternalLookupAsync(workspace.Settings.UseJawsSpeechLookup && !workspace.Settings.UseNarratorSpeechLookup && !workspace.Settings.UseWindowsVoiceLookup));
         AddSetting(review, "在 Windows 朗讀程式（Narrator）開啟點心配詞解釋", () => workspace.Settings.UseNarratorSpeechLookup,
             value => workspace.Settings.UseNarratorSpeechLookup = value, NarratorLookupDescription,
-            save: () => SaveExternalLookupAsync(workspace.Settings.UseNarratorSpeechLookup && !workspace.Settings.UseJawsSpeechLookup));
+            save: () => SaveExternalLookupAsync(workspace.Settings.UseNarratorSpeechLookup && !workspace.Settings.UseJawsSpeechLookup && !workspace.Settings.UseWindowsVoiceLookup));
+        AddSetting(review, "用 Windows 內置語音合成器讀配詞解釋", () => workspace.Settings.UseWindowsVoiceLookup,
+            value => workspace.Settings.UseWindowsVoiceLookup = value, "複製想查嘅文字，再按點心查配詞快捷鍵。其他已啟用嘅讀屏報讀方式會優先使用。",
+            save: () => SaveExternalLookupAsync(workspace.Settings.UseWindowsVoiceLookup &&
+                !workspace.Settings.UseJawsSpeechLookup && !workspace.Settings.UseNarratorSpeechLookup));
+        Add(review, lookupVoiceLabel);
+        Add(review, lookupVoice);
+        Add(review, lookupVoiceHint);
+        lookupVoice.SelectedIndexChanged += async (_, _) =>
+        {
+            if (!refreshingControls && lookupVoice.SelectedIndex >= 0)
+                await RunOperationAsync(() => SaveLookupVoiceAsync(speechVoices[lookupVoice.SelectedIndex].Id));
+        };
         Add(review, shortcut);
         AddLabel(review, LookupDescription);
         recordShortcut = AddButton(review, "設定查配詞快捷鍵", () =>
@@ -216,21 +232,27 @@ sealed class ManagerForm : Form
             speechOutput.SelectedIndex = Array.FindIndex(CandidateModes, item => item.Mode == mode);
             automaticSpeech.AccessibleDescription = automaticSpeech.Checked
                 ? $"目前報讀方式係{speechOutput.Text}。{AutomaticSpeechHint}" : AutomaticSpeechHint;
-            voiceLabel.Visible = speechVoice.Visible = mode == CandidateOutput.WindowsVoice;
-            if (mode == CandidateOutput.WindowsVoice)
+            bool candidateVoiceEnabled = mode == CandidateOutput.WindowsVoice;
+            bool lookupVoiceEnabled = workspace.Settings.UseWindowsVoiceLookup;
+            if (candidateVoiceEnabled || lookupVoiceEnabled)
             {
                 var installed = WindowsVoiceSpeech.Voices();
                 if (!installed.Select(voice => voice.Id).SequenceEqual(speechVoices.Select(voice => voice.Id)))
                 {
                     speechVoices = installed;
-                    speechVoice.Items.Clear();
-                    speechVoice.Items.AddRange(speechVoices.Select(voice => $"{voice.DisplayName}（{voice.Language}）").ToArray());
+                    string[] names = speechVoices.Select(voice => $"{voice.DisplayName}（{voice.Language}）").ToArray();
+                    foreach (var combo in new[] { speechVoice, lookupVoice })
+                    {
+                        combo.Items.Clear();
+                        combo.Items.AddRange(names);
+                    }
                 }
-                string? voiceId = workspace.Settings.CandidateVoiceId;
-                speechVoice.SelectedIndex = Array.FindIndex(speechVoices, voice =>
-                    voiceId is null ? WindowsVoiceSpeech.IsCantonese(voice.Language) : voice.Id == voiceId);
-                speechVoice.Enabled = speechVoices.Length > 0;
             }
+            RefreshVoice(speechVoice, voiceLabel, candidateVoiceEnabled, workspace.Settings.CandidateVoiceId);
+            RefreshVoice(lookupVoice, lookupVoiceLabel, lookupVoiceEnabled, workspace.Settings.LookupVoiceId);
+            lookupVoiceHint.Visible = lookupVoiceEnabled && lookupVoice.SelectedIndex < 0;
+            lookupVoiceHint.Text = ChooseVoiceHint;
+            lookupVoice.AccessibleDescription = lookupVoice.SelectedIndex < 0 ? ChooseVoiceHint : "";
 
             speechHint.Text = mode switch
             {
@@ -243,12 +265,35 @@ sealed class ManagerForm : Form
                 CandidateOutput.Narrator when !readers.CanNotifyNarrator => "請先關閉 NVDA 同 JAWS，先可以由 Windows 朗讀程式報讀候選。",
                 CandidateOutput.Narrator when !readers.Narrator => "未偵測到 Windows 朗讀程式。已手動選用，請確認朗讀程式已開啟。",
                 CandidateOutput.Narrator => "由 Windows 朗讀程式報讀候選。",
-                CandidateOutput.WindowsVoice when speechVoice.SelectedIndex < 0 => "請選擇已安裝嘅聲線，或者喺 Windows 語音設定安裝廣東話聲線。",
+                CandidateOutput.WindowsVoice when speechVoice.SelectedIndex < 0 => ChooseVoiceHint,
                 _ => ""
             };
             speechOutput.AccessibleDescription = speechHint.Text;
             speechVoice.AccessibleDescription = speechHint.Text;
         });
+    }
+
+    void RefreshVoice(ComboBox combo, Label label, bool enabled, string? voiceId)
+    {
+        label.Visible = combo.Visible = enabled;
+        if (!enabled) return;
+        combo.SelectedIndex = Array.FindIndex(speechVoices, voice =>
+            voiceId is null ? WindowsVoiceSpeech.IsCantonese(voice.Language) : voice.Id == voiceId);
+        combo.Enabled = speechVoices.Length > 0;
+    }
+
+    Task<string> SaveLookupVoiceAsync(string voiceId)
+    {
+        string? previous = workspace.Settings.LookupVoiceId;
+        workspace.Settings.LookupVoiceId = voiceId;
+        try { workspace.Save(); }
+        catch
+        {
+            workspace.Settings.LookupVoiceId = previous;
+            throw;
+        }
+        finally { RefreshSpeechSettings(); }
+        return Task.FromResult("已更新配詞解釋報讀聲線。");
     }
 
     Task<string> SaveSpeechSettings(CandidateOutput? mode, string? voiceId)
@@ -345,13 +390,15 @@ sealed class ManagerForm : Form
     {
         if (enablingFirst) SpeechLookup.CheckAvailability(workspace.Settings.LookupGesture);
         workspace.Save();
+        RefreshSpeechSettings();
         return Task.CompletedTask;
     }
 
     string SaveShortcut(string value)
     {
         string previous = workspace.Settings.LookupGesture;
-        if (value != previous && (workspace.Settings.UseJawsSpeechLookup || workspace.Settings.UseNarratorSpeechLookup))
+        if (value != previous && (workspace.Settings.UseJawsSpeechLookup || workspace.Settings.UseNarratorSpeechLookup ||
+            workspace.Settings.UseWindowsVoiceLookup))
             SpeechLookup.CheckAvailability(value);
         workspace.Settings.LookupGesture = value;
         try { workspace.Save(); }

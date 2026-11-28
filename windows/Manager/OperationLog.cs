@@ -51,6 +51,8 @@ sealed class OperationLog(Workspace workspace)
             在 NVDA 開啟點心配詞解釋 {Enabled(settings.UseDimsumReviewDescription)}
             在 JAWS 開啟點心配詞解釋 {Enabled(settings.UseJawsSpeechLookup)}
             在 Windows 朗讀程式（Narrator）開啟點心配詞解釋 {Enabled(settings.UseNarratorSpeechLookup)}
+            用 Windows 內置語音合成器讀配詞解釋 {Enabled(settings.UseWindowsVoiceLookup)}
+            配詞解釋報讀聲線 {settings.LookupVoiceId ?? "預設"}
             查配詞快捷鍵 {(settings.LookupGesture.Length == 0 ? "未設定" : settings.LookupGesture)}
             {workspace.Status()}
 

@@ -10,7 +10,7 @@ sealed class CandidateSpeech : IDisposable
     readonly SpeechLookup lookup;
     readonly JawsSpeech jaws = new();
     NarratorSpeech? narrator;
-    WindowsVoiceSpeech? tts;
+    WindowsVoiceSpeech? tts, lookupTts;
     Preferences settings = new();
     DateTime? settingsStamp;
     DateTime nextDetection;
@@ -26,7 +26,7 @@ sealed class CandidateSpeech : IDisposable
         this.data = data;
         settingsPath = Path.Combine(data, "settings.json");
         descriptions = new(data);
-        lookup = new(LookupCopiedSpeech);
+        lookup = new(LookupCopiedSpeechAsync);
     }
 
     public async Task PollAsync()
@@ -40,6 +40,11 @@ sealed class CandidateSpeech : IDisposable
             nextDetection = now.AddMilliseconds(250);
         }
         lookup.Update(settings, readers);
+        if (lookupTts is not null && SpeechLookup.SelectReader(settings, readers) != CandidateOutput.WindowsVoice)
+        {
+            lookupTts.Dispose();
+            lookupTts = null;
+        }
 
         var route = readers.Select(settings.CandidateSpeechOutput);
         var window = GetForegroundWindow();
@@ -98,6 +103,7 @@ sealed class CandidateSpeech : IDisposable
                 return;
         }
 
+        lookupTts?.Stop();
         switch (route)
         {
             case CandidateOutput.Jaws:
@@ -112,7 +118,7 @@ sealed class CandidateSpeech : IDisposable
         }
     }
 
-    void LookupCopiedSpeech(string gesture)
+    async Task LookupCopiedSpeechAsync(string gesture)
     {
         LoadSettings();
         if (settings.LookupGesture != gesture ||
@@ -126,23 +132,30 @@ sealed class CandidateSpeech : IDisposable
             string text = Clipboard.GetText(TextDataFormat.UnicodeText).Trim();
             reply = text.Length switch
             {
-                0 => "請先從讀屏軟件複製要查嘅報讀。",
+                0 => reader == CandidateOutput.WindowsVoice ? "請先複製要查嘅字詞。" : "請先從讀屏軟件複製要查嘅報讀。",
                 > 1024 => "剪貼簿文字太長。請只複製要查嘅一句。",
                 _ => descriptions.Lookup(text) ?? "呢段文字喺點心配詞表入面搵唔到配詞。"
             };
         }
         catch (ExternalException)
         {
-            reply = "未能讀取剪貼簿。請重新複製要查嘅報讀。";
+            reply = "未能讀取剪貼簿。請重新複製要查嘅文字。";
         }
 
         try
         {
             tts?.Stop();
-            SpeakWithReader(reader, reply);
+            if (reader == CandidateOutput.WindowsVoice)
+            {
+                lookupTts ??= new();
+                await lookupTts.SpeakAsync(reply, settings.LookupVoiceId,
+                    () => !disposed && settings.LookupGesture == gesture &&
+                        SpeechLookup.SelectReader(settings, ScreenReaders.Detect()) == CandidateOutput.WindowsVoice);
+            }
+            else SpeakWithReader(reader, reply);
         }
         catch (Exception error) when (error is COMException or System.Reflection.TargetInvocationException or
-            Microsoft.CSharp.RuntimeBinder.RuntimeBinderException or InvalidOperationException)
+            Microsoft.CSharp.RuntimeBinder.RuntimeBinderException or InvalidOperationException or TypeLoadException or FileNotFoundException)
         {
             // A speech API failure must not terminate the login helper.
         }
@@ -168,6 +181,7 @@ sealed class CandidateSpeech : IDisposable
             settingsStamp = stamp;
             // In particular cancel speech from the voice the user just changed.
             tts?.Stop();
+            lookupTts?.Stop();
         }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or JsonException) { }
     }
@@ -177,6 +191,7 @@ sealed class CandidateSpeech : IDisposable
         disposed = true;
         lookup.Dispose();
         tts?.Dispose();
+        lookupTts?.Dispose();
         narrator?.Dispose();
         jaws.Dispose();
     }
