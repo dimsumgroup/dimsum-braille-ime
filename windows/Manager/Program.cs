@@ -25,12 +25,15 @@ static class Program
                         if (new LegacyUpgrade(new Workspace()).NeedsNotice()) Environment.ExitCode = 6;
                         break;
                     case "--check-nvda-addon" when args.Length == 1:
-                        if (NvdaAddon.ShouldOffer(new Workspace().DataDirectory)) Environment.ExitCode = 6;
+                        Environment.ExitCode = NvdaAddon.GetOffer(new Workspace().DataDirectory) switch
+                        {
+                            NvdaAddonOffer.Running => 6,
+                            NvdaAddonOffer.StartNvda => 7,
+                            _ => 0
+                        };
                         break;
                     case "--install-nvda-addon" when args.Length == 1:
-                        if (NvdaAddon.ShouldOffer(new Workspace().DataDirectory)) NvdaAddon.Install();
-                        else if (NvdaSession.Find() is null)
-                            throw new IOException("NVDA 已關閉。請先開啟 NVDA，再喺點心管理器安裝附加組件。");
+                        NvdaAddon.InstallAsync(new Workspace().DataDirectory).GetAwaiter().GetResult();
                         break;
                     case "--complete-install" when args.Length == 1:
                         var installedWorkspace = new Workspace();

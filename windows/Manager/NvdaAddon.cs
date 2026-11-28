@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 
 namespace Dimsum;
 
+enum NvdaAddonOffer { None, Running, StartNvda }
+
 static class NvdaAddon
 {
     const string Name = "dimsumCandidates";
@@ -13,9 +15,27 @@ static class NvdaAddon
     public static Version BundledVersion => Bundled.Value.Version;
     static string Bundle => Path.Combine(AppContext.BaseDirectory, "assets", Name + ".nvda-addon");
 
-    public static void Install()
+    public static async Task<bool> InstallAsync(string data)
     {
+        var offer = GetOffer(data);
+        if (offer == NvdaAddonOffer.None) return false;
         string? running = NvdaSession.Find()?.Directory;
+        if (offer == NvdaAddonOffer.StartNvda && running is null)
+        {
+            string installation = NvdaDictionaries.FindInstallation()
+                ?? throw new IOException("搵唔到 NVDA。請先開啟 NVDA，再更新附加組件。");
+            Program.Open(Path.Combine(installation, "nvda.exe"));
+            for (int attempt = 0; attempt < 60; attempt++)
+            {
+                await Task.Delay(250);
+                running = NvdaSession.FindReady()?.Directory;
+                if (NvdaDictionaries.IsSameDirectory(running, installation)) break;
+                running = null;
+            }
+            if (running is null)
+                throw new IOException("未能確認 NVDA 已開啟。請開啟 NVDA，再喺點心管理器更新附加組件。");
+        }
+        if (GetOffer(data) != NvdaAddonOffer.Running) return false;
         if (running is not null)
         {
             string helper = Path.Combine(running, "nvda_slave.exe");
@@ -26,16 +46,23 @@ static class NvdaAddon
                 command.ArgumentList.Add("addons_installAddonPackage");
                 command.ArgumentList.Add(Bundle);
                 using var process = Process.Start(command) ?? throw new IOException("未能開啟 NVDA 附加元件安裝檔。");
-                return;
+                return true;
             }
         }
         Program.Open(Bundle);
+        return true;
     }
 
-    public static bool ShouldOffer(string data)
+    public static NvdaAddonOffer GetOffer(string data)
     {
         var running = NvdaSession.Find();
-        if (running is null) return false;
+        if (running is null)
+        {
+            if (NvdaDictionaries.FindInstallation() is null ||
+                NvdaDictionaries.InstalledConfigDirectory() is not { } installedProfile)
+                return NvdaAddonOffer.None;
+            return CheckProfile(installedProfile, running: false);
+        }
         string? profile = running.ReadProfile(data)?.ConfigDirectory;
         if (profile is null && running.Directory is { } directory)
         {
@@ -44,9 +71,22 @@ static class NvdaAddon
                 ? NvdaDictionaries.InstalledConfigDirectory()
                 : Path.Combine(directory, "userConfig");
         }
-        if (profile is null) return false;
+        return profile is null ? NvdaAddonOffer.None : CheckProfile(profile, running: true);
+    }
+
+    internal static NvdaAddonOffer CheckProfile(string profile, bool running)
+    {
         _ = BundledVersion;
-        return !AddonFolders(profile).Any(IsCurrentOrNewer);
+        bool installed = false;
+        foreach (string folder in AddonFolders(profile))
+        {
+            var version = ReadOwnedVersion(folder);
+            if (version is null) continue;
+            installed = true;
+            if (IsCurrentOrNewer(folder, version)) return NvdaAddonOffer.None;
+        }
+        if (running) return NvdaAddonOffer.Running;
+        return installed ? NvdaAddonOffer.StartNvda : NvdaAddonOffer.None;
     }
 
     static (Version Version, byte[] PluginHash) ReadBundle()
@@ -63,10 +103,9 @@ static class NvdaAddon
         return (version, SHA256.HashData(plugin));
     }
 
-    static bool IsCurrentOrNewer(string folder)
+    static bool IsCurrentOrNewer(string folder, Version installed)
     {
-        var installed = ReadOwnedVersion(folder);
-        if (installed is null || installed < BundledVersion) return false;
+        if (installed < BundledVersion) return false;
         if (installed > BundledVersion) return true;
 
         // A previous test installer used the same public version number.

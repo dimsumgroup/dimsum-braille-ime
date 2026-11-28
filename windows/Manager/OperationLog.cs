@@ -50,7 +50,7 @@ sealed class OperationLog(Workspace workspace)
             單按 Shift 切換中英文 {Enabled(settings.ShiftSwitch)}
             在 NVDA 開啟點心配詞解釋 {Enabled(settings.UseDimsumReviewDescription)}
             在 JAWS 開啟點心配詞解釋 {Enabled(settings.UseJawsSpeechLookup)}
-            在 Windows 朗讀程式開啟點心配詞解釋 {Enabled(settings.UseNarratorSpeechLookup)}
+            在 Windows 朗讀程式（Narrator）開啟點心配詞解釋 {Enabled(settings.UseNarratorSpeechLookup)}
             查配詞快捷鍵 {(settings.LookupGesture.Length == 0 ? "未設定" : settings.LookupGesture)}
             {workspace.Status()}
 

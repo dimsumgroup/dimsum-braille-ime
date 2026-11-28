@@ -4,12 +4,12 @@ namespace Dimsum;
 
 sealed class ManagerForm : Form
 {
-    const string AutomaticSpeechHint = "有多款讀屏開啟時，優先使用 NVDA，其次係 JAWS，再到 Windows 朗讀程式。關閉自動偵測就可以自行揀報讀方式。";
+    const string AutomaticSpeechHint = "有多款讀屏開啟時，優先使用 NVDA，其次係 JAWS，再到 Windows 朗讀程式（Narrator）。關閉自動偵測就可以自行揀報讀方式。";
     const string ReviewDescription = "用 NVDA 原有快捷鍵連按兩下，讀出檢閱游標所在字嘅點心配詞。關閉後會用返 NVDA 原有解釋。";
     const string LookupLabel = "查配詞快捷鍵（可留空）";
     const string LookupDescription = "非 NVDA 使用者可以設定呢個快捷鍵去聆聽配詞解釋報讀。先複製要查嘅讀屏報讀，再按點心快捷鍵。";
     const string JawsLookupDescription = "按 JAWS 鍵加空格，再按 H 開啟語音紀錄。複製要查嘅一句，再按點心查配詞快捷鍵。";
-    const string NarratorLookupDescription = "用支援呢個功能嘅 Windows 朗讀程式，按朗讀程式鍵加 Ctrl 加 X 複製最近一句，再按點心查配詞快捷鍵。";
+    const string NarratorLookupDescription = "按朗讀程式鍵加 Ctrl 加 X 複製最近一句，再按點心查配詞快捷鍵。";
     readonly Workspace workspace;
     readonly OperationLog log;
     readonly TabControl tabs = new() { Dock = DockStyle.Fill };
@@ -21,8 +21,8 @@ sealed class ManagerForm : Form
         (CandidateOutput.Off, "關閉"),
         (CandidateOutput.Nvda, "NVDA"),
         (CandidateOutput.Jaws, "JAWS"),
-        (CandidateOutput.Narrator, "Windows 內置讀屏（朗讀程式）"),
-        (CandidateOutput.WindowsVoice, "Windows 內置發音")
+        (CandidateOutput.Narrator, "Windows 朗讀程式（Narrator）"),
+        (CandidateOutput.WindowsVoice, "Windows 內置語音合成器")
     ];
     readonly CheckBox automaticSpeech = new() { AutoSize = true, Text = "自動偵測讀屏軟件" };
     readonly ComboBox speechOutput = new() { Width = 320, DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "候選報讀方式" };
@@ -80,7 +80,7 @@ sealed class ManagerForm : Form
         AddSetting(review, "在 JAWS 開啟點心配詞解釋", () => workspace.Settings.UseJawsSpeechLookup,
             value => workspace.Settings.UseJawsSpeechLookup = value, JawsLookupDescription,
             save: () => SaveExternalLookupAsync(workspace.Settings.UseJawsSpeechLookup && !workspace.Settings.UseNarratorSpeechLookup));
-        AddSetting(review, "在 Windows 朗讀程式開啟點心配詞解釋", () => workspace.Settings.UseNarratorSpeechLookup,
+        AddSetting(review, "在 Windows 朗讀程式（Narrator）開啟點心配詞解釋", () => workspace.Settings.UseNarratorSpeechLookup,
             value => workspace.Settings.UseNarratorSpeechLookup = value, NarratorLookupDescription,
             save: () => SaveExternalLookupAsync(workspace.Settings.UseNarratorSpeechLookup && !workspace.Settings.UseJawsSpeechLookup));
         Add(review, shortcut);
@@ -148,7 +148,7 @@ sealed class ManagerForm : Form
         nvdaMonitor.Tick += (_, _) =>
         {
             if (busy) return;
-            SetAddonButtons(CanOfferAddon());
+            SetAddonButtons(CheckAddonOffer() != NvdaAddonOffer.None);
             RefreshSpeechSettings();
         };
         FormClosed += (_, _) => nvdaMonitor.Dispose();
@@ -157,10 +157,16 @@ sealed class ManagerForm : Form
             var dataCheck = Workspace.CheckDataIndexAsync();
             using var updateTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             var programCheck = Workspace.NewReleaseAsync(updateTimeout.Token);
-            bool offer = CanOfferAddon();
-            SetAddonButtons(offer);
-            if (offer && !nvdaPromptAlreadyShown && Confirm($"偵測到 NVDA 正在執行。要安裝或更新點心 NVDA 附加組件至 {NvdaAddon.BundledVersion.ToString(3)} 嗎？"))
-                await RunOperationAsync(InstallAddonAsync);
+            var offer = CheckAddonOffer();
+            SetAddonButtons(offer != NvdaAddonOffer.None);
+            if (offer != NvdaAddonOffer.None && !nvdaPromptAlreadyShown)
+            {
+                string version = NvdaAddon.BundledVersion.ToString(3);
+                string message = offer == NvdaAddonOffer.StartNvda
+                    ? $"要開啟 NVDA 並更新點心 NVDA 附加組件至 {version} 嗎？"
+                    : $"偵測到 NVDA 正在執行。要安裝或更新點心 NVDA 附加組件至 {version} 嗎？";
+                if (Confirm(message)) await RunOperationAsync(InstallAddonAsync);
+            }
             if (IsDisposed || Disposing) return;
             nvdaMonitor.Start();
             try { await RefreshDefaultAsync(); }
@@ -234,7 +240,7 @@ sealed class ManagerForm : Form
                 CandidateOutput.Nvda when !readers.Nvda => "請開啟 NVDA 並安裝點心 NVDA 附加組件。",
                 CandidateOutput.Nvda => "由點心 NVDA 附加組件報讀候選。",
                 CandidateOutput.Jaws when !readers.Jaws => "未偵測到 JAWS。已手動選用 JAWS，請確認 JAWS 已開啟。",
-                CandidateOutput.Jaws => "由 JAWS 報讀候選。如果未能聽到候選，可以改用 Windows 內置發音。",
+                CandidateOutput.Jaws => "由 JAWS 報讀候選。如果未能聽到候選，可以改用 Windows 內置語音合成器。",
                 CandidateOutput.Narrator when !readers.CanNotifyNarrator => "請先關閉 NVDA 同 JAWS，先可以由 Windows 朗讀程式報讀候選。",
                 CandidateOutput.Narrator when !readers.Narrator => "未偵測到 Windows 朗讀程式。已手動選用，請確認朗讀程式已開啟。",
                 CandidateOutput.Narrator => "由 Windows 朗讀程式報讀候選。",
@@ -471,23 +477,20 @@ sealed class ManagerForm : Form
             : $"有 Windows 新版 {release.Version.ToString(3)}。";
     }
 
-    bool CanOfferAddon()
+    NvdaAddonOffer CheckAddonOffer()
     {
-        try { return NvdaAddon.ShouldOffer(workspace.DataDirectory); }
-        catch (Exception error) when (error is IOException or UnauthorizedAccessException) { return false; }
+        try { return NvdaAddon.GetOffer(workspace.DataDirectory); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException) { return NvdaAddonOffer.None; }
     }
 
     void SetAddonButtons(bool available) => inputAddon.Visible = reviewAddon.Visible = available;
 
-    Task<string> InstallAddonAsync()
+    async Task<string> InstallAddonAsync()
     {
-        if (!CanOfferAddon())
-        {
-            SetAddonButtons(false);
-            return Task.FromResult("");
-        }
-        NvdaAddon.Install();
-        return Task.FromResult("已開啟 NVDA 附加組件安裝檔。");
+        if (await NvdaAddon.InstallAsync(workspace.DataDirectory))
+            return "已開啟 NVDA 附加組件安裝檔。";
+        SetAddonButtons(false);
+        return "";
     }
 
     bool HasRimeUpdate => dataUpdates.Dictionary is DataUpdate.Available or DataUpdate.Downloaded;
